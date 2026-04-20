@@ -291,7 +291,7 @@ export function normalizeProject(raw) {
       ? raw.layers.map((layer, index) => createDefaultLayer({ ...layer, id: layer.id || nextId('layer'), name: layer.name || `Layer ${index + 1}` }))
       : base.layers,
     texts: Array.isArray(raw?.texts) && raw.texts.length
-      ? raw.texts.map((text, index) => createDefaultText({ ...text, id: text.id || nextId('text'), content: text.content || `TEXT ${index + 1}` }))
+      ? raw.texts.map((text, index) => createDefaultText({ ...text, id: text.id || nextId('text'), content: text.content || '' }))
       : base.texts,
     svgLayers: Array.isArray(raw?.svgLayers)
       ? raw.svgLayers.map((svg) => createDefaultSvgLayer({ ...svg, id: svg.id || nextId('svg'), _rasterDirty: true }))
