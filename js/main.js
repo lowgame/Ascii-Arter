@@ -290,9 +290,14 @@ function bindButtons() {
       const type = btn.dataset.type;
       if (!project.subject) project.subject = {};
       project.subject.type = type;
-      // Update active tab styling
-      document.querySelectorAll('.subject-tab').forEach((b) => b.classList.toggle('active', b === btn));
-      // Show/hide sections
+      // Sync all subject-tab active states
+      document.querySelectorAll('.subject-tab').forEach((b) => b.classList.toggle('active', b.dataset.type === type));
+      // Highlight the active textarea
+      const textTA = document.getElementById('subjectTextInput');
+      const svgTA = document.getElementById('subjectSvgInput');
+      if (textTA) textTA.classList.toggle('active-subject', type === 'text');
+      if (svgTA) svgTA.classList.toggle('active-subject', type === 'svg');
+      // Legacy hidden sections (if they still exist)
       const textArea = document.getElementById('subjectTextArea');
       const svgArea = document.getElementById('subjectSvgArea');
       const opts = document.getElementById('subjectOptions');
@@ -303,6 +308,21 @@ function bindButtons() {
       needsRedraw = true;
     });
   });
+
+  // Clear button
+  const subjectClearBtn = document.getElementById('subjectClearBtn');
+  if (subjectClearBtn) {
+    subjectClearBtn.addEventListener('click', () => {
+      const textTA = document.getElementById('subjectTextInput');
+      const svgTA = document.getElementById('subjectSvgInput');
+      if (textTA) { textTA.value = ''; textTA.classList.remove('active-subject'); }
+      if (svgTA) { svgTA.value = ''; svgTA.classList.remove('active-subject'); }
+      if (project.subject) { project.subject.type = 'none'; project.subject.text = ''; project.subject.svgContent = ''; }
+      document.querySelectorAll('.subject-tab').forEach((b) => b.classList.toggle('active', b.dataset.type === 'none'));
+      subjectDirty = true;
+      needsRedraw = true;
+    });
+  }
 
   const subjectTextInput = document.getElementById('subjectTextInput');
   if (subjectTextInput) {
