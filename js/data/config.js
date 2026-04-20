@@ -206,7 +206,7 @@ export function createDefaultLayer(overrides = {}) {
 export function createDefaultText(overrides = {}) {
   return {
     id: nextId('text'),
-    content: 'ASCII ARTER',
+    content: '',
     enabled: true,
     animation: 'pulse',
     x: 8,

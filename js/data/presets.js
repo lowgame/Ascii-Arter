@@ -20,7 +20,7 @@ export const BUILTIN_PRESETS = [
         createDefaultLayer({ name: 'Matrix Rain', mode: 'matrix-rain', palette: 'matrix', blend: 'screen', intensity: 1.1, scale: 1 }),
         createDefaultLayer({ name: 'Circuit Bloom', mode: 'circuit-bloom', palette: 'radar', blend: 'add', intensity: 0.55, scale: 1.4, speed: 0.7, warp: 1.4 })
       ],
-      texts: [createDefaultText({ content: 'ASCII ARTER', animation: 'pulse', x: 10, y: 4, color: '#d7ffe9' })]
+      texts: [createDefaultText({ content: '', animation: 'pulse', x: 10, y: 4, color: '#d7ffe9' })]
     })
   },
   {
@@ -38,7 +38,7 @@ export const BUILTIN_PRESETS = [
         createDefaultLayer({ name: 'Tunnel', mode: 'neon-tunnel', palette: 'synthwave', blend: 'screen', intensity: 1.1 }),
         createDefaultLayer({ name: 'Pulse', mode: 'pulse-vortex', palette: 'candy', blend: 'add', intensity: 0.58, speed: 0.8, scale: 1.35 })
       ],
-      texts: [createDefaultText({ content: 'RETRO WAVE', animation: 'marquee', x: 8, y: 6, color: '#fff2cc', outline: true })]
+      texts: [createDefaultText({ content: '', animation: 'marquee', x: 8, y: 6, color: '#fff2cc', outline: true })]
     })
   },
   {
@@ -55,7 +55,7 @@ export const BUILTIN_PRESETS = [
         createDefaultLayer({ name: 'Aurora', mode: 'aurora-noise', palette: 'aurora', blend: 'screen', intensity: 1.05, scale: 1.1 }),
         createDefaultLayer({ name: 'Tidal', mode: 'tidepool', palette: 'ocean', blend: 'max', intensity: 0.65, speed: 0.75, scale: 1.5 })
       ],
-      texts: [createDefaultText({ content: 'NORTHERN SIGNAL', animation: 'wave', x: 6, y: 5, color: '#caf0f8' })]
+      texts: [createDefaultText({ content: '', animation: 'wave', x: 6, y: 5, color: '#caf0f8' })]
     })
   },
   {
@@ -71,7 +71,7 @@ export const BUILTIN_PRESETS = [
         createDefaultLayer({ name: 'Crystals', mode: 'frost-crystal', palette: 'ice', blend: 'screen', intensity: 1, scale: 1.25 }),
         createDefaultLayer({ name: 'Lattice', mode: 'moire-lattice', palette: 'mono', blend: 'difference', intensity: 0.5, speed: 0.55, scale: 1.8 })
       ],
-      texts: [createDefaultText({ content: 'POLAR GRID', animation: 'drift', x: 12, y: 7, color: '#f1fdff' })]
+      texts: [createDefaultText({ content: '', animation: 'drift', x: 12, y: 7, color: '#f1fdff' })]
     })
   },
   {
@@ -88,7 +88,7 @@ export const BUILTIN_PRESETS = [
         createDefaultLayer({ name: 'Fire Column', mode: 'fire-column', palette: 'fire', blend: 'screen', intensity: 1.2, scale: 0.95 }),
         createDefaultLayer({ name: 'Sunflare', mode: 'sunflare', palette: 'gold', blend: 'add', intensity: 0.65, speed: 0.7, scale: 1.6 })
       ],
-      texts: [createDefaultText({ content: 'SOLAR BREACH', animation: 'pulse', x: 7, y: 4, color: '#fff4cc' })]
+      texts: [createDefaultText({ content: '', animation: 'pulse', x: 7, y: 4, color: '#fff4cc' })]
     })
   },
   {
@@ -104,7 +104,7 @@ export const BUILTIN_PRESETS = [
         createDefaultLayer({ name: 'Sweep', mode: 'radar-sweep', palette: 'radar', blend: 'screen', intensity: 0.95, scale: 1 }),
         createDefaultLayer({ name: 'Bloom', mode: 'sonar-bloom', palette: 'matrix', blend: 'add', intensity: 0.52, speed: 0.82, scale: 1.45 })
       ],
-      texts: [createDefaultText({ content: 'SCAN // LOCK', animation: 'orbit', x: 22, y: 11, color: '#f2fff2', outline: false })]
+      texts: [createDefaultText({ content: '', animation: 'orbit', x: 22, y: 11, color: '#f2fff2', outline: false })]
     })
   },
   {
@@ -121,7 +121,7 @@ export const BUILTIN_PRESETS = [
         createDefaultLayer({ name: 'Bytefall', mode: 'bytefall', palette: 'cyber', blend: 'screen', intensity: 1.1 }),
         createDefaultLayer({ name: 'Static', mode: 'signal-loss', palette: 'mono', blend: 'difference', intensity: 0.5, speed: 1.6, scale: 1.8 })
       ],
-      texts: [createDefaultText({ content: '01000001 01010010 01010100', animation: 'marquee', x: 4, y: 3, color: '#f5f5f5', outline: false })]
+      texts: [createDefaultText({ content: '', animation: 'marquee', x: 4, y: 3, color: '#f5f5f5', outline: false })]
     })
   },
   {
@@ -138,7 +138,7 @@ export const BUILTIN_PRESETS = [
         createDefaultLayer({ name: 'Caustic', mode: 'caustic-net', palette: 'gold', blend: 'screen', intensity: 1.05, scale: 1.1 }),
         createDefaultLayer({ name: 'Bloom', mode: 'fractal-bloom', palette: 'sunset', blend: 'add', intensity: 0.45, speed: 0.62, scale: 1.7 })
       ],
-      texts: [createDefaultText({ content: 'MOLTEN ASCII', animation: 'bounce', x: 14, y: 8, color: '#fff4cc' })]
+      texts: [createDefaultText({ content: '', animation: 'bounce', x: 14, y: 8, color: '#fff4cc' })]
     })
   },
   {
@@ -154,7 +154,7 @@ export const BUILTIN_PRESETS = [
         createDefaultLayer({ name: 'Kaleido', mode: 'kaleido', palette: 'candy', blend: 'screen', intensity: 1.1, scale: 1 }),
         createDefaultLayer({ name: 'Orbit', mode: 'orbital-weave', palette: 'synthwave', blend: 'add', intensity: 0.42, speed: 0.86, scale: 1.42 })
       ],
-      texts: [createDefaultText({ content: 'PIXEL POP', animation: 'wave', x: 20, y: 9, color: '#fff0f6', rainbow: true })]
+      texts: [createDefaultText({ content: '', animation: 'wave', x: 20, y: 9, color: '#fff0f6', rainbow: true })]
     })
   },
   {
@@ -170,7 +170,7 @@ export const BUILTIN_PRESETS = [
         createDefaultLayer({ name: 'Moon Tide', mode: 'moon-tide', palette: 'ocean', blend: 'screen', intensity: 0.96, scale: 1.1 }),
         createDefaultLayer({ name: 'Ripple Pond', mode: 'ripple-pond', palette: 'aurora', blend: 'add', intensity: 0.6, speed: 0.92, scale: 1.55 })
       ],
-      texts: [createDefaultText({ content: 'TIDAL FRAME', animation: 'drift', x: 18, y: 5, color: '#dff6ff' })]
+      texts: [createDefaultText({ content: '', animation: 'drift', x: 18, y: 5, color: '#dff6ff' })]
     })
   },
   {
@@ -187,7 +187,7 @@ export const BUILTIN_PRESETS = [
         createDefaultLayer({ name: 'Monolith', mode: 'monolith', palette: 'mono', blend: 'screen', intensity: 1.1, scale: 1.25 }),
         createDefaultLayer({ name: 'Vector', mode: 'vector-scan', palette: 'mono', blend: 'difference', intensity: 0.35, speed: 0.7, scale: 1.8 })
       ],
-      texts: [createDefaultText({ content: 'BRUTAL SIGNAL', animation: 'static', x: 14, y: 5, color: '#ffffff', outline: false })]
+      texts: [createDefaultText({ content: '', animation: 'static', x: 14, y: 5, color: '#ffffff', outline: false })]
     })
   }
 ];

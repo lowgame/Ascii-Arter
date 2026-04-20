@@ -207,7 +207,7 @@ function bindButtons() {
   dom.moveLayerDownBtn.addEventListener('click', () => moveLayer(1));
 
   dom.addTextBtn.addEventListener('click', () => {
-    const text = createDefaultText({ content: `TEXT ${project.texts.length + 1}`, x: 6, y: 8 + project.texts.length * 2 });
+    const text = createDefaultText({ content: '', x: 6, y: 8 + project.texts.length * 2 });
     project.texts.push(text);
     selectedTextId = text.id;
     renderLists();
@@ -233,7 +233,7 @@ function bindButtons() {
     const active = getSelectedText();
     if (!active) return;
     const { id: _ignoredId, ...rest } = cloneProject(active);
-    const duplicate = createDefaultText({ ...rest, content: `${active.content} COPY`, x: active.x + 2, y: active.y + 2 });
+    const duplicate = createDefaultText({ ...rest, content: active.content, x: active.x + 2, y: active.y + 2 });
     project.texts.push(duplicate);
     selectedTextId = duplicate.id;
     renderLists();
@@ -1148,7 +1148,7 @@ function randomizeProject() {
   const layerCount = 2 + Math.floor(Math.random() * 3);
   const textCount = 1 + Math.floor(Math.random() * 2);
 
-  project.projectName = 'Ascii Arter Remix';
+  project.projectName = project.projectName || 'Ascii Arter';
   project.palette = pick(palettes);
   project.charSet = pick(charSets);
   project.background = rgbToHex({ r: Math.floor(Math.random() * 22), g: Math.floor(Math.random() * 22), b: Math.floor(Math.random() * 38) });
@@ -1190,7 +1190,7 @@ function randomizeProject() {
   }));
 
   project.texts = Array.from({ length: textCount }, (_, index) => createDefaultText({
-    content: index === 0 ? 'ASCII ARTER' : pick(['PURE JS', '60 MODES', 'GITHUB PAGES', 'LAYERED TEXT']),  // decorative text only
+    content: '',  // never overwrite user content
     animation: pick(TEXT_ANIMATIONS).value,
     x: Math.floor(randomBetween(4, project.cols * 0.45)),
     y: Math.floor(randomBetween(2, project.rows * 0.5)),
