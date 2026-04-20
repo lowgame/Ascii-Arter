@@ -128,11 +128,59 @@ export const TEXT_CONTROL_SCHEMA = [
   { key: 'bg', label: 'Text Background', type: 'text', placeholder: 'transparent or #000000' },
   { key: 'repeat', label: 'Repeat', type: 'checkbox' },
   { key: 'rainbow', label: 'Rainbow', type: 'checkbox' },
-  { key: 'outline', label: 'Outline', type: 'checkbox' }
+  { key: 'outline', label: 'Outline', type: 'checkbox' },
+  { key: 'glow', label: 'Text Glow', type: 'range', min: 0, max: 20, step: 0.5 },
+  { key: 'outlineColor', label: 'Outline Color', type: 'color' },
+  { key: 'bgOpacity', label: 'BG Opacity', type: 'range', min: 0, max: 1, step: 0.01 },
+  { key: 'bgPadding', label: 'BG Padding', type: 'range', min: 0, max: 6, step: 1 },
+  { key: 'scale', label: 'Scale', type: 'range', min: 0.5, max: 4, step: 0.1 }
+];
+
+export const SVG_CONTROL_SCHEMA = [
+  { key: 'svgContent', label: 'SVG Code', type: 'textarea', placeholder: '<svg>...</svg>' },
+  { key: 'enabled', label: 'Enabled', type: 'checkbox' },
+  { key: 'fgPalette', label: 'Shape Palette', type: 'select', options: ['inherit', ...Object.keys(PALETTES)] },
+  { key: 'fgColor', label: 'Shape Color', type: 'color' },
+  { key: 'fgIntensity', label: 'Shape Intensity', type: 'range', min: 0, max: 2, step: 0.01 },
+  { key: 'fgGlow', label: 'Shape Glow', type: 'range', min: 0, max: 20, step: 0.5 },
+  { key: 'fgCharSet', label: 'Shape Charset', type: 'select', options: ['inherit', ...Object.keys(CHARSETS)] },
+  { key: 'bgPalette', label: 'Background Palette', type: 'select', options: ['inherit', ...Object.keys(PALETTES)] },
+  { key: 'bgColor', label: 'Background Color', type: 'color' },
+  { key: 'bgIntensity', label: 'BG Intensity', type: 'range', min: 0, max: 2, step: 0.01 },
+  { key: 'svgScale', label: 'SVG Scale', type: 'range', min: 0.25, max: 4, step: 0.01 },
+  { key: 'svgX', label: 'SVG Offset X', type: 'range', min: -1, max: 1, step: 0.01 },
+  { key: 'svgY', label: 'SVG Offset Y', type: 'range', min: -1, max: 1, step: 0.01 },
+  { key: 'invert', label: 'Invert Shape', type: 'checkbox' },
+  { key: 'blend', label: 'Blend Mode', type: 'select', options: ['add', 'screen', 'max', 'difference', 'multiply', 'overlay'] },
 ];
 
 let idCounter = 1;
 const nextId = (prefix) => `${prefix}-${idCounter++}`;
+
+export function createDefaultSvgLayer(overrides = {}) {
+  return {
+    id: nextId('svg'),
+    type: 'svg',
+    svgContent: '',
+    enabled: true,
+    fgPalette: 'inherit',
+    fgColor: '#ffffff',
+    fgIntensity: 1,
+    fgGlow: 0,
+    fgCharSet: 'inherit',
+    bgPalette: 'inherit',
+    bgColor: '#000000',
+    bgIntensity: 0,
+    svgScale: 1,
+    svgX: 0,
+    svgY: 0,
+    invert: false,
+    blend: 'screen',
+    _rasterCache: null,
+    _rasterDirty: true,
+    ...overrides,
+  };
+}
 
 export function createDefaultLayer(overrides = {}) {
   return {
@@ -172,6 +220,11 @@ export function createDefaultText(overrides = {}) {
     repeat: false,
     rainbow: false,
     outline: true,
+    glow: 0,
+    outlineColor: '#000000',
+    bgOpacity: 1,
+    bgPadding: 0,
+    scale: 1,
     ...overrides
   };
 }
@@ -209,7 +262,8 @@ export function createDefaultProject() {
     mirrorX: false,
     mirrorY: false,
     layers: [createDefaultLayer()],
-    texts: [createDefaultText()]
+    texts: [createDefaultText()],
+    svgLayers: []
   };
 }
 
@@ -227,7 +281,10 @@ export function normalizeProject(raw) {
       : base.layers,
     texts: Array.isArray(raw?.texts) && raw.texts.length
       ? raw.texts.map((text, index) => createDefaultText({ ...text, id: text.id || nextId('text'), content: text.content || `TEXT ${index + 1}` }))
-      : base.texts
+      : base.texts,
+    svgLayers: Array.isArray(raw?.svgLayers)
+      ? raw.svgLayers.map((svg) => createDefaultSvgLayer({ ...svg, id: svg.id || nextId('svg'), _rasterDirty: true }))
+      : []
   };
   return project;
 }

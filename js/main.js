@@ -6,10 +6,12 @@ import {
   PALETTES,
   TEXT_ANIMATIONS,
   TEXT_CONTROL_SCHEMA,
+  SVG_CONTROL_SCHEMA,
   cloneProject,
   createDefaultLayer,
   createDefaultProject,
   createDefaultText,
+  createDefaultSvgLayer,
   normalizeProject
 } from './data/config.js';
 import { ANIMATION_MODES, MODE_BY_ID, sampleMode } from './data/animations.js';
@@ -23,6 +25,7 @@ let renderer;
 let buffer;
 let selectedLayerId = project.layers[0].id;
 let selectedTextId = project.texts[0].id;
+let selectedSvgLayerId = null;
 let frameValues = new Float32Array(project.cols * project.rows);
 let isPlaying = true;
 let timeline = 0;
@@ -69,7 +72,9 @@ function bindDom() {
     'importProjectInput', 'copyFrameBtn', 'exportTxtBtn', 'exportPngBtn', 'exportHtmlBtn',
     'refreshFrameBtn', 'layersList', 'textsList', 'layerInspector', 'textInspector',
     'addLayerBtn', 'removeLayerBtn', 'duplicateLayerBtn', 'moveLayerUpBtn', 'moveLayerDownBtn',
-    'addTextBtn', 'removeTextBtn', 'duplicateTextBtn'
+    'addTextBtn', 'removeTextBtn', 'duplicateTextBtn',
+    'svgLayersList', 'svgLayerInspector', 'addSvgLayerBtn', 'removeSvgLayerBtn',
+    'svgUploadInput', 'presetsGalleryBtn', 'presetsModal', 'presetsModalClose', 'presetsGrid'
   ];
 
   ids.forEach((id) => {
@@ -233,6 +238,48 @@ function bindButtons() {
     setStatus('Duplicated text layer');
     needsRedraw = true;
   });
+
+  // Preset Gallery
+  dom.presetsGalleryBtn.addEventListener('click', () => openPresetsModal());
+  dom.presetsModalClose.addEventListener('click', () => closePresetsModal());
+  dom.presetsModal.addEventListener('click', (e) => { if (e.target === dom.presetsModal) closePresetsModal(); });
+
+  // SVG Layers
+  dom.addSvgLayerBtn.addEventListener('click', () => {
+    const layer = createDefaultSvgLayer();
+    project.svgLayers.push(layer);
+    selectedSvgLayerId = layer.id;
+    renderSvgList();
+    renderSvgInspector();
+    setStatus('Added SVG layer');
+    needsRedraw = true;
+  });
+
+  dom.removeSvgLayerBtn.addEventListener('click', () => {
+    if (!project.svgLayers.length) return;
+    project.svgLayers = project.svgLayers.filter((l) => l.id !== selectedSvgLayerId);
+    selectedSvgLayerId = project.svgLayers[0]?.id || null;
+    svgRasterCache.clear();
+    renderSvgList();
+    renderSvgInspector();
+    setStatus('Removed SVG layer');
+    needsRedraw = true;
+  });
+
+  dom.svgUploadInput.addEventListener('change', async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const text = await file.text();
+    const layer = getSelectedSvgLayer();
+    if (layer) {
+      layer.svgContent = text;
+      layer._rasterDirty = true;
+      rasterizeSvg(layer);
+      renderSvgInspector();
+      needsRedraw = true;
+    }
+    e.target.value = '';
+  });
 }
 
 function buildGlobalControls() {
@@ -371,11 +418,13 @@ function renderLists() {
   });
 
   updateStats();
+  renderSvgList();
 }
 
 function renderInspectors() {
   renderLayerInspector();
   renderTextInspector();
+  renderSvgInspector();
 }
 
 function renderLayerInspector() {
@@ -399,6 +448,12 @@ function renderTextInspector() {
   if (!text) return;
 
   TEXT_CONTROL_SCHEMA.forEach((control) => {
+    if (control.key === 'glow') {
+      const divider = document.createElement('div');
+      divider.className = 'inspector-section-title';
+      divider.textContent = 'Text Effects';
+      dom.textInspector.appendChild(divider);
+    }
     const field = createField(control, text[control.key], (value) => {
       text[control.key] = value;
       renderLists();
@@ -406,6 +461,174 @@ function renderTextInspector() {
     });
     dom.textInspector.appendChild(field.wrapper);
   });
+}
+
+// ── SVG LAYERS ──
+const svgRasterCache = new Map();
+
+function rasterizeSvg(svgLayer) {
+  if (!svgLayer.svgContent || !svgLayer._rasterDirty) return;
+  const blob = new Blob([svgLayer.svgContent], { type: 'image/svg+xml' });
+  const url = URL.createObjectURL(blob);
+  const img = new Image();
+  img.onload = () => {
+    URL.revokeObjectURL(url);
+    const offscreen = document.createElement('canvas');
+    offscreen.width = project.cols;
+    offscreen.height = project.rows;
+    const ctx = offscreen.getContext('2d');
+    const scale = svgLayer.svgScale || 1;
+    const ox = (svgLayer.svgX || 0) * project.cols;
+    const oy = (svgLayer.svgY || 0) * project.rows;
+    ctx.drawImage(img, ox, oy, project.cols * scale, project.rows * scale);
+    svgRasterCache.set(svgLayer.id, ctx.getImageData(0, 0, project.cols, project.rows));
+    svgLayer._rasterDirty = false;
+    needsRedraw = true;
+  };
+  img.onerror = () => URL.revokeObjectURL(url);
+  img.src = url;
+}
+
+function applySvgLayers() {
+  if (!project.svgLayers || !project.svgLayers.length) return;
+  project.svgLayers.filter((l) => l.enabled).forEach((svgLayer) => {
+    if (svgLayer._rasterDirty && svgLayer.svgContent) rasterizeSvg(svgLayer);
+    const imageData = svgRasterCache.get(svgLayer.id);
+    if (!imageData) return;
+    const data = imageData.data;
+    for (let y = 0; y < project.rows; y++) {
+      for (let x = 0; x < project.cols; x++) {
+        const idx = (y * project.cols + x) * 4;
+        const r = data[idx], g = data[idx + 1], b = data[idx + 2], a = data[idx + 3];
+        const brightness = (r * 0.299 + g * 0.587 + b * 0.114) / 255 * (a / 255);
+        const inShape = svgLayer.invert ? brightness <= 0.3 : brightness > 0.3;
+        if (inShape && svgLayer.fgIntensity > 0) {
+          const palName = svgLayer.fgPalette !== 'inherit' ? svgLayer.fgPalette : project.palette;
+          const fg = samplePalette(palName, brightness, project.saturation, project.hueShift);
+          const charset = svgLayer.fgCharSet !== 'inherit' ? (CHARSETS[svgLayer.fgCharSet] || getActiveCharset()) : getActiveCharset();
+          const charLen = Math.max(1, charset.length - 1);
+          const charIdx = clamp(Math.floor(brightness * charLen), 0, charLen);
+          const ch = brightness < 0.12 ? ' ' : (charset[charIdx] || charset[charset.length - 1]);
+          buffer.setCell(x, y, ch, fg, 'transparent');
+        } else if (!inShape && svgLayer.bgIntensity > 0) {
+          const palName = svgLayer.bgPalette !== 'inherit' ? svgLayer.bgPalette : project.palette;
+          const fg = samplePalette(palName, brightness, project.saturation, project.hueShift);
+          const cell = buffer.getCell(x, y);
+          const blended = blendSample(cell ? 0.5 : 0, svgLayer.bgIntensity * 0.5, svgLayer.blend);
+          if (blended > 0.05) buffer.setCell(x, y, cell?.char || ' ', fg, 'transparent');
+        }
+      }
+    }
+  });
+}
+
+function renderSvgList() {
+  if (!dom.svgLayersList) return;
+  dom.svgLayersList.innerHTML = '';
+  (project.svgLayers || []).forEach((layer) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'layerItem' + (layer.id === selectedSvgLayerId ? ' active' : '');
+    const label = layer.svgContent ? 'SVG (has content)' : 'SVG (empty)';
+    btn.innerHTML = `<div><strong>${label}</strong></div><small>${layer.enabled ? 'ON' : 'OFF'}</small>`;
+    btn.addEventListener('click', () => {
+      selectedSvgLayerId = layer.id;
+      renderSvgList();
+      renderSvgInspector();
+    });
+    dom.svgLayersList.appendChild(btn);
+  });
+}
+
+function renderSvgInspector() {
+  if (!dom.svgLayerInspector) return;
+  dom.svgLayerInspector.innerHTML = '';
+  const layer = getSelectedSvgLayer();
+  if (!layer) return;
+  SVG_CONTROL_SCHEMA.forEach((control) => {
+    const field = createField(control, layer[control.key], (value) => {
+      layer[control.key] = value;
+      if (control.key === 'svgContent' || control.key === 'svgScale' || control.key === 'svgX' || control.key === 'svgY') {
+        layer._rasterDirty = true;
+        rasterizeSvg(layer);
+      }
+      renderSvgList();
+      needsRedraw = true;
+    });
+    dom.svgLayerInspector.appendChild(field.wrapper);
+  });
+}
+
+function getSelectedSvgLayer() {
+  return (project.svgLayers || []).find((l) => l.id === selectedSvgLayerId) || (project.svgLayers || [])[0] || null;
+}
+
+// ── PRESET GALLERY ──
+const PRESET_META = {
+  'matrix-cathedral': { palette: 'matrix', tags: 'Rain • Matrix • Circuit' },
+  'synthwave-core':   { palette: 'synthwave', tags: 'Neon • Tunnel • Retro' },
+  'aurora-terminal':  { palette: 'aurora', tags: 'Aurora • Noise • Tidal' },
+  'frost-grid':       { palette: 'ice', tags: 'Crystal • Geometric • Cold' },
+  'solar-breach':     { palette: 'fire', tags: 'Fire • Solar • Intense' },
+  'radar-dream':      { palette: 'radar', tags: 'Radar • Sweep • Tactical' },
+  'byte-storm':       { palette: 'cyber', tags: 'Binary • Glitch • Data' },
+  'liquid-gold':      { palette: 'gold', tags: 'Caustic • Gold • Flow' },
+  'dream-candy':      { palette: 'candy', tags: 'Kaleido • Rainbow • Pop' },
+  'deep-ocean':       { palette: 'ocean', tags: 'Tide • Deep • Fluid' },
+  'terminal-monolith':{ palette: 'mono', tags: 'Brutal • Mono • Classic' },
+};
+
+function buildPresetsGrid() {
+  dom.presetsGrid.innerHTML = '';
+  BUILTIN_PRESETS.forEach((preset) => {
+    const meta = PRESET_META[preset.id] || { palette: 'matrix', tags: '' };
+    const colors = (PALETTES[meta.palette] || []).slice(0, 4);
+    const card = document.createElement('div');
+    card.className = 'preset-card';
+    const swatchHtml = colors.map((c) => `<span class="preset-swatch" style="background:${c}"></span>`).join('');
+    card.innerHTML = `
+      <div class="preset-card-body">
+        <div class="preset-card-name">${preset.name}</div>
+        <div class="preset-card-tags">${meta.tags}</div>
+      </div>
+      <div class="preset-card-swatches">${swatchHtml}</div>
+    `;
+    card.addEventListener('click', () => {
+      dom.presetSelect.value = `builtin:${preset.id}`;
+      dom.presetSelect.dispatchEvent(new Event('change'));
+      closePresetsModal();
+    });
+    dom.presetsGrid.appendChild(card);
+  });
+
+  // Also add saved presets
+  const savedPresets = getSavedPresets();
+  savedPresets.forEach((preset) => {
+    const card = document.createElement('div');
+    card.className = 'preset-card preset-card-saved';
+    card.innerHTML = `
+      <div class="preset-card-body">
+        <div class="preset-card-name">${preset.name}</div>
+        <div class="preset-card-tags">Saved Preset</div>
+      </div>
+      <div class="preset-card-swatches"></div>
+    `;
+    card.addEventListener('click', () => {
+      dom.presetSelect.value = `saved:${preset.id}`;
+      dom.presetSelect.dispatchEvent(new Event('change'));
+      closePresetsModal();
+    });
+    dom.presetsGrid.appendChild(card);
+  });
+}
+
+function openPresetsModal() {
+  buildPresetsGrid();
+  dom.presetsModal.hidden = false;
+}
+
+function closePresetsModal() {
+  dom.presetsModal.hidden = true;
 }
 
 function loop(now) {
@@ -489,6 +712,7 @@ function renderFrame(time) {
   }
 
   applyTextLayers(time);
+  applySvgLayers();
 }
 
 function applyTextLayers(time) {
@@ -576,6 +800,8 @@ function applyProject(nextProject, { keepPresetSelection = false, status = 'Proj
   project = normalizeProject(nextProject);
   selectedLayerId = project.layers.find((layer) => layer.id === selectedLayerId)?.id || project.layers[0]?.id;
   selectedTextId = project.texts.find((text) => text.id === selectedTextId)?.id || project.texts[0]?.id;
+  selectedSvgLayerId = (project.svgLayers || []).find((l) => l.id === selectedSvgLayerId)?.id || (project.svgLayers || [])[0]?.id || null;
+  svgRasterCache.clear();
   resizeScene();
   renderLists();
   renderInspectors();

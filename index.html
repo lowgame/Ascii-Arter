@@ -22,7 +22,8 @@
         <button id="shuffleCharsetBtn" class="btn">🔀 Charset</button>
       </div>
       <div class="topbar-right">
-        <select id="presetSelect" class="select-compact"></select>
+        <select id="presetSelect" class="select-compact" hidden></select>
+        <button id="presetsGalleryBtn" class="btn">🎨 Presets</button>
         <button id="savePresetBtn" class="btn btn-ghost">💾 Save</button>
         <div class="export-group">
           <button class="btn btn-ghost" id="exportMenuBtn">⬇ Export ▾</button>
@@ -99,6 +100,23 @@
             <div id="textInspector" class="inspector"></div>
           </details>
 
+          <!-- SVG Layers -->
+          <details id="svgLayersSection">
+            <summary>
+              <span>SVG Layers</span>
+              <span class="summary-actions" onclick="event.stopPropagation()">
+                <button id="removeSvgLayerBtn" class="icon-btn danger" title="Remove">−</button>
+                <button id="addSvgLayerBtn" class="icon-btn primary" title="Add SVG Layer">＋</button>
+              </span>
+            </summary>
+            <div id="svgLayersList" class="list-stack"></div>
+            <label class="upload-svg-label">
+              <input id="svgUploadInput" type="file" accept=".svg,image/svg+xml" hidden />
+              <button class="btn btn-ghost btn-sm" onclick="document.getElementById('svgUploadInput').click()">📁 Upload SVG</button>
+            </label>
+            <div id="svgLayerInspector" class="inspector"></div>
+          </details>
+
           <!-- ASCII Snapshot (rarely used) -->
           <details>
             <summary>ASCII Snapshot</summary>
@@ -115,6 +133,17 @@
       </button>
 
     </div><!-- /stage-area -->
+
+    <!-- ── PRESETS MODAL ── -->
+    <div id="presetsModal" class="presets-modal-overlay" hidden>
+      <div class="presets-modal">
+        <div class="presets-modal-header">
+          <span class="presets-modal-title">🎨 Choose a Preset</span>
+          <button id="presetsModalClose" class="panel-close" title="Close">✕</button>
+        </div>
+        <div id="presetsGrid" class="presets-grid"></div>
+      </div>
+    </div>
 
     <!-- ── BOTTOM STATS BAR ── -->
     <footer class="stats-bar">

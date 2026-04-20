@@ -489,3 +489,140 @@ details > *:not(summary) {
   :root { --panel-w: 260px; }
   .topbar-center .btn span { display: none; }
 }
+
+/* ── PRESETS MODAL ── */
+.presets-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.82);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+.presets-modal-overlay[hidden] { display: none; }
+
+.presets-modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 8px 48px rgba(0,0,0,.7);
+  width: min(900px, 95vw);
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.presets-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface2);
+  flex-shrink: 0;
+}
+
+.presets-modal-title {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--accent2);
+}
+
+.presets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px;
+  padding: 16px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.preset-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color var(--transition), transform var(--transition), box-shadow var(--transition);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.preset-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(124,106,255,0.25);
+}
+.preset-card-saved {
+  border-style: dashed;
+}
+
+.preset-card-body {
+  padding: 10px 12px;
+  flex: 1;
+}
+
+.preset-card-name {
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.preset-card-tags {
+  font-size: 10px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.preset-card-swatches {
+  display: flex;
+  height: 8px;
+}
+
+.preset-swatch {
+  flex: 1;
+  display: block;
+}
+
+/* ── INSPECTOR SECTION DIVIDER ── */
+.inspector-section-title {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--accent2);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 8px 0 2px;
+  border-top: 1px solid var(--border);
+  margin-top: 6px;
+}
+
+/* ── SVG UPLOAD LABEL ── */
+.upload-svg-label {
+  display: block !important;
+  margin: 4px 0 !important;
+  padding: 0 !important;
+}
+
+/* ── textItem class used by main.js ── */
+.list-stack .textItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--muted);
+  transition: background var(--transition), color var(--transition);
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  justify-content: space-between;
+}
+.list-stack .textItem:hover { background: var(--surface2); color: var(--text); }
+.list-stack .textItem.active { background: #2d2a45; color: var(--accent2); }
