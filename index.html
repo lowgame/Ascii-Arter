@@ -18,7 +18,7 @@
       <span class="logo">ASCII Arter</span>
       <div class="topbar-center">
         <button id="playPauseBtn" class="btn btn-primary">⏸ Pause</button>
-        <button id="randomizeBtn" class="btn btn-randomize">🎲 Randomize</button>
+        <button id="randomizeBtn" class="btn btn-randomize">⟳ Randomize</button>
         <button id="shuffleCharsetBtn" class="btn">🔀 Charset</button>
       </div>
       <div class="topbar-right">
@@ -87,6 +87,9 @@
 
     <!-- ── MAIN STAGE ── -->
     <div class="stage-area">
+
+      <!-- Background ASCII canvas (decorative) -->
+      <canvas id="bgCanvas" aria-hidden="true"></canvas>
 
       <!-- Canvas fills the stage -->
       <div class="canvas-wrap">
