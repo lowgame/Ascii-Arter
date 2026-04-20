@@ -89,6 +89,34 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
 .btn:hover { background: #2a2a30; border-color: #444; }
 .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
 .btn-primary:hover { background: #6a58f0; border-color: #6a58f0; }
+
+/* ── RANDOMIZE — hero button ── */
+.btn-randomize {
+  background: linear-gradient(135deg, #7c6aff 0%, #a855f7 50%, #ec4899 100%);
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  font-size: 13px;
+  padding: 5px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  box-shadow: 0 0 12px rgba(168,85,247,.55), 0 0 28px rgba(124,106,255,.3);
+  animation: randomize-pulse 2.4s ease-in-out infinite;
+  transition: transform 0.1s, box-shadow 0.2s;
+}
+.btn-randomize:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(168,85,247,.8), 0 0 44px rgba(124,106,255,.5);
+  animation: none;
+}
+.btn-randomize:active {
+  transform: scale(0.97);
+}
+@keyframes randomize-pulse {
+  0%, 100% { box-shadow: 0 0 10px rgba(168,85,247,.5), 0 0 24px rgba(124,106,255,.25); }
+  50%       { box-shadow: 0 0 20px rgba(236,72,153,.7), 0 0 40px rgba(168,85,247,.45); }
+}
 .btn-ghost { background: transparent; border-color: transparent; color: var(--muted); }
 .btn-ghost:hover { color: var(--text); background: var(--surface2); }
 .btn-sm { padding: 2px 8px; font-size: 11px; }

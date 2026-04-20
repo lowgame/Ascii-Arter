@@ -1189,19 +1189,31 @@ function randomizeProject() {
     charBias: randomBetween(-0.3, 0.3)
   }));
 
-  project.texts = Array.from({ length: textCount }, (_, index) => createDefaultText({
-    content: '',  // never overwrite user content
-    animation: pick(TEXT_ANIMATIONS).value,
-    x: Math.floor(randomBetween(4, project.cols * 0.45)),
-    y: Math.floor(randomBetween(2, project.rows * 0.5)),
-    speed: randomBetween(0.7, 2.2),
-    amplitude: randomBetween(1, 8),
-    color: samplePalette(project.palette, Math.random(), 1.2, 0),
-    bg: 'transparent',
-    repeat: Math.random() > 0.72,
-    rainbow: Math.random() > 0.62,
-    outline: Math.random() > 0.3
-  }));
+  // Pick a nice bg color per text — dark tinted version of its text color
+  const bgOptions = [
+    () => { const c = hexToRgb(samplePalette(project.palette, Math.random(), 1, 0)); return `rgba(${Math.round(c.r*0.18)},${Math.round(c.g*0.18)},${Math.round(c.b*0.18)},0.82)`; },
+    () => 'rgba(0,0,0,0.7)',
+    () => { const c = hexToRgb(project.background); return `rgba(${Math.min(255,c.r+8)},${Math.min(255,c.g+8)},${Math.min(255,c.b+18)},0.85)`; },
+  ];
+
+  project.texts = Array.from({ length: textCount }, (_, index) => {
+    const textColor = samplePalette(project.palette, Math.random(), 1.2, 0);
+    const bgFn = pick(bgOptions);
+    return createDefaultText({
+      content: '',  // never overwrite user content
+      animation: pick(TEXT_ANIMATIONS).value,
+      x: Math.floor(randomBetween(4, project.cols * 0.45)),
+      y: Math.floor(randomBetween(2, project.rows * 0.5)),
+      speed: randomBetween(0.7, 2.2),
+      amplitude: randomBetween(1, 8),
+      color: textColor,
+      bg: bgFn(),
+      repeat: Math.random() > 0.72,
+      rainbow: Math.random() > 0.62,
+      outline: Math.random() > 0.5,
+      glow: randomBetween(0, 10),
+    });
+  });
 
   selectedLayerId = project.layers[0].id;
   selectedTextId = project.texts[0].id;
