@@ -34,6 +34,7 @@
             <button id="exportHtmlBtn">🌐 HTML</button>
             <button id="exportProjectBtn">📦 JSON Project</button>
             <button id="importBtn">📂 Import JSON</button>
+            <button id="embedCodeBtn">🔗 Get Embed Code</button>
           </div>
         </div>
         <input id="importProjectInput" type="file" accept="application/json" hidden />
@@ -192,6 +193,44 @@
           <button id="presetsModalClose" class="panel-close" title="Close">✕</button>
         </div>
         <div id="presetsGrid" class="presets-grid"></div>
+      </div>
+    </div>
+
+    <!-- ── EMBED MODAL ── -->
+    <div id="embedModal" class="presets-modal-overlay" hidden>
+      <div class="presets-modal embed-modal">
+        <div class="presets-modal-header">
+          <span class="presets-modal-title">🔗 Embed on your site</span>
+          <button id="embedModalClose" class="panel-close" title="Close">✕</button>
+        </div>
+        <div class="embed-modal-body">
+          <div class="embed-step">
+            <div class="embed-step-label">Step 1 — Install the library</div>
+            <pre class="embed-code-block">npm install ascii-bg</pre>
+          </div>
+          <div class="embed-step">
+            <div class="embed-step-label">Step 2 — ESM / bundler usage</div>
+            <pre class="embed-code-block" id="embedSnippetBlock">import AsciiBackground from 'ascii-bg';
+import project from './my-project.json'; // your exported JSON
+
+AsciiBackground.mount('#my-element', project);</pre>
+            <button class="btn btn-ghost embed-copy-btn" id="embedCopySnippetBtn">📋 Copy Snippet</button>
+          </div>
+          <div class="embed-step">
+            <div class="embed-step-label">Step 2 (alt) — CDN, no build step</div>
+            <pre class="embed-code-block" id="embedCdnBlock">&lt;script type="module"&gt;
+  import AsciiBackground from 'https://unpkg.com/ascii-bg/dist/ascii-bg.esm.js';
+  // paste your project JSON below
+  const project = { /* ... paste JSON here ... */ };
+  AsciiBackground.mount('#my-element', project);
+&lt;/script&gt;</pre>
+          </div>
+          <div class="embed-step">
+            <div class="embed-step-label">Your current project JSON</div>
+            <textarea id="embedJsonTextarea" class="embed-json-textarea" readonly></textarea>
+            <button class="btn btn-ghost embed-copy-btn" id="embedCopyJsonBtn">📋 Copy JSON</button>
+          </div>
+        </div>
       </div>
     </div>
 

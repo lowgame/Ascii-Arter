@@ -1,0 +1,23 @@
+{
+  "name": "ascii-bg",
+  "version": "1.0.0",
+  "description": "Drop ASCII art animations onto any element. Design on ASCII Arter, export JSON, embed anywhere.",
+  "type": "module",
+  "main": "./dist/ascii-bg.cjs.js",
+  "module": "./dist/ascii-bg.esm.js",
+  "exports": {
+    ".": {
+      "import": "./dist/ascii-bg.esm.js",
+      "require": "./dist/ascii-bg.cjs.js"
+    }
+  },
+  "files": ["dist", "README.md"],
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "keywords": ["ascii", "art", "animation", "background", "canvas"],
+  "license": "MIT",
+  "devDependencies": {
+    "esbuild": "^0.20.0"
+  }
+}

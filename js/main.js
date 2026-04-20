@@ -135,7 +135,8 @@ function bindDom() {
     'addLayerBtn', 'removeLayerBtn', 'duplicateLayerBtn', 'moveLayerUpBtn', 'moveLayerDownBtn',
     'addTextBtn', 'removeTextBtn', 'duplicateTextBtn',
     'svgLayersList', 'svgLayerInspector', 'addSvgLayerBtn', 'removeSvgLayerBtn',
-    'svgUploadInput', 'presetsGalleryBtn', 'presetsModal', 'presetsModalClose', 'presetsGrid'
+    'svgUploadInput', 'presetsGalleryBtn', 'presetsModal', 'presetsModalClose', 'presetsGrid',
+    'embedCodeBtn', 'embedModal', 'embedModalClose', 'embedJsonTextarea', 'embedCopyJsonBtn', 'embedCopySnippetBtn'
   ];
 
   ids.forEach((id) => {
@@ -304,6 +305,24 @@ function bindButtons() {
   dom.presetsGalleryBtn.addEventListener('click', () => openPresetsModal());
   dom.presetsModalClose.addEventListener('click', () => closePresetsModal());
   dom.presetsModal.addEventListener('click', (e) => { if (e.target === dom.presetsModal) closePresetsModal(); });
+
+  // Embed modal
+  dom.embedCodeBtn.addEventListener('click', () => openEmbedModal());
+  dom.embedModalClose.addEventListener('click', () => closeEmbedModal());
+  dom.embedModal.addEventListener('click', (e) => { if (e.target === dom.embedModal) closeEmbedModal(); });
+  dom.embedCopyJsonBtn.addEventListener('click', () => {
+    navigator.clipboard.writeText(dom.embedJsonTextarea.value).then(() => {
+      dom.embedCopyJsonBtn.textContent = '✅ Copied!';
+      setTimeout(() => { dom.embedCopyJsonBtn.textContent = '📋 Copy JSON'; }, 1500);
+    });
+  });
+  dom.embedCopySnippetBtn.addEventListener('click', () => {
+    const snippet = `import AsciiBackground from 'ascii-bg';\nimport project from './my-project.json'; // your exported JSON\n\nAsciiBackground.mount('#my-element', project);`;
+    navigator.clipboard.writeText(snippet).then(() => {
+      dom.embedCopySnippetBtn.textContent = '✅ Copied!';
+      setTimeout(() => { dom.embedCopySnippetBtn.textContent = '📋 Copy Snippet'; }, 1500);
+    });
+  });
 
   // SVG Layers
   dom.addSvgLayerBtn.addEventListener('click', () => {
@@ -879,6 +898,15 @@ function openPresetsModal() {
 
 function closePresetsModal() {
   dom.presetsModal.hidden = true;
+}
+
+function openEmbedModal() {
+  dom.embedJsonTextarea.value = exportProjectJSON(project);
+  dom.embedModal.hidden = false;
+}
+
+function closeEmbedModal() {
+  dom.embedModal.hidden = true;
 }
 
 function loop(now) {
