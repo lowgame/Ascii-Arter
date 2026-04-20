@@ -4,141 +4,154 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ASCII Arter</title>
-  <meta name="description" content="Pure JavaScript ASCII art animation creator with 60 animation modes, layered text, presets, and export tools." />
+  <meta name="description" content="Pure JavaScript ASCII art animation creator." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./css/main.css" />
 </head>
 <body>
   <div id="appShell">
+
+    <!-- ── TOP BAR ── -->
     <header class="topbar">
-      <div>
-        <p class="eyebrow">Pure JS • GitHub Pages ready • Optimized Canvas renderer</p>
-        <h1>ASCII Arter</h1>
+      <span class="logo">ASCII Arter</span>
+      <div class="topbar-center">
+        <button id="playPauseBtn" class="btn btn-primary">⏸ Pause</button>
+        <button id="randomizeBtn" class="btn">🎲 Randomize</button>
+        <button id="shuffleCharsetBtn" class="btn">🔀 Charset</button>
       </div>
-      <div class="topbarActions">
-        <button id="playPauseBtn" class="btn btn-primary">Pause</button>
-        <button id="randomizeBtn" class="btn">Randomize</button>
-        <button id="shuffleCharsetBtn" class="btn">Shuffle Charset</button>
-        <button id="savePresetBtn" class="btn">Save Preset</button>
-        <button id="importBtn" class="btn">Import JSON</button>
-        <button id="exportProjectBtn" class="btn">Export JSON</button>
+      <div class="topbar-right">
+        <select id="presetSelect" class="select-compact"></select>
+        <button id="savePresetBtn" class="btn btn-ghost">💾 Save</button>
+        <div class="export-group">
+          <button class="btn btn-ghost" id="exportMenuBtn">⬇ Export ▾</button>
+          <div class="dropdown" id="exportDropdown">
+            <button id="copyFrameBtn">📋 Copy Frame</button>
+            <button id="exportTxtBtn">📄 TXT</button>
+            <button id="exportPngBtn">🖼 PNG</button>
+            <button id="exportHtmlBtn">🌐 HTML</button>
+            <button id="exportProjectBtn">📦 JSON Project</button>
+            <button id="importBtn">📂 Import JSON</button>
+          </div>
+        </div>
         <input id="importProjectInput" type="file" accept="application/json" hidden />
       </div>
     </header>
 
-    <section class="heroStrip">
-      <article class="heroCard">
-        <span>Animations</span>
-        <strong>60</strong>
-      </article>
-      <article class="heroCard">
-        <span>Controls</span>
-        <strong>28+</strong>
-      </article>
-      <article class="heroCard">
-        <span>Layer Types</span>
-        <strong>Animation + Text</strong>
-      </article>
-      <article class="heroCard">
-        <span>Exports</span>
-        <strong>PNG • TXT • HTML • JSON</strong>
-      </article>
-    </section>
+    <!-- ── MAIN STAGE ── -->
+    <div class="stage-area">
 
-    <main class="layoutGrid">
-      <aside class="panel controlPanel">
-        <div class="panelHeader sticky">
-          <div>
-            <p class="panelEyebrow">Global System</p>
-            <h2>Controls</h2>
-          </div>
-          <select id="presetSelect" class="select"></select>
-        </div>
-        <div id="controlsContent" class="panelContent"></div>
-      </aside>
+      <!-- Canvas fills the stage -->
+      <div class="canvas-wrap">
+        <canvas id="stageCanvas" aria-label="ASCII preview canvas"></canvas>
+      </div>
 
-      <section class="stageColumn">
-        <div class="panel stagePanel">
-          <div class="panelHeader stageHeader">
-            <div>
-              <p class="panelEyebrow">Live Preview</p>
-              <h2 id="projectTitleLabel">Ascii Arter</h2>
-            </div>
-            <div class="toolbarButtons">
-              <button id="copyFrameBtn" class="btn btn-ghost">Copy Frame</button>
-              <button id="exportTxtBtn" class="btn btn-ghost">TXT</button>
-              <button id="exportPngBtn" class="btn btn-ghost">PNG</button>
-              <button id="exportHtmlBtn" class="btn btn-ghost">HTML</button>
-            </div>
-          </div>
-          <div class="stageWrap">
-            <div class="canvasFrame">
-              <canvas id="stageCanvas" aria-label="ASCII preview canvas"></canvas>
-            </div>
-          </div>
-          <div class="statsBar">
-            <span id="fpsStat">FPS: 0</span>
-            <span id="renderStat">Render: 0 ms</span>
-            <span id="cellsStat">Cells: 0</span>
-            <span id="layersStat">Layers: 0</span>
-            <span id="statusStat">Ready</span>
-          </div>
+      <!-- ── LEFT PANEL: Controls ── -->
+      <div class="float-panel float-panel-left" id="controlsPanel">
+        <div class="panel-header">
+          <span>Controls</span>
+          <button class="panel-close" data-panel="controlsPanel" title="Close">✕</button>
         </div>
+        <div class="panel-body">
+          <div id="controlsContent"></div>
+        </div>
+      </div>
+      <button class="panel-tab panel-tab-left" id="controlsTab" data-panel="controlsPanel" title="Open Controls">
+        ◀ Controls
+      </button>
 
-        <div class="panel outputPanel">
-          <div class="panelHeader">
-            <div>
-              <p class="panelEyebrow">Frame Output</p>
-              <h2>ASCII Snapshot</h2>
-            </div>
-            <button id="refreshFrameBtn" class="btn btn-ghost">Refresh Text</button>
-          </div>
-          <textarea id="frameOutput" spellcheck="false" aria-label="ASCII frame output"></textarea>
+      <!-- ── RIGHT PANEL: Layers ── -->
+      <div class="float-panel float-panel-right" id="layersPanel">
+        <div class="panel-header">
+          <span>Layers</span>
+          <button class="panel-close" data-panel="layersPanel" title="Close">✕</button>
         </div>
-      </section>
+        <div class="panel-body">
 
-      <aside class="panel sidePanel">
-        <div class="panelHeader sticky">
-          <div>
-            <p class="panelEyebrow">Scene Editor</p>
-            <h2>Layers & Text</h2>
-          </div>
-          <span class="tag">Multi-layer</span>
-        </div>
-        <div class="panelContent stackGap">
-          <section class="editorBlock">
-            <div class="subHeader">
-              <h3>Animation Layers</h3>
-              <div class="inlineActions">
-                <button id="moveLayerUpBtn" class="iconBtn">↑</button>
-                <button id="moveLayerDownBtn" class="iconBtn">↓</button>
-                <button id="duplicateLayerBtn" class="iconBtn">⎘</button>
-                <button id="removeLayerBtn" class="iconBtn danger">−</button>
-                <button id="addLayerBtn" class="iconBtn primary">＋</button>
-              </div>
-            </div>
-            <div id="layersList" class="listStack"></div>
+          <!-- Animation Layers -->
+          <details open>
+            <summary>
+              <span>Animation Layers</span>
+              <span class="summary-actions" onclick="event.stopPropagation()">
+                <button id="moveLayerUpBtn" class="icon-btn" title="Move Up">↑</button>
+                <button id="moveLayerDownBtn" class="icon-btn" title="Move Down">↓</button>
+                <button id="duplicateLayerBtn" class="icon-btn" title="Duplicate">⎘</button>
+                <button id="removeLayerBtn" class="icon-btn danger" title="Remove">−</button>
+                <button id="addLayerBtn" class="icon-btn primary" title="Add">＋</button>
+              </span>
+            </summary>
+            <div id="layersList" class="list-stack"></div>
             <div id="layerInspector" class="inspector"></div>
-          </section>
+          </details>
 
-          <section class="editorBlock">
-            <div class="subHeader">
-              <h3>Text Layers</h3>
-              <div class="inlineActions">
-                <button id="duplicateTextBtn" class="iconBtn">⎘</button>
-                <button id="removeTextBtn" class="iconBtn danger">−</button>
-                <button id="addTextBtn" class="iconBtn primary">＋</button>
-              </div>
-            </div>
-            <div id="textsList" class="listStack"></div>
+          <!-- Text Layers -->
+          <details>
+            <summary>
+              <span>Text Layers</span>
+              <span class="summary-actions" onclick="event.stopPropagation()">
+                <button id="duplicateTextBtn" class="icon-btn" title="Duplicate">⎘</button>
+                <button id="removeTextBtn" class="icon-btn danger" title="Remove">−</button>
+                <button id="addTextBtn" class="icon-btn primary" title="Add">＋</button>
+              </span>
+            </summary>
+            <div id="textsList" class="list-stack"></div>
             <div id="textInspector" class="inspector"></div>
-          </section>
+          </details>
+
+          <!-- ASCII Snapshot (rarely used) -->
+          <details>
+            <summary>ASCII Snapshot</summary>
+            <div class="snapshot-bar">
+              <button id="refreshFrameBtn" class="btn btn-ghost btn-sm">↻ Refresh</button>
+            </div>
+            <textarea id="frameOutput" spellcheck="false" aria-label="ASCII frame output"></textarea>
+          </details>
+
         </div>
-      </aside>
-    </main>
-  </div>
+      </div>
+      <button class="panel-tab panel-tab-right" id="layersTab" data-panel="layersPanel" title="Open Layers">
+        Layers ▶
+      </button>
+
+    </div><!-- /stage-area -->
+
+    <!-- ── BOTTOM STATS BAR ── -->
+    <footer class="stats-bar">
+      <span id="fpsStat">FPS: —</span>
+      <span id="renderStat">Render: — ms</span>
+      <span id="cellsStat">Cells: —</span>
+      <span id="layersStat">Layers: —</span>
+      <span id="projectTitleLabel" class="stats-title">ASCII Arter</span>
+      <span id="statusStat" class="stats-status">Ready</span>
+    </footer>
+
+  </div><!-- /appShell -->
+
+  <script>
+    // Panel toggle logic
+    function togglePanel(panelId) {
+      const panel = document.getElementById(panelId);
+      const isLeft = panel.classList.contains('float-panel-left');
+      const tabId = isLeft ? 'controlsTab' : 'layersTab';
+      const tab = document.getElementById(tabId);
+      const open = panel.classList.toggle('panel-open');
+      tab.style.display = open ? 'none' : '';
+    }
+
+    document.querySelectorAll('.panel-close, .panel-tab').forEach(btn => {
+      btn.addEventListener('click', () => togglePanel(btn.dataset.panel));
+    });
+
+    // Export dropdown
+    const exportBtn = document.getElementById('exportMenuBtn');
+    const exportDropdown = document.getElementById('exportDropdown');
+    exportBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      exportDropdown.classList.toggle('open');
+    });
+    document.addEventListener('click', () => exportDropdown.classList.remove('open'));
+  </script>
 
   <script type="module" src="./js/main.js"></script>
 </body>
