@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ASCII Arter</title>
+  <meta name="description" content="Pure JavaScript ASCII art animation creator with 60 animation modes, layered text, presets, and export tools." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./css/main.css" />
+</head>
+<body>
+  <div id="appShell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Pure JS • GitHub Pages ready • Optimized Canvas renderer</p>
+        <h1>ASCII Arter</h1>
+      </div>
+      <div class="topbarActions">
+        <button id="playPauseBtn" class="btn btn-primary">Pause</button>
+        <button id="randomizeBtn" class="btn">Randomize</button>
+        <button id="shuffleCharsetBtn" class="btn">Shuffle Charset</button>
+        <button id="savePresetBtn" class="btn">Save Preset</button>
+        <button id="importBtn" class="btn">Import JSON</button>
+        <button id="exportProjectBtn" class="btn">Export JSON</button>
+        <input id="importProjectInput" type="file" accept="application/json" hidden />
+      </div>
+    </header>
+
+    <section class="heroStrip">
+      <article class="heroCard">
+        <span>Animations</span>
+        <strong>60</strong>
+      </article>
+      <article class="heroCard">
+        <span>Controls</span>
+        <strong>28+</strong>
+      </article>
+      <article class="heroCard">
+        <span>Layer Types</span>
+        <strong>Animation + Text</strong>
+      </article>
+      <article class="heroCard">
+        <span>Exports</span>
+        <strong>PNG • TXT • HTML • JSON</strong>
+      </article>
+    </section>
+
+    <main class="layoutGrid">
+      <aside class="panel controlPanel">
+        <div class="panelHeader sticky">
+          <div>
+            <p class="panelEyebrow">Global System</p>
+            <h2>Controls</h2>
+          </div>
+          <select id="presetSelect" class="select"></select>
+        </div>
+        <div id="controlsContent" class="panelContent"></div>
+      </aside>
+
+      <section class="stageColumn">
+        <div class="panel stagePanel">
+          <div class="panelHeader stageHeader">
+            <div>
+              <p class="panelEyebrow">Live Preview</p>
+              <h2 id="projectTitleLabel">Ascii Arter</h2>
+            </div>
+            <div class="toolbarButtons">
+              <button id="copyFrameBtn" class="btn btn-ghost">Copy Frame</button>
+              <button id="exportTxtBtn" class="btn btn-ghost">TXT</button>
+              <button id="exportPngBtn" class="btn btn-ghost">PNG</button>
+              <button id="exportHtmlBtn" class="btn btn-ghost">HTML</button>
+            </div>
+          </div>
+          <div class="stageWrap">
+            <div class="canvasFrame">
+              <canvas id="stageCanvas" aria-label="ASCII preview canvas"></canvas>
+            </div>
+          </div>
+          <div class="statsBar">
+            <span id="fpsStat">FPS: 0</span>
+            <span id="renderStat">Render: 0 ms</span>
+            <span id="cellsStat">Cells: 0</span>
+            <span id="layersStat">Layers: 0</span>
+            <span id="statusStat">Ready</span>
+          </div>
+        </div>
+
+        <div class="panel outputPanel">
+          <div class="panelHeader">
+            <div>
+              <p class="panelEyebrow">Frame Output</p>
+              <h2>ASCII Snapshot</h2>
+            </div>
+            <button id="refreshFrameBtn" class="btn btn-ghost">Refresh Text</button>
+          </div>
+          <textarea id="frameOutput" spellcheck="false" aria-label="ASCII frame output"></textarea>
+        </div>
+      </section>
+
+      <aside class="panel sidePanel">
+        <div class="panelHeader sticky">
+          <div>
+            <p class="panelEyebrow">Scene Editor</p>
+            <h2>Layers & Text</h2>
+          </div>
+          <span class="tag">Multi-layer</span>
+        </div>
+        <div class="panelContent stackGap">
+          <section class="editorBlock">
+            <div class="subHeader">
+              <h3>Animation Layers</h3>
+              <div class="inlineActions">
+                <button id="moveLayerUpBtn" class="iconBtn">↑</button>
+                <button id="moveLayerDownBtn" class="iconBtn">↓</button>
+                <button id="duplicateLayerBtn" class="iconBtn">⎘</button>
+                <button id="removeLayerBtn" class="iconBtn danger">−</button>
+                <button id="addLayerBtn" class="iconBtn primary">＋</button>
+              </div>
+            </div>
+            <div id="layersList" class="listStack"></div>
+            <div id="layerInspector" class="inspector"></div>
+          </section>
+
+          <section class="editorBlock">
+            <div class="subHeader">
+              <h3>Text Layers</h3>
+              <div class="inlineActions">
+                <button id="duplicateTextBtn" class="iconBtn">⎘</button>
+                <button id="removeTextBtn" class="iconBtn danger">−</button>
+                <button id="addTextBtn" class="iconBtn primary">＋</button>
+              </div>
+            </div>
+            <div id="textsList" class="listStack"></div>
+            <div id="textInspector" class="inspector"></div>
+          </section>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>
