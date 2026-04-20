@@ -36,6 +36,9 @@ let fpsFrames = 0;
 let fpsWindow = 0;
 let needsRedraw = true;
 let lastFrameTextRefresh = 0;
+// ── SUBJECT MASK ──
+let subjectMask = null; // Float32Array | null
+let subjectDirty = true;
 const controlRefs = new Map();
 const paletteCache = new Map(Object.entries(PALETTES).map(([name, stops]) => [name, stops.map(hexToRgb)]));
 
@@ -280,6 +283,92 @@ function bindButtons() {
     }
     e.target.value = '';
   });
+
+  // ── SUBJECT PANEL BINDINGS ──
+  document.querySelectorAll('.subject-tab').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const type = btn.dataset.type;
+      if (!project.subject) project.subject = {};
+      project.subject.type = type;
+      // Update active tab styling
+      document.querySelectorAll('.subject-tab').forEach((b) => b.classList.toggle('active', b === btn));
+      // Show/hide sections
+      const textArea = document.getElementById('subjectTextArea');
+      const svgArea = document.getElementById('subjectSvgArea');
+      const opts = document.getElementById('subjectOptions');
+      if (textArea) textArea.style.display = type === 'text' ? '' : 'none';
+      if (svgArea) svgArea.style.display = type === 'svg' ? '' : 'none';
+      if (opts) opts.style.display = type !== 'none' ? '' : 'none';
+      subjectDirty = true;
+      needsRedraw = true;
+    });
+  });
+
+  const subjectTextInput = document.getElementById('subjectTextInput');
+  if (subjectTextInput) {
+    subjectTextInput.addEventListener('input', () => {
+      if (!project.subject) project.subject = {};
+      project.subject.text = subjectTextInput.value;
+      subjectDirty = true;
+      needsRedraw = true;
+    });
+  }
+
+  const subjectSvgInput = document.getElementById('subjectSvgInput');
+  if (subjectSvgInput) {
+    subjectSvgInput.addEventListener('input', () => {
+      if (!project.subject) project.subject = {};
+      project.subject.svgContent = subjectSvgInput.value;
+      subjectDirty = true;
+      needsRedraw = true;
+    });
+  }
+
+  const subjectSvgUpload = document.getElementById('subjectSvgUpload');
+  const subjectSvgFileInput = document.getElementById('subjectSvgFileInput');
+  if (subjectSvgUpload && subjectSvgFileInput) {
+    subjectSvgUpload.addEventListener('click', () => subjectSvgFileInput.click());
+    subjectSvgFileInput.addEventListener('change', async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const text = await file.text();
+      if (subjectSvgInput) subjectSvgInput.value = text;
+      if (!project.subject) project.subject = {};
+      project.subject.svgContent = text;
+      subjectDirty = true;
+      needsRedraw = true;
+      e.target.value = '';
+    });
+  }
+
+  const subjectFontWeight = document.getElementById('subjectFontWeight');
+  if (subjectFontWeight) {
+    subjectFontWeight.addEventListener('change', () => {
+      if (!project.subject) project.subject = {};
+      project.subject.textFont = subjectFontWeight.value;
+      subjectDirty = true;
+      needsRedraw = true;
+    });
+  }
+
+  const subjectBgIntensity = document.getElementById('subjectBgIntensity');
+  if (subjectBgIntensity) {
+    subjectBgIntensity.addEventListener('input', () => {
+      if (!project.subject) project.subject = {};
+      project.subject.bgIntensity = Number(subjectBgIntensity.value);
+      needsRedraw = true;
+    });
+  }
+
+  const subjectPadding = document.getElementById('subjectPadding');
+  if (subjectPadding) {
+    subjectPadding.addEventListener('input', () => {
+      if (!project.subject) project.subject = {};
+      project.subject.padding = Number(subjectPadding.value);
+      subjectDirty = true;
+      needsRedraw = true;
+    });
+  }
 }
 
 function buildGlobalControls() {
@@ -563,6 +652,89 @@ function getSelectedSvgLayer() {
   return (project.svgLayers || []).find((l) => l.id === selectedSvgLayerId) || (project.svgLayers || [])[0] || null;
 }
 
+// ── SUBJECT MASK GENERATION ──
+
+function buildSubjectMask() {
+  const { subject } = project;
+  if (!subject || subject.type === 'none' || (!subject.text && !subject.svgContent)) {
+    subjectMask = null;
+    subjectDirty = false;
+    return;
+  }
+
+  const offscreen = document.createElement('canvas');
+  offscreen.width = project.cols;
+  offscreen.height = project.rows;
+  const ctx = offscreen.getContext('2d');
+  ctx.fillStyle = '#000000';
+  ctx.fillRect(0, 0, project.cols, project.rows);
+
+  if (subject.type === 'text' && subject.text) {
+    // Fit text to canvas width using padding
+    const padding = subject.padding || 4;
+    const maxW = project.cols - padding * 2;
+    let fSize = project.rows * 0.72;
+    ctx.font = `${subject.textFont || 'bold'} ${fSize}px monospace`;
+    const lines = subject.text.split('\n').filter(Boolean);
+    const longestLine = lines.reduce((a, b) => a.length > b.length ? a : b, '');
+    while (ctx.measureText(longestLine).width > maxW && fSize > 4) {
+      fSize -= 0.5;
+      ctx.font = `${subject.textFont || 'bold'} ${fSize}px monospace`;
+    }
+    ctx.fillStyle = '#ffffff';
+    ctx.textBaseline = 'middle';
+    ctx.textAlign = 'center';
+    const lineH = fSize * 1.1;
+    const totalH = lines.length * lineH;
+    const startY = (project.rows - totalH) / 2 + lineH / 2;
+    lines.forEach((line, i) => {
+      ctx.fillText(line, project.cols / 2, startY + i * lineH);
+    });
+
+    // Sample pixels → mask
+    const imageData = ctx.getImageData(0, 0, project.cols, project.rows);
+    subjectMask = new Float32Array(project.cols * project.rows);
+    for (let i = 0; i < subjectMask.length; i++) {
+      const r = imageData.data[i * 4];
+      const g = imageData.data[i * 4 + 1];
+      const b = imageData.data[i * 4 + 2];
+      subjectMask[i] = (r * 0.299 + g * 0.587 + b * 0.114) / 255;
+    }
+    subjectDirty = false;
+
+  } else if (subject.type === 'svg' && subject.svgContent) {
+    // Async SVG rasterization — will trigger needsRedraw when done
+    _buildSvgMaskAsync(subject.svgContent, offscreen, ctx);
+    // subjectDirty remains true until async completes
+  }
+}
+
+async function _buildSvgMaskAsync(svgContent, offscreen, ctx) {
+  try {
+    const blob = new Blob([svgContent], { type: 'image/svg+xml' });
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+    await new Promise((resolve, reject) => { img.onload = resolve; img.onerror = reject; img.src = url; });
+    URL.revokeObjectURL(url);
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, offscreen.width, offscreen.height);
+    ctx.drawImage(img, 0, 0, offscreen.width, offscreen.height);
+    const imageData = ctx.getImageData(0, 0, project.cols, project.rows);
+    subjectMask = new Float32Array(project.cols * project.rows);
+    for (let i = 0; i < subjectMask.length; i++) {
+      const r = imageData.data[i * 4];
+      const g = imageData.data[i * 4 + 1];
+      const b = imageData.data[i * 4 + 2];
+      subjectMask[i] = (r * 0.299 + g * 0.587 + b * 0.114) / 255;
+    }
+    subjectDirty = false;
+    needsRedraw = true;
+  } catch (e) {
+    console.warn('SVG subject rasterization failed', e);
+    subjectDirty = false;
+  }
+}
+
 // ── PRESET GALLERY ──
 const PRESET_META = {
   'matrix-cathedral': { palette: 'matrix', tags: 'Rain • Matrix • Circuit' },
@@ -666,6 +838,9 @@ function loop(now) {
 }
 
 function renderFrame(time) {
+  // ── Rebuild subject mask if dirty ──
+  if (subjectDirty) buildSubjectMask();
+
   ensureBuffers();
   buffer.clear('transparent');
   const backgroundRgb = hexToRgb(project.background);
@@ -707,7 +882,32 @@ function renderFrame(time) {
       const colorRgb = samplePaletteRgb(paletteName, fract(shaded + hue), project.saturation, project.hueShift);
       const fg = rgbToCss(mixRgb(colorRgb, backgroundRgb, project.backgroundMix * 0.55));
       const char = shaded < 0.12 ? ' ' : charset[charIndex] || charset[charset.length - 1] || '#';
-      buffer.setCell(x, y, char, fg, 'transparent');
+
+      // ── Subject mask compositing ──
+      if (subjectMask !== null) {
+        const maskVal = subjectMask[index];
+        if (maskVal < 0.15) {
+          // Background cell — dim or empty based on bgIntensity
+          const bgIntensity = project.subject?.bgIntensity ?? 0.08;
+          const bgVal = clamp01(value * bgIntensity);
+          if (bgVal < 0.1) {
+            buffer.setCell(x, y, ' ', '#000', 'transparent');
+          } else {
+            buffer.setCell(x, y, char, rgbToCss(mixRgb(colorRgb, backgroundRgb, 0.85)), 'transparent');
+          }
+        } else {
+          // Shape cell — modulate by mask brightness for vivid subject rendering
+          const modValue = clamp01(value * (0.4 + maskVal * 0.6) + maskVal * 0.5);
+          const modShaded = clamp01(Math.pow(modValue, 1 / Math.max(0.15, project.density)));
+          const modCharIdx = clamp(Math.floor(modShaded * charLength), 0, charLength);
+          const modColor = samplePaletteRgb(paletteName, fract(modShaded + hue), project.saturation, project.hueShift);
+          const modChar = modShaded < 0.08 ? ' ' : charset[modCharIdx] || charset[charset.length - 1] || '#';
+          buffer.setCell(x, y, modChar, rgbToCss(mixRgb(modColor, backgroundRgb, project.backgroundMix * 0.3)), 'transparent');
+        }
+      } else {
+        // Legacy mode — no subject, fill everything
+        buffer.setCell(x, y, char, fg, 'transparent');
+      }
     }
   }
 
@@ -807,6 +1007,7 @@ function applyProject(nextProject, { keepPresetSelection = false, status = 'Proj
   renderInspectors();
   syncGlobalControls();
   updateProjectLabel();
+  subjectDirty = true; // subject may have changed with new project
   if (!keepPresetSelection) dom.presetSelect.value = '';
   setStatus(status);
   needsRedraw = true;
@@ -827,6 +1028,37 @@ function syncGlobalControls() {
     else field.input.value = value;
     if (field.valueEl) field.valueEl.textContent = formatValue(value, field.control);
   });
+  syncSubjectUI();
+}
+
+function syncSubjectUI() {
+  const subject = project.subject || {};
+  const type = subject.type || 'none';
+
+  // Update tab active states
+  document.querySelectorAll('.subject-tab').forEach((btn) => {
+    btn.classList.toggle('active', btn.dataset.type === type);
+  });
+
+  // Show/hide sections
+  const textArea = document.getElementById('subjectTextArea');
+  const svgArea = document.getElementById('subjectSvgArea');
+  const opts = document.getElementById('subjectOptions');
+  if (textArea) textArea.style.display = type === 'text' ? '' : 'none';
+  if (svgArea) svgArea.style.display = type === 'svg' ? '' : 'none';
+  if (opts) opts.style.display = type !== 'none' ? '' : 'none';
+
+  // Sync values
+  const subjectTextInput = document.getElementById('subjectTextInput');
+  if (subjectTextInput) subjectTextInput.value = subject.text || '';
+  const subjectSvgInput = document.getElementById('subjectSvgInput');
+  if (subjectSvgInput) subjectSvgInput.value = subject.svgContent || '';
+  const subjectFontWeight = document.getElementById('subjectFontWeight');
+  if (subjectFontWeight) subjectFontWeight.value = subject.textFont || 'bold';
+  const subjectBgIntensity = document.getElementById('subjectBgIntensity');
+  if (subjectBgIntensity) subjectBgIntensity.value = subject.bgIntensity ?? 0.08;
+  const subjectPadding = document.getElementById('subjectPadding');
+  if (subjectPadding) subjectPadding.value = subject.padding ?? 4;
 }
 
 function populatePresetSelect() {
@@ -888,6 +1120,9 @@ async function handleImportProject(event) {
 }
 
 function randomizeProject() {
+  // Save subject before randomizing — user content is sacred
+  const savedSubject = project.subject ? { ...project.subject } : null;
+
   const palettes = Object.keys(PALETTES);
   const charSets = Object.keys(CHARSETS);
   const layerCount = 2 + Math.floor(Math.random() * 3);
@@ -935,7 +1170,7 @@ function randomizeProject() {
   }));
 
   project.texts = Array.from({ length: textCount }, (_, index) => createDefaultText({
-    content: index === 0 ? 'ASCII ARTER' : pick(['PURE JS', '60 MODES', 'GITHUB PAGES', 'LAYERED TEXT']),
+    content: index === 0 ? 'ASCII ARTER' : pick(['PURE JS', '60 MODES', 'GITHUB PAGES', 'LAYERED TEXT']),  // decorative text only
     animation: pick(TEXT_ANIMATIONS).value,
     x: Math.floor(randomBetween(4, project.cols * 0.45)),
     y: Math.floor(randomBetween(2, project.rows * 0.5)),
@@ -950,6 +1185,10 @@ function randomizeProject() {
 
   selectedLayerId = project.layers[0].id;
   selectedTextId = project.texts[0].id;
+
+  // Restore subject — user content is never randomized
+  if (savedSubject) project.subject = savedSubject;
+  subjectDirty = true; // re-render mask with potentially new dimensions
 }
 
 function moveLayer(direction) {

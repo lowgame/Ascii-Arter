@@ -70,6 +70,45 @@
         </div>
         <div class="panel-body">
 
+          <!-- ✏️ Your Content — PRIMARY SUBJECT -->
+          <details id="subjectPanel" open>
+            <summary>
+              <span>✏️ Your Content</span>
+            </summary>
+            <div class="subject-type-tabs">
+              <button class="subject-tab active" data-type="none">None</button>
+              <button class="subject-tab" data-type="text">Text</button>
+              <button class="subject-tab" data-type="svg">SVG</button>
+            </div>
+
+            <div id="subjectTextArea" class="subject-section" style="display:none">
+              <textarea id="subjectTextInput" placeholder="Type your text here...
+Works with multiline!" rows="4"></textarea>
+              <label>Font Weight
+                <select id="subjectFontWeight">
+                  <option value="bold">Bold</option>
+                  <option value="900">Extra Bold</option>
+                  <option value="normal">Normal</option>
+                </select>
+              </label>
+            </div>
+
+            <div id="subjectSvgArea" class="subject-section" style="display:none">
+              <textarea id="subjectSvgInput" placeholder="<svg>...</svg>" rows="5"></textarea>
+              <button class="btn btn-ghost btn-sm" id="subjectSvgUpload">📁 Upload SVG</button>
+              <input id="subjectSvgFileInput" type="file" accept=".svg,image/svg+xml" hidden />
+            </div>
+
+            <div id="subjectOptions" class="subject-section" style="display:none">
+              <label>BG Intensity
+                <input type="range" id="subjectBgIntensity" min="0" max="0.5" step="0.01" value="0.08" />
+              </label>
+              <label>Padding
+                <input type="range" id="subjectPadding" min="0" max="12" step="1" value="4" />
+              </label>
+            </div>
+          </details>
+
           <!-- Animation Layers -->
           <details open>
             <summary>

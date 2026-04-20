@@ -263,7 +263,18 @@ export function createDefaultProject() {
     mirrorY: false,
     layers: [createDefaultLayer()],
     texts: [createDefaultText()],
-    svgLayers: []
+    svgLayers: [],
+    subject: {
+      type: 'none',   // 'none' | 'text' | 'svg'
+      text: '',
+      svgContent: '',
+      fgPalette: 'inherit',
+      fgCharSet: 'inherit',
+      bgIntensity: 0.08,
+      textFont: 'bold',
+      textLetterSpacing: 0,
+      padding: 4,
+    }
   };
 }
 
@@ -284,7 +295,8 @@ export function normalizeProject(raw) {
       : base.texts,
     svgLayers: Array.isArray(raw?.svgLayers)
       ? raw.svgLayers.map((svg) => createDefaultSvgLayer({ ...svg, id: svg.id || nextId('svg'), _rasterDirty: true }))
-      : []
+      : [],
+    subject: raw?.subject ? { ...base.subject, ...raw.subject } : base.subject
   };
   return project;
 }
