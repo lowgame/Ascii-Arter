@@ -11,28 +11,16 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./css/main.css?v=ultra-simple-3" />
+  <link rel="stylesheet" href="./css/main.css?v=reboot-1" />
 </head>
 <body>
-  <div id="appShell" class="aa-shell">
-
+  <div id="appShell" class="app-shell">
     <header class="topbar">
-      <div class="topbar-left">
-        <span class="logo">ASCII Arter</span>
-        <span class="topbar-subtitle">Create → Test JSON → Export</span>
-      </div>
-
-      <div class="topbar-center" hidden>
-        <button id="playPauseBtn" class="btn btn-primary" hidden>Pause</button>
-        <button id="shuffleCharsetBtn" class="btn" hidden>Charset</button>
-      </div>
-
-      <div class="topbar-right">
-        <select id="presetSelect" class="select-compact" hidden></select>
-        <button id="jsonTestBtn" class="btn btn-accent-soft">JSON Test</button>
+      <div class="brand">ASCII Arter</div>
+      <div class="top-actions">
+        <button id="jsonTestBtn" class="btn">JSON Test</button>
         <button id="randomizeBtn" class="btn btn-accent">Randomize</button>
         <button id="presetsGalleryBtn" class="btn">Presets</button>
-        <button id="savePresetBtn" class="btn" hidden>Save</button>
 
         <div class="export-group">
           <button class="btn" id="exportMenuBtn">Export</button>
@@ -46,214 +34,132 @@
             <button id="embedCodeBtn" hidden>Open JSON Test / Embed</button>
           </div>
         </div>
-        <input id="importProjectInput" type="file" accept="application/json" hidden />
       </div>
+
+      <input id="importProjectInput" type="file" accept="application/json" hidden />
+
+      <select id="presetSelect" hidden></select>
+      <button id="savePresetBtn" hidden>Save</button>
+      <button id="playPauseBtn" hidden>Pause</button>
+      <button id="shuffleCharsetBtn" hidden>Charset</button>
     </header>
 
-    <section class="subject-strip">
-      <div class="subject-card">
-        <label class="subject-label" for="subjectTextInput">Main Text</label>
-        <textarea id="subjectTextInput" class="subject-textarea" rows="4" spellcheck="false" placeholder="Write text"></textarea>
-        <div class="subject-actions">
-          <button class="subject-tab active" data-type="text" id="activateTextBtn" hidden>Use Text</button>
-          <button class="btn btn-sm" id="subjectClearBtn">Clear</button>
-          <select id="subjectFontWeight" class="select-compact" hidden>
-            <option value="bold">Bold</option>
-            <option value="900">Extra Bold</option>
-            <option value="normal">Normal</option>
-          </select>
-          <input type="range" id="subjectBgIntensity" min="0" max="0.5" step="0.01" value="0.08" hidden />
-          <input type="range" id="subjectPadding" min="0" max="12" step="1" value="4" hidden />
-        </div>
-      </div>
-
-      <div class="subject-card" hidden>
-        <label class="subject-label" for="subjectSvgInput">SVG Subject</label>
-        <textarea id="subjectSvgInput" class="subject-textarea" rows="3" spellcheck="false" placeholder="Paste <svg>...</svg>"></textarea>
-        <div class="subject-actions">
-          <button class="btn btn-sm" id="subjectSvgUpload">Upload SVG</button>
-          <input id="subjectSvgFileInput" type="file" accept=".svg,image/svg+xml" hidden />
-          <button class="subject-tab" data-type="svg" id="activateSvgBtn">Use SVG</button>
-        </div>
-      </div>
-
-      <div class="subject-options" hidden>
-        <label class="subject-label">Subject Options</label>
-        <label class="opt-row">
-          <span>BG</span>
-          <input type="range" min="0" max="0.5" step="0.01" value="0.08" disabled />
-        </label>
-        <label class="opt-row">
-          <span>Pad</span>
-          <input type="range" min="0" max="12" step="1" value="4" disabled />
-        </label>
+    <section id="subjectTextArea" class="input-card">
+      <label for="subjectTextInput">Main Text</label>
+      <textarea id="subjectTextInput" rows="4" spellcheck="false" placeholder="Write text"></textarea>
+      <div class="input-row">
+        <button id="subjectClearBtn" class="btn">Clear</button>
+        <button class="subject-tab" data-type="text" id="activateTextBtn" hidden>Use Text</button>
+        <select id="subjectFontWeight" hidden>
+          <option value="bold">Bold</option>
+          <option value="900">Extra Bold</option>
+          <option value="normal">Normal</option>
+        </select>
+        <input type="range" id="subjectBgIntensity" min="0" max="0.5" step="0.01" value="0.08" hidden />
+        <input type="range" id="subjectPadding" min="0" max="12" step="1" value="4" hidden />
       </div>
     </section>
 
-    <main class="workspace">
-      <aside class="panel panel-controls" hidden>
-        <div class="panel-head">
-          <h2>Controls</h2>
-          <p>Start with only what you need.</p>
-        </div>
-        <div class="panel-body">
-          <div id="controlsContent"></div>
-        </div>
-      </aside>
-
-      <section class="stage-area">
-        <div class="stage-wrap">
-          <canvas id="bgCanvas" aria-hidden="true"></canvas>
-          <div class="canvas-wrap">
-            <canvas id="stageCanvas" aria-label="ASCII preview canvas"></canvas>
-          </div>
-        </div>
-      </section>
-
-      <aside class="panel panel-layers" hidden>
-        <div class="panel-head">
-          <h2>Layers</h2>
-          <p>Animation, text and SVG stacks.</p>
-        </div>
-
-        <div class="panel-body">
-          <details open>
-            <summary>
-              <span>Animation Layers</span>
-              <span class="summary-actions" onclick="event.stopPropagation()">
-                <button id="moveLayerUpBtn" class="icon-btn" title="Move Up">↑</button>
-                <button id="moveLayerDownBtn" class="icon-btn" title="Move Down">↓</button>
-                <button id="duplicateLayerBtn" class="icon-btn" title="Duplicate">⎘</button>
-                <button id="removeLayerBtn" class="icon-btn danger" title="Remove">−</button>
-                <button id="addLayerBtn" class="icon-btn primary" title="Add">＋</button>
-              </span>
-            </summary>
-            <div id="layersList" class="list-stack"></div>
-            <div id="layerInspector" class="inspector"></div>
-          </details>
-
-          <details>
-            <summary>
-              <span>Text Layers</span>
-              <span class="summary-actions" onclick="event.stopPropagation()">
-                <button id="duplicateTextBtn" class="icon-btn" title="Duplicate">⎘</button>
-                <button id="removeTextBtn" class="icon-btn danger" title="Remove">−</button>
-                <button id="addTextBtn" class="icon-btn primary" title="Add">＋</button>
-              </span>
-            </summary>
-            <div id="textsList" class="list-stack"></div>
-            <div id="textInspector" class="inspector"></div>
-          </details>
-
-          <details id="svgLayersSection">
-            <summary>
-              <span>SVG Layers</span>
-              <span class="summary-actions" onclick="event.stopPropagation()">
-                <button id="removeSvgLayerBtn" class="icon-btn danger" title="Remove">−</button>
-                <button id="addSvgLayerBtn" class="icon-btn primary" title="Add SVG Layer">＋</button>
-              </span>
-            </summary>
-            <div id="svgLayersList" class="list-stack"></div>
-            <label class="upload-svg-label">
-              <input id="svgUploadInput" type="file" accept=".svg,image/svg+xml" hidden />
-              <button class="btn btn-sm" onclick="document.getElementById('svgUploadInput').click()">Upload SVG Layer</button>
-            </label>
-            <div id="svgLayerInspector" class="inspector"></div>
-          </details>
-
-          <details>
-            <summary>ASCII Snapshot</summary>
-            <div class="snapshot-bar">
-              <button id="refreshFrameBtn" class="btn btn-sm">Refresh</button>
-            </div>
-            <textarea id="frameOutput" spellcheck="false" aria-label="ASCII frame output"></textarea>
-          </details>
-        </div>
-      </aside>
+    <main class="stage-card">
+      <canvas id="bgCanvas" aria-hidden="true"></canvas>
+      <div class="canvas-wrap">
+        <canvas id="stageCanvas" aria-label="ASCII preview canvas"></canvas>
+      </div>
     </main>
 
-    <div id="presetsModal" class="presets-modal-overlay" hidden>
-      <div class="presets-modal">
-        <div class="presets-modal-header">
-          <span class="presets-modal-title">Choose a Preset</span>
-          <button id="presetsModalClose" class="panel-close" title="Close">✕</button>
-        </div>
-        <div id="presetsGrid" class="presets-grid"></div>
-      </div>
-    </div>
-
-    <div id="embedModal" class="presets-modal-overlay" hidden>
-      <div class="presets-modal embed-modal">
-        <div class="presets-modal-header">
-          <span class="presets-modal-title">JSON Test & Export</span>
-          <button id="embedModalClose" class="panel-close" title="Close">✕</button>
-        </div>
-
-        <div class="embed-modal-body">
-          <div class="embed-step">
-            <div class="embed-step-label">NPM</div>
-            <pre class="embed-code-block">npm install ascii-bg</pre>
-          </div>
-
-          <div class="embed-step">
-            <div class="embed-step-label">Bundler</div>
-            <pre class="embed-code-block" id="embedSnippetBlock">import AsciiBackground from 'ascii-bg';
-import project from './my-project.json';
-
-AsciiBackground.mount('#my-element', project);</pre>
-            <button class="btn" id="embedCopySnippetBtn" hidden>Copy Snippet</button>
-          </div>
-
-          <div class="embed-step" hidden>
-            <div class="embed-step-label">CDN</div>
-            <pre class="embed-code-block" id="embedCdnBlock">&lt;script type="module"&gt;
-  import AsciiBackground from 'https://unpkg.com/ascii-bg/dist/ascii-bg.esm.js';
-  const project = { /* paste JSON */ };
-  AsciiBackground.mount('#my-element', project);
-&lt;/script&gt;</pre>
-          </div>
-
-          <div class="embed-step">
-            <div class="embed-step-label">Current Project JSON</div>
-            <textarea id="embedJsonTextarea" class="embed-json-textarea" readonly></textarea>
-            <button class="btn" id="embedCopyJsonBtn">Copy JSON</button>
-            <button class="btn btn-primary" id="embedExportJsonBtn">Export JSON</button>
-          </div>
-
-          <div class="embed-step">
-            <div class="embed-step-label">Test Existing JSONs</div>
-            <div class="embed-inline-row" hidden>
-              <select id="embedPresetJsonSelect" class="select-compact embed-select"></select>
-              <button class="btn btn-primary" id="embedApplyPresetJsonBtn">Apply Selected</button>
-              <button class="btn" id="embedLoadPresetJsonBtn" hidden>Load to Paste</button>
-              <button class="btn" id="embedExportTesterJsonBtn" hidden>Export Tested JSON</button>
-            </div>
-            <textarea id="embedPresetJsonPreview" class="embed-json-textarea" readonly></textarea>
-          </div>
-
-          <div class="embed-step" hidden>
-            <div class="embed-step-label">Paste & Test</div>
-            <textarea id="embedPasteJsonTextarea" class="embed-json-textarea" placeholder="Paste project JSON"></textarea>
-            <button class="btn btn-primary" id="embedApplyJsonBtn">Apply Pasted JSON</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <footer class="stats-bar" hidden>
-      <span id="fpsStat">FPS: —</span>
-      <span id="renderStat">Render: — ms</span>
-      <span id="cellsStat">Cells: —</span>
-      <span id="layersStat">Layers: —</span>
-      <span id="projectTitleLabel" class="stats-title">ASCII Arter</span>
-      <span id="statusStat" class="stats-status">Ready</span>
-    </footer>
-
-    <div class="simple-status">
+    <footer class="simple-status">
       <span id="projectTitleLabelInline">ASCII Arter</span>
       <span id="statusStatInline">Ready</span>
+    </footer>
+  </div>
+
+  <section id="subjectSvgArea" hidden>
+    <textarea id="subjectSvgInput" rows="3" spellcheck="false" placeholder="Paste <svg>...</svg>"></textarea>
+    <button id="subjectSvgUpload">Upload SVG</button>
+    <input id="subjectSvgFileInput" type="file" accept=".svg,image/svg+xml" hidden />
+    <button class="subject-tab" data-type="svg" id="activateSvgBtn">Use SVG</button>
+  </section>
+
+  <section id="subjectOptions" hidden></section>
+
+  <div class="infra" hidden>
+    <div id="controlsContent"></div>
+
+    <button id="addLayerBtn"></button>
+    <button id="removeLayerBtn"></button>
+    <button id="duplicateLayerBtn"></button>
+    <button id="moveLayerUpBtn"></button>
+    <button id="moveLayerDownBtn"></button>
+
+    <button id="addTextBtn"></button>
+    <button id="removeTextBtn"></button>
+    <button id="duplicateTextBtn"></button>
+
+    <button id="addSvgLayerBtn"></button>
+    <button id="removeSvgLayerBtn"></button>
+    <input id="svgUploadInput" type="file" accept=".svg,image/svg+xml" />
+
+    <div id="layersList"></div>
+    <div id="layerInspector"></div>
+    <div id="textsList"></div>
+    <div id="textInspector"></div>
+    <div id="svgLayersList"></div>
+    <div id="svgLayerInspector"></div>
+
+    <button id="refreshFrameBtn"></button>
+    <textarea id="frameOutput" spellcheck="false"></textarea>
+  </div>
+
+  <div id="presetsModal" class="presets-modal-overlay" hidden>
+    <div class="presets-modal">
+      <div class="modal-head">
+        <span>Choose a Preset</span>
+        <button id="presetsModalClose" class="btn">✕</button>
+      </div>
+      <div id="presetsGrid" class="presets-grid"></div>
     </div>
   </div>
+
+  <div id="embedModal" class="presets-modal-overlay" hidden>
+    <div class="presets-modal embed-modal">
+      <div class="modal-head">
+        <span>JSON Test & Export</span>
+        <button id="embedModalClose" class="btn">✕</button>
+      </div>
+      <div class="embed-body">
+        <label>Current Project JSON</label>
+        <textarea id="embedJsonTextarea" class="embed-textarea" readonly></textarea>
+
+        <div class="embed-row">
+          <button id="embedCopyJsonBtn" class="btn">Copy JSON</button>
+          <button id="embedExportJsonBtn" class="btn btn-accent">Export JSON</button>
+          <button id="embedCopySnippetBtn" class="btn" hidden>Copy Snippet</button>
+        </div>
+
+        <label>Test Existing JSONs</label>
+        <select id="embedPresetJsonSelect"></select>
+        <textarea id="embedPresetJsonPreview" class="embed-textarea" readonly></textarea>
+        <div class="embed-row">
+          <button id="embedLoadPresetJsonBtn" class="btn" hidden>Load to Paste</button>
+          <button id="embedApplyPresetJsonBtn" class="btn btn-accent">Apply Selected</button>
+          <button id="embedExportTesterJsonBtn" class="btn" hidden>Export Tested JSON</button>
+        </div>
+
+        <label>Paste & Test</label>
+        <textarea id="embedPasteJsonTextarea" class="embed-textarea" placeholder="Paste project JSON"></textarea>
+        <button id="embedApplyJsonBtn" class="btn btn-accent">Apply Pasted JSON</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="stats-bar" hidden>
+    <span id="fpsStat">FPS: —</span>
+    <span id="renderStat">Render: — ms</span>
+    <span id="cellsStat">Cells: —</span>
+    <span id="layersStat">Layers: —</span>
+    <span id="projectTitleLabel">ASCII Arter</span>
+    <span id="statusStat">Ready</span>
+  </footer>
 
   <script>
     const exportBtn = document.getElementById('exportMenuBtn');
@@ -271,6 +177,6 @@ AsciiBackground.mount('#my-element', project);</pre>
     });
   </script>
 
-  <script type="module" src="./js/main.js?v=67c5b7b"></script>
+  <script type="module" src="./js/main.js?v=reboot-1"></script>
 </body>
 </html>
