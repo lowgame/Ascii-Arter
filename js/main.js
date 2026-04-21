@@ -159,10 +159,6 @@ function bindButtons() {
 
   dom.randomizeBtn.addEventListener('click', () => {
     randomizeProject();
-    if (project.subject && !project.subject.type) {
-      if (project.subject.text && project.subject.text.trim()) project.subject.type = 'text';
-      else if (project.subject.svgContent && project.subject.svgContent.trim()) project.subject.type = 'svg';
-    }
     applyProject(project, { keepPresetSelection: false, status: 'Randomized scene' });
   });
 
@@ -483,9 +479,6 @@ function bindButtons() {
     subjectTextInput.addEventListener('input', () => {
       if (!project.subject) project.subject = {};
       project.subject.text = subjectTextInput.value;
-      if (project.subject.text && project.subject.text.trim().length > 0) {
-        project.subject.type = 'text';
-      }
       subjectDirty = true;
       needsRedraw = true;
     });
@@ -1258,7 +1251,7 @@ function syncSubjectUI() {
   const type = subject.type || 'none';
 
   // Keep hidden controls in sync for simplified UI
-  const subjectType = project.subject?.type || (project.subject?.text ? 'text' : 'none');
+  const subjectType = project.subject?.type || 'text';
   const activateTextBtn = document.getElementById('activateTextBtn');
   const activateSvgBtn = document.getElementById('activateSvgBtn');
   if (activateTextBtn) activateTextBtn.classList.toggle('active', subjectType === 'text');
@@ -1275,9 +1268,6 @@ function syncSubjectUI() {
   // Sync values
   const subjectTextInput = document.getElementById('subjectTextInput');
   if (subjectTextInput) subjectTextInput.value = subject.text || '';
-  if (!project.subject?.type && subjectTextInput && subjectTextInput.value.trim()) {
-    project.subject.type = 'text';
-  }
   const subjectSvgInput = document.getElementById('subjectSvgInput');
   if (subjectSvgInput) subjectSvgInput.value = subject.svgContent || '';
   const subjectFontWeight = document.getElementById('subjectFontWeight');
