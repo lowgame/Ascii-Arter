@@ -8,6 +8,9 @@ Drop animated ASCII art backgrounds onto any HTML element — design your scene 
 npm install ascii-bg
 ```
 
+Tip: You can test JSONs directly in ASCII Arter first, then export and use in your own project:
+https://lowgame.github.io/Ascii-Arter/  (use the JSON Test button)
+
 ## Quick Start
 
 1. Design your animation at **https://lowgame.github.io/Ascii-Arter/**

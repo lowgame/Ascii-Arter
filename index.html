@@ -24,6 +24,7 @@
       <div class="topbar-right">
         <select id="presetSelect" class="select-compact" hidden></select>
         <button id="presetsGalleryBtn" class="btn">🎨 Presets</button>
+        <button id="jsonTestBtn" class="btn">🧪 JSON Test</button>
         <button id="savePresetBtn" class="btn btn-ghost">💾 Save</button>
         <div class="export-group">
           <button class="btn btn-ghost" id="exportMenuBtn">⬇ Export ▾</button>
@@ -206,7 +207,11 @@
         <div class="embed-modal-body">
           <div class="embed-step">
             <div class="embed-step-label">Step 1 — Install the library</div>
-            <pre class="embed-code-block">npm install ascii-bg</pre>
+            <pre class="embed-code-block">npm install ascii-bg
+
+// Try JSONs in ASCII Arter first:
+// https://lowgame.github.io/Ascii-Arter/  (JSON Test button)
+// then export and use in your own project.</pre>
           </div>
           <div class="embed-step">
             <div class="embed-step-label">Step 2 — ESM / bundler usage</div>
@@ -229,6 +234,21 @@ AsciiBackground.mount('#my-element', project);</pre>
             <div class="embed-step-label">Your current project JSON</div>
             <textarea id="embedJsonTextarea" class="embed-json-textarea" readonly></textarea>
             <button class="btn btn-ghost embed-copy-btn" id="embedCopyJsonBtn">📋 Copy JSON</button>
+          </div>
+          <div class="embed-step">
+            <div class="embed-step-label">Test with existing JSONs</div>
+            <div class="embed-inline-row">
+              <select id="embedPresetJsonSelect" class="select-compact embed-select"></select>
+              <button class="btn btn-ghost" id="embedLoadPresetJsonBtn">⬇ Load to Paste Area</button>
+              <button class="btn btn-primary" id="embedApplyPresetJsonBtn">✅ Apply Selected</button>
+              <button class="btn" id="embedExportTesterJsonBtn">⬇ Export Tested JSON</button>
+            </div>
+            <textarea id="embedPresetJsonPreview" class="embed-json-textarea" readonly></textarea>
+          </div>
+          <div class="embed-step">
+            <div class="embed-step-label">Paste JSON here (test/import)</div>
+            <textarea id="embedPasteJsonTextarea" class="embed-json-textarea" placeholder="Paste project JSON and click Apply"></textarea>
+            <button class="btn btn-primary embed-copy-btn" id="embedApplyJsonBtn">✅ Apply Pasted JSON</button>
           </div>
         </div>
       </div>

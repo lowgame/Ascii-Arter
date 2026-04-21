@@ -3,12 +3,12 @@
   "version": "1.0.0",
   "description": "Drop ASCII art animations onto any element. Design on ASCII Arter, export JSON, embed anywhere.",
   "type": "module",
-  "main": "./dist/ascii-bg.cjs.js",
+  "main": "./dist/ascii-bg.cjs",
   "module": "./dist/ascii-bg.esm.js",
   "exports": {
     ".": {
       "import": "./dist/ascii-bg.esm.js",
-      "require": "./dist/ascii-bg.cjs.js"
+      "require": "./dist/ascii-bg.cjs"
     }
   },
   "files": ["dist", "README.md"],

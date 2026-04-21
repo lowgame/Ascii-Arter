@@ -886,3 +886,22 @@ details > *:not(summary) {
 .embed-copy-btn {
   align-self: flex-start;
 }
+.embed-inline-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.embed-select {
+  min-width: 220px;
+  max-width: 100%;
+}
+#jsonTestBtn {
+  border-color: var(--accent2);
+  color: var(--accent2);
+}
+#jsonTestBtn:hover {
+  color: #fff;
+  border-color: #c4b5fd;
+  background: rgba(167,139,250,.12);
+}
