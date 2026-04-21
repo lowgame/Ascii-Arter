@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./css/main.css" />
+  <link rel="stylesheet" href="./css/main.css?v=ultra-simple-2" />
 </head>
 <body>
   <div id="appShell" class="aa-shell">
@@ -22,24 +22,24 @@
         <span class="topbar-subtitle">Create → Test JSON → Export</span>
       </div>
 
-      <div class="topbar-center">
+      <div class="topbar-center" hidden>
         <button id="playPauseBtn" class="btn btn-primary" hidden>Pause</button>
-        <button id="randomizeBtn" class="btn btn-accent">Randomize</button>
         <button id="shuffleCharsetBtn" class="btn" hidden>Charset</button>
       </div>
 
       <div class="topbar-right">
         <select id="presetSelect" class="select-compact" hidden></select>
         <button id="jsonTestBtn" class="btn btn-accent-soft">JSON Test</button>
+        <button id="randomizeBtn" class="btn btn-accent">Randomize</button>
         <button id="presetsGalleryBtn" class="btn">Presets</button>
         <button id="savePresetBtn" class="btn" hidden>Save</button>
 
         <div class="export-group">
           <button class="btn" id="exportMenuBtn">Export</button>
           <div class="dropdown" id="exportDropdown">
-            <button id="exportProjectBtn">Export JSON Project</button>
+            <button id="exportProjectBtn">Export JSON</button>
             <button id="exportPngBtn">Export PNG</button>
-            <button id="importBtn">Import JSON Project</button>
+            <button id="importBtn">Import JSON</button>
             <button id="copyFrameBtn" hidden>Copy Frame</button>
             <button id="exportTxtBtn" hidden>Export TXT</button>
             <button id="exportHtmlBtn" hidden>Export HTML</button>
@@ -55,7 +55,7 @@
         <label class="subject-label" for="subjectTextInput">Main Text</label>
         <textarea id="subjectTextInput" class="subject-textarea" rows="4" spellcheck="false" placeholder="Write text"></textarea>
         <div class="subject-actions">
-          <button class="subject-tab active" data-type="text" id="activateTextBtn">Use Text</button>
+          <button class="subject-tab active" data-type="text" id="activateTextBtn" hidden>Use Text</button>
           <button class="btn btn-sm" id="subjectClearBtn">Clear</button>
           <select id="subjectFontWeight" class="select-compact" hidden>
             <option value="bold">Bold</option>
@@ -217,11 +217,12 @@ AsciiBackground.mount('#my-element', project);</pre>
             <div class="embed-step-label">Current Project JSON</div>
             <textarea id="embedJsonTextarea" class="embed-json-textarea" readonly></textarea>
             <button class="btn" id="embedCopyJsonBtn">Copy JSON</button>
+            <button class="btn btn-primary" id="embedExportJsonBtn">Export JSON</button>
           </div>
 
           <div class="embed-step">
             <div class="embed-step-label">Test Existing JSONs</div>
-            <div class="embed-inline-row">
+            <div class="embed-inline-row" hidden>
               <select id="embedPresetJsonSelect" class="select-compact embed-select"></select>
               <button class="btn btn-primary" id="embedApplyPresetJsonBtn">Apply Selected</button>
               <button class="btn" id="embedLoadPresetJsonBtn" hidden>Load to Paste</button>

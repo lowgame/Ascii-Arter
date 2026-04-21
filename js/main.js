@@ -140,7 +140,8 @@ function bindDom() {
     'jsonTestBtn',
     'embedCodeBtn', 'embedModal', 'embedModalClose', 'embedJsonTextarea', 'embedCopyJsonBtn', 'embedCopySnippetBtn',
     'embedPasteJsonTextarea', 'embedApplyJsonBtn',
-    'embedPresetJsonSelect', 'embedLoadPresetJsonBtn', 'embedApplyPresetJsonBtn', 'embedPresetJsonPreview', 'embedExportTesterJsonBtn'
+    'embedPresetJsonSelect', 'embedLoadPresetJsonBtn', 'embedApplyPresetJsonBtn', 'embedPresetJsonPreview', 'embedExportTesterJsonBtn',
+    'embedExportJsonBtn'
   ];
 
   ids.forEach((id) => {
@@ -322,6 +323,12 @@ function bindButtons() {
       dom.embedCopyJsonBtn.textContent = '✅ Copied!';
       setTimeout(() => { dom.embedCopyJsonBtn.textContent = '📋 Copy JSON'; }, 1500);
     });
+  });
+  dom.embedExportJsonBtn.addEventListener('click', () => {
+    const json = dom.embedJsonTextarea.value || exportProjectJSON(project);
+    const file = `${slugify(project.projectName || 'ascii-arter')}.json`;
+    downloadText(file, json);
+    setStatus(`Exported JSON: ${file}`);
   });
   dom.embedCopySnippetBtn.addEventListener('click', () => {
     const snippet = `import AsciiBackground from 'ascii-bg';\nimport project from './my-project.json'; // your exported JSON\n\nAsciiBackground.mount('#my-element', project);`;
@@ -1243,10 +1250,12 @@ function syncSubjectUI() {
   const subject = project.subject || {};
   const type = subject.type || 'none';
 
-  // Update tab active states
-  document.querySelectorAll('.subject-tab').forEach((btn) => {
-    btn.classList.toggle('active', btn.dataset.type === type);
-  });
+  // Keep hidden controls in sync for simplified UI
+  const subjectType = project.subject?.type || 'text';
+  const activateTextBtn = document.getElementById('activateTextBtn');
+  const activateSvgBtn = document.getElementById('activateSvgBtn');
+  if (activateTextBtn) activateTextBtn.classList.toggle('active', subjectType === 'text');
+  if (activateSvgBtn) activateSvgBtn.classList.toggle('active', subjectType === 'svg');
 
   // Show/hide sections
   const textArea = document.getElementById('subjectTextArea');

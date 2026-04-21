@@ -50,10 +50,7 @@ button, input, select, textarea { font: inherit; }
 }
 
 .topbar-left {
-  display: flex;
-  align-items: baseline;
-  gap: 12px;
-  min-width: 240px;
+  display: none;
 }
 
 .logo {
@@ -69,10 +66,16 @@ button, input, select, textarea { font: inherit; }
   display: none;
 }
 
-.topbar-center, .topbar-right {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+/* Minimal mode: center main actions, hide secondary controls */
+.topbar {
+  justify-content: center;
+}
+.topbar-left {
+  min-width: auto;
+}
+
+.topbar-right {
+  gap: 10px;
 }
 
 /* Subject strip */
@@ -83,6 +86,9 @@ button, input, select, textarea { font: inherit; }
   padding: 8px;
   border-bottom: 1px solid var(--border);
   background: var(--surface);
+  max-width: 960px;
+  width: 100%;
+  margin: 0 auto;
 }
 
 .subject-card, .subject-options {
@@ -188,6 +194,9 @@ button, input, select, textarea { font: inherit; }
   background: linear-gradient(180deg, #0e1623, #0a111b);
   overflow: hidden;
   box-shadow: var(--shadow);
+  max-width: 960px;
+  width: 100%;
+  margin: 0 auto;
 }
 
 .stage-wrap {
@@ -639,11 +648,11 @@ summary::-webkit-details-marker { display: none; }
 }
 
 #projectTitleLabelInline {
-  color: var(--accent-2);
-  font-weight: 700;
+  color: var(--text-muted);
+  font-weight: 600;
 }
 
 #statusStatInline {
-  color: var(--success);
+  color: var(--text-muted);
   font-weight: 600;
 }
