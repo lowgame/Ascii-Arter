@@ -1429,7 +1429,10 @@ function refreshFrameOutput(force = false) {
 }
 
 function updateProjectLabel() {
-  dom.projectTitleLabel.textContent = project.projectName || 'Ascii Arter';
+  const title = project.projectName || 'Ascii Arter';
+  dom.projectTitleLabel.textContent = title;
+  const inline = document.getElementById('projectTitleLabelInline');
+  if (inline) inline.textContent = title;
 }
 
 function updateStats() {
@@ -1441,6 +1444,8 @@ function updateStats() {
 
 function setStatus(message) {
   dom.statusStat.textContent = message;
+  const inline = document.getElementById('statusStatInline');
+  if (inline) inline.textContent = message;
 }
 
 function ensureBuffers() {

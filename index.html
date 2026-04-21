@@ -7,122 +7,113 @@
   <meta name="description" content="Pure JavaScript ASCII art animation creator." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./css/main.css" />
 </head>
 <body>
-  <div id="appShell">
+  <div id="appShell" class="aa-shell">
 
-    <!-- ── TOP BAR ── -->
     <header class="topbar">
-      <span class="logo">ASCII Arter</span>
-      <div class="topbar-center">
-        <button id="playPauseBtn" class="btn btn-primary">⏸ Pause</button>
-        <button id="randomizeBtn" class="btn btn-randomize">⟳ Randomize</button>
-        <button id="shuffleCharsetBtn" class="btn">🔀 Charset</button>
+      <div class="topbar-left">
+        <span class="logo">ASCII Arter</span>
+        <span class="topbar-subtitle">Create → Test JSON → Export</span>
       </div>
+
+      <div class="topbar-center">
+        <button id="playPauseBtn" class="btn btn-primary" hidden>Pause</button>
+        <button id="randomizeBtn" class="btn btn-accent">Randomize</button>
+        <button id="shuffleCharsetBtn" class="btn" hidden>Charset</button>
+      </div>
+
       <div class="topbar-right">
         <select id="presetSelect" class="select-compact" hidden></select>
-        <button id="presetsGalleryBtn" class="btn">🎨 Presets</button>
-        <button id="jsonTestBtn" class="btn">🧪 JSON Test</button>
-        <button id="savePresetBtn" class="btn btn-ghost">💾 Save</button>
+        <button id="jsonTestBtn" class="btn btn-accent-soft">JSON Test</button>
+        <button id="presetsGalleryBtn" class="btn">Presets</button>
+        <button id="savePresetBtn" class="btn" hidden>Save</button>
+
         <div class="export-group">
-          <button class="btn btn-ghost" id="exportMenuBtn">⬇ Export ▾</button>
+          <button class="btn" id="exportMenuBtn">Export</button>
           <div class="dropdown" id="exportDropdown">
-            <button id="copyFrameBtn">📋 Copy Frame</button>
-            <button id="exportTxtBtn">📄 TXT</button>
-            <button id="exportPngBtn">🖼 PNG</button>
-            <button id="exportHtmlBtn">🌐 HTML</button>
-            <button id="exportProjectBtn">📦 JSON Project</button>
-            <button id="importBtn">📂 Import JSON</button>
-            <button id="embedCodeBtn">🔗 Get Embed Code</button>
+            <button id="exportProjectBtn">Export JSON Project</button>
+            <button id="exportPngBtn">Export PNG</button>
+            <button id="importBtn">Import JSON Project</button>
+            <button id="copyFrameBtn" hidden>Copy Frame</button>
+            <button id="exportTxtBtn" hidden>Export TXT</button>
+            <button id="exportHtmlBtn" hidden>Export HTML</button>
+            <button id="embedCodeBtn" hidden>Open JSON Test / Embed</button>
           </div>
         </div>
         <input id="importProjectInput" type="file" accept="application/json" hidden />
       </div>
     </header>
 
-    <!-- ── INPUT DOCK (always visible) ── -->
-    <div class="input-dock">
-
-      <div class="input-dock-cell">
-        <label class="input-dock-label">✏️ Text</label>
-        <textarea id="subjectTextInput" class="input-dock-textarea" placeholder="Type here — becomes the canvas subject" rows="2" spellcheck="false"></textarea>
-        <div class="input-dock-row">
-          <select id="subjectFontWeight" class="select-compact">
+    <section class="subject-strip">
+      <div class="subject-card">
+        <label class="subject-label" for="subjectTextInput">Main Text</label>
+        <textarea id="subjectTextInput" class="subject-textarea" rows="4" spellcheck="false" placeholder="Write text"></textarea>
+        <div class="subject-actions">
+          <button class="subject-tab active" data-type="text" id="activateTextBtn">Use Text</button>
+          <button class="btn btn-sm" id="subjectClearBtn">Clear</button>
+          <select id="subjectFontWeight" class="select-compact" hidden>
             <option value="bold">Bold</option>
             <option value="900">Extra Bold</option>
             <option value="normal">Normal</option>
           </select>
-          <button class="subject-tab active" data-type="text" id="activateTextBtn">Use Text</button>
+          <input type="range" id="subjectBgIntensity" min="0" max="0.5" step="0.01" value="0.08" hidden />
+          <input type="range" id="subjectPadding" min="0" max="12" step="1" value="4" hidden />
         </div>
       </div>
 
-      <div class="input-dock-divider"></div>
-
-      <div class="input-dock-cell">
-        <label class="input-dock-label">◈ SVG</label>
-        <textarea id="subjectSvgInput" class="input-dock-textarea" placeholder="Paste <svg>...</svg> here" rows="2" spellcheck="false"></textarea>
-        <div class="input-dock-row">
-          <button class="btn btn-ghost btn-sm" id="subjectSvgUpload">📁 Upload</button>
+      <div class="subject-card" hidden>
+        <label class="subject-label" for="subjectSvgInput">SVG Subject</label>
+        <textarea id="subjectSvgInput" class="subject-textarea" rows="3" spellcheck="false" placeholder="Paste <svg>...</svg>"></textarea>
+        <div class="subject-actions">
+          <button class="btn btn-sm" id="subjectSvgUpload">Upload SVG</button>
           <input id="subjectSvgFileInput" type="file" accept=".svg,image/svg+xml" hidden />
           <button class="subject-tab" data-type="svg" id="activateSvgBtn">Use SVG</button>
         </div>
       </div>
 
-      <div class="input-dock-divider"></div>
-
-      <div class="input-dock-cell input-dock-options">
-        <label class="input-dock-label">⚙ Options</label>
-        <label class="input-dock-option-row">
+      <div class="subject-options" hidden>
+        <label class="subject-label">Subject Options</label>
+        <label class="opt-row">
           <span>BG</span>
-          <input type="range" id="subjectBgIntensity" min="0" max="0.5" step="0.01" value="0.08" />
+          <input type="range" min="0" max="0.5" step="0.01" value="0.08" disabled />
         </label>
-        <label class="input-dock-option-row">
+        <label class="opt-row">
           <span>Pad</span>
-          <input type="range" id="subjectPadding" min="0" max="12" step="1" value="4" />
+          <input type="range" min="0" max="12" step="1" value="4" disabled />
         </label>
-        <button class="btn btn-ghost btn-sm" id="subjectClearBtn" style="margin-top:4px">✕ Clear</button>
       </div>
+    </section>
 
-    </div>
-
-    <!-- ── MAIN STAGE ── -->
-    <div class="stage-area">
-
-      <!-- Background ASCII canvas (decorative) -->
-      <canvas id="bgCanvas" aria-hidden="true"></canvas>
-
-      <!-- Canvas fills the stage -->
-      <div class="canvas-wrap">
-        <canvas id="stageCanvas" aria-label="ASCII preview canvas"></canvas>
-      </div>
-
-      <!-- ── LEFT PANEL: Controls ── -->
-      <div class="float-panel float-panel-left" id="controlsPanel">
-        <div class="panel-header">
-          <span>Controls</span>
-          <button class="panel-close" data-panel="controlsPanel" title="Close">✕</button>
+    <main class="workspace">
+      <aside class="panel panel-controls" hidden>
+        <div class="panel-head">
+          <h2>Controls</h2>
+          <p>Start with only what you need.</p>
         </div>
         <div class="panel-body">
           <div id="controlsContent"></div>
         </div>
-      </div>
-      <button class="panel-tab panel-tab-left" id="controlsTab" data-panel="controlsPanel" title="Open Controls">
-        ◀ Controls
-      </button>
+      </aside>
 
-      <!-- ── RIGHT PANEL: Layers ── -->
-      <div class="float-panel float-panel-right" id="layersPanel">
-        <div class="panel-header">
-          <span>Layers</span>
-          <button class="panel-close" data-panel="layersPanel" title="Close">✕</button>
+      <section class="stage-area">
+        <div class="stage-wrap">
+          <canvas id="bgCanvas" aria-hidden="true"></canvas>
+          <div class="canvas-wrap">
+            <canvas id="stageCanvas" aria-label="ASCII preview canvas"></canvas>
+          </div>
         </div>
+      </section>
+
+      <aside class="panel panel-layers" hidden>
+        <div class="panel-head">
+          <h2>Layers</h2>
+          <p>Animation, text and SVG stacks.</p>
+        </div>
+
         <div class="panel-body">
-
-          <!-- ✏️ Your Content moved to input-dock (always visible below topbar) -->
-
-          <!-- Animation Layers -->
           <details open>
             <summary>
               <span>Animation Layers</span>
@@ -138,7 +129,6 @@
             <div id="layerInspector" class="inspector"></div>
           </details>
 
-          <!-- Text Layers -->
           <details>
             <summary>
               <span>Text Layers</span>
@@ -152,7 +142,6 @@
             <div id="textInspector" class="inspector"></div>
           </details>
 
-          <!-- SVG Layers -->
           <details id="svgLayersSection">
             <summary>
               <span>SVG Layers</span>
@@ -164,98 +153,90 @@
             <div id="svgLayersList" class="list-stack"></div>
             <label class="upload-svg-label">
               <input id="svgUploadInput" type="file" accept=".svg,image/svg+xml" hidden />
-              <button class="btn btn-ghost btn-sm" onclick="document.getElementById('svgUploadInput').click()">📁 Upload SVG</button>
+              <button class="btn btn-sm" onclick="document.getElementById('svgUploadInput').click()">Upload SVG Layer</button>
             </label>
             <div id="svgLayerInspector" class="inspector"></div>
           </details>
 
-          <!-- ASCII Snapshot (rarely used) -->
           <details>
             <summary>ASCII Snapshot</summary>
             <div class="snapshot-bar">
-              <button id="refreshFrameBtn" class="btn btn-ghost btn-sm">↻ Refresh</button>
+              <button id="refreshFrameBtn" class="btn btn-sm">Refresh</button>
             </div>
             <textarea id="frameOutput" spellcheck="false" aria-label="ASCII frame output"></textarea>
           </details>
-
         </div>
-      </div>
-      <button class="panel-tab panel-tab-right" id="layersTab" data-panel="layersPanel" title="Open Layers">
-        Layers ▶
-      </button>
+      </aside>
+    </main>
 
-    </div><!-- /stage-area -->
-
-    <!-- ── PRESETS MODAL ── -->
     <div id="presetsModal" class="presets-modal-overlay" hidden>
       <div class="presets-modal">
         <div class="presets-modal-header">
-          <span class="presets-modal-title">🎨 Choose a Preset</span>
+          <span class="presets-modal-title">Choose a Preset</span>
           <button id="presetsModalClose" class="panel-close" title="Close">✕</button>
         </div>
         <div id="presetsGrid" class="presets-grid"></div>
       </div>
     </div>
 
-    <!-- ── EMBED MODAL ── -->
     <div id="embedModal" class="presets-modal-overlay" hidden>
       <div class="presets-modal embed-modal">
         <div class="presets-modal-header">
-          <span class="presets-modal-title">🔗 Embed on your site</span>
+          <span class="presets-modal-title">JSON Test & Export</span>
           <button id="embedModalClose" class="panel-close" title="Close">✕</button>
         </div>
+
         <div class="embed-modal-body">
           <div class="embed-step">
-            <div class="embed-step-label">Step 1 — Install the library</div>
-            <pre class="embed-code-block">npm install ascii-bg
-
-// Try JSONs in ASCII Arter first:
-// https://lowgame.github.io/Ascii-Arter/  (JSON Test button)
-// then export and use in your own project.</pre>
+            <div class="embed-step-label">NPM</div>
+            <pre class="embed-code-block">npm install ascii-bg</pre>
           </div>
+
           <div class="embed-step">
-            <div class="embed-step-label">Step 2 — ESM / bundler usage</div>
+            <div class="embed-step-label">Bundler</div>
             <pre class="embed-code-block" id="embedSnippetBlock">import AsciiBackground from 'ascii-bg';
-import project from './my-project.json'; // your exported JSON
+import project from './my-project.json';
 
 AsciiBackground.mount('#my-element', project);</pre>
-            <button class="btn btn-ghost embed-copy-btn" id="embedCopySnippetBtn">📋 Copy Snippet</button>
+            <button class="btn" id="embedCopySnippetBtn" hidden>Copy Snippet</button>
           </div>
-          <div class="embed-step">
-            <div class="embed-step-label">Step 2 (alt) — CDN, no build step</div>
+
+          <div class="embed-step" hidden>
+            <div class="embed-step-label">CDN</div>
             <pre class="embed-code-block" id="embedCdnBlock">&lt;script type="module"&gt;
   import AsciiBackground from 'https://unpkg.com/ascii-bg/dist/ascii-bg.esm.js';
-  // paste your project JSON below
-  const project = { /* ... paste JSON here ... */ };
+  const project = { /* paste JSON */ };
   AsciiBackground.mount('#my-element', project);
 &lt;/script&gt;</pre>
           </div>
+
           <div class="embed-step">
-            <div class="embed-step-label">Your current project JSON</div>
+            <div class="embed-step-label">Current Project JSON</div>
             <textarea id="embedJsonTextarea" class="embed-json-textarea" readonly></textarea>
-            <button class="btn btn-ghost embed-copy-btn" id="embedCopyJsonBtn">📋 Copy JSON</button>
+            <button class="btn" id="embedCopyJsonBtn">Copy JSON</button>
           </div>
+
           <div class="embed-step">
-            <div class="embed-step-label">Test with existing JSONs</div>
+            <div class="embed-step-label">Test Existing JSONs</div>
             <div class="embed-inline-row">
               <select id="embedPresetJsonSelect" class="select-compact embed-select"></select>
-              <button class="btn btn-ghost" id="embedLoadPresetJsonBtn">⬇ Load to Paste Area</button>
-              <button class="btn btn-primary" id="embedApplyPresetJsonBtn">✅ Apply Selected</button>
-              <button class="btn" id="embedExportTesterJsonBtn">⬇ Export Tested JSON</button>
+              <button class="btn btn-primary" id="embedApplyPresetJsonBtn">Apply Selected</button>
+              <button class="btn" id="embedLoadPresetJsonBtn" hidden>Load to Paste</button>
+              <button class="btn" id="embedExportTesterJsonBtn" hidden>Export Tested JSON</button>
             </div>
             <textarea id="embedPresetJsonPreview" class="embed-json-textarea" readonly></textarea>
           </div>
-          <div class="embed-step">
-            <div class="embed-step-label">Paste JSON here (test/import)</div>
-            <textarea id="embedPasteJsonTextarea" class="embed-json-textarea" placeholder="Paste project JSON and click Apply"></textarea>
-            <button class="btn btn-primary embed-copy-btn" id="embedApplyJsonBtn">✅ Apply Pasted JSON</button>
+
+          <div class="embed-step" hidden>
+            <div class="embed-step-label">Paste & Test</div>
+            <textarea id="embedPasteJsonTextarea" class="embed-json-textarea" placeholder="Paste project JSON"></textarea>
+            <button class="btn btn-primary" id="embedApplyJsonBtn">Apply Pasted JSON</button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ── BOTTOM STATS BAR ── -->
-    <footer class="stats-bar">
+    <footer class="stats-bar" hidden>
       <span id="fpsStat">FPS: —</span>
       <span id="renderStat">Render: — ms</span>
       <span id="cellsStat">Cells: —</span>
@@ -264,41 +245,26 @@ AsciiBackground.mount('#my-element', project);</pre>
       <span id="statusStat" class="stats-status">Ready</span>
     </footer>
 
-  </div><!-- /appShell -->
+    <div class="simple-status">
+      <span id="projectTitleLabelInline">ASCII Arter</span>
+      <span id="statusStatInline">Ready</span>
+    </div>
+  </div>
 
   <script>
-    // Panel toggle logic
-    function togglePanel(panelId) {
-      const panel = document.getElementById(panelId);
-      const isLeft = panel.classList.contains('float-panel-left');
-      const tabId = isLeft ? 'controlsTab' : 'layersTab';
-      const tab = document.getElementById(tabId);
-      const open = panel.classList.toggle('panel-open');
-      tab.style.display = open ? 'none' : '';
-    }
-
-    document.querySelectorAll('.panel-close, .panel-tab').forEach(btn => {
-      btn.addEventListener('click', () => togglePanel(btn.dataset.panel));
-    });
-
-    // Input dock activate buttons — visual feedback (JS logic is in main.js)
-    document.getElementById('activateTextBtn').addEventListener('click', () => {
-      document.getElementById('activateTextBtn').classList.add('active');
-      document.getElementById('activateSvgBtn').classList.remove('active');
-    });
-    document.getElementById('activateSvgBtn').addEventListener('click', () => {
-      document.getElementById('activateSvgBtn').classList.add('active');
-      document.getElementById('activateTextBtn').classList.remove('active');
-    });
-
-    // Export dropdown
     const exportBtn = document.getElementById('exportMenuBtn');
     const exportDropdown = document.getElementById('exportDropdown');
+
     exportBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       exportDropdown.classList.toggle('open');
     });
-    document.addEventListener('click', () => exportDropdown.classList.remove('open'));
+
+    document.addEventListener('click', (e) => {
+      if (!exportDropdown.contains(e.target) && e.target !== exportBtn) {
+        exportDropdown.classList.remove('open');
+      }
+    });
   </script>
 
   <script type="module" src="./js/main.js"></script>
