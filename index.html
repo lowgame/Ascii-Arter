@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./css/main.css?v=ultra-simple-3" />
+  <link rel="stylesheet" href="./css/main.css?v=ultra-simple-4" />
 </head>
 <body>
   <div id="appShell" class="aa-shell">
@@ -32,6 +32,7 @@
         <button id="jsonTestBtn" class="btn btn-accent-soft">JSON Test</button>
         <button id="randomizeBtn" class="btn btn-accent">Randomize</button>
         <button id="presetsGalleryBtn" class="btn">Presets</button>
+        <button id="settingsToggleBtn" class="btn" title="Ayar panelini aç/kapat">Ayarlar</button>
         <button id="savePresetBtn" class="btn" hidden>Save</button>
 
         <div class="export-group">
@@ -91,10 +92,10 @@
     </section>
 
     <main class="workspace">
-      <aside class="panel panel-controls" hidden>
+      <aside class="panel panel-controls" id="settingsPanel" hidden>
         <div class="panel-head">
-          <h2>Controls</h2>
-          <p>Start with only what you need.</p>
+          <h2>Ayarlar</h2>
+          <p>Gelişmiş kontroller burada.</p>
         </div>
         <div class="panel-body">
           <div id="controlsContent"></div>
@@ -110,7 +111,7 @@
         </div>
       </section>
 
-      <aside class="panel panel-layers" hidden>
+      <aside class="panel panel-layers" id="layersPanel" hidden>
         <div class="panel-head">
           <h2>Layers</h2>
           <p>Animation, text and SVG stacks.</p>
@@ -271,6 +272,6 @@ AsciiBackground.mount('#my-element', project);</pre>
     });
   </script>
 
-  <script type="module" src="./js/main.js?v=67c5b7b"></script>
+  <script type="module" src="./js/main.js?v=desktop-fix-1"></script>
 </body>
 </html>
