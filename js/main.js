@@ -19,6 +19,20 @@ import { BUILTIN_PRESETS, getPresetById } from './data/presets.js';
 import { AsciiRenderer, FrameBuffer } from './core/engine.js';
 import { downloadText, exportCanvasPNG, exportHTMLSnapshot, exportProjectJSON, importProjectJSON } from './core/exporters.js';
 
+const PRESET_VISUALS = {
+  'matrix-cathedral': { textFont: '900', textColor: '#d7ffe9', textBg: 'rgba(1, 22, 12, 0.78)', animation: 'pulse', outline: false },
+  'synthwave-core': { textFont: '900', textColor: '#fff2cc', textBg: 'rgba(57, 8, 68, 0.78)', animation: 'marquee', outline: true },
+  'aurora-terminal': { textFont: 'bold', textColor: '#caf0f8', textBg: 'rgba(7, 25, 37, 0.78)', animation: 'wave', outline: false },
+  'frost-grid': { textFont: 'bold', textColor: '#f1fdff', textBg: 'rgba(10, 19, 33, 0.8)', animation: 'drift', outline: true },
+  'solar-breach': { textFont: '900', textColor: '#fff4cc', textBg: 'rgba(45, 12, 1, 0.82)', animation: 'pulse', outline: true },
+  'radar-dream': { textFont: 'bold', textColor: '#f2fff2', textBg: 'rgba(5, 31, 0, 0.82)', animation: 'orbit', outline: false },
+  'byte-storm': { textFont: '900', textColor: '#f5f5f5', textBg: 'rgba(9, 16, 35, 0.82)', animation: 'marquee', outline: false },
+  'liquid-gold': { textFont: '900', textColor: '#fff4cc', textBg: 'rgba(52, 36, 0, 0.82)', animation: 'bounce', outline: true },
+  'dream-candy': { textFont: 'bold', textColor: '#fff0f6', textBg: 'rgba(65, 16, 56, 0.8)', animation: 'wave', outline: false },
+  'deep-ocean': { textFont: 'bold', textColor: '#dff6ff', textBg: 'rgba(5, 30, 42, 0.82)', animation: 'drift', outline: false },
+  'terminal-monolith': { textFont: '900', textColor: '#ffffff', textBg: 'rgba(18, 18, 18, 0.84)', animation: 'static', outline: false }
+};
+
 const dom = {};
 let project = createDefaultProject();
 let renderer;
@@ -136,7 +150,8 @@ function bindDom() {
     'addTextBtn', 'removeTextBtn', 'duplicateTextBtn',
     'svgLayersList', 'svgLayerInspector', 'addSvgLayerBtn', 'removeSvgLayerBtn',
     'svgUploadInput', 'presetsGalleryBtn', 'presetsModal', 'presetsModalClose', 'presetsGrid',
-    'embedCodeBtn', 'embedModal', 'embedModalClose', 'embedJsonTextarea', 'embedCopyJsonBtn', 'embedCopySnippetBtn'
+    'embedCodeBtn', 'embedModal', 'embedModalClose', 'embedJsonTextarea', 'embedCopyJsonBtn', 'embedCopySnippetBtn',
+    'subjectPresetLabel'
   ];
 
   ids.forEach((id) => {
@@ -165,7 +180,90 @@ function setSubjectType(type) {
   if (opts) opts.hidden = false;
 }
 
+function bindPresetControls() {
+  if (!dom.presetSelect) return;
+
+  dom.presetSelect.addEventListener('change', () => {
+    const value = dom.presetSelect.value;
+    if (!value) return;
+
+    if (value.startsWith('builtin:')) {
+      const presetId = value.replace('builtin:', '');
+      const preset = getPresetById(presetId);
+      if (preset) {
+        applyPresetVisuals(presetId, preset);
+        project = normalizeProject(preset);
+        selectedLayerId = project.layers[0]?.id || selectedLayerId;
+        selectedTextId = project.texts[0]?.id || selectedTextId;
+        applyProject(project, { keepPresetSelection: true, status: `Loaded ${preset.projectName || 'preset'}` });
+      }
+      return;
+    }
+
+    if (value.startsWith('saved:')) {
+      const presets = getSavedPresets();
+      const preset = presets.find((item) => item.id === value.replace('saved:', ''));
+      if (preset) {
+        applyPresetVisuals(null, preset.project);
+        project = normalizeProject(preset.project);
+        selectedLayerId = project.layers[0]?.id || selectedLayerId;
+        selectedTextId = project.texts[0]?.id || selectedTextId;
+        applyProject(project, { keepPresetSelection: true, status: `Loaded ${preset.name}` });
+      }
+    }
+  });
+}
+
+function ensureSubjectDefaults() {
+  if (!project.subject) project.subject = {};
+  project.subject.textFont = project.subject.textFont || '900';
+  project.subject.padding = project.subject.padding ?? 4;
+  project.subject.bgIntensity = project.subject.bgIntensity ?? 0.08;
+}
+
+function applyPresetVisuals(presetId, presetProject) {
+  ensureSubjectDefaults();
+  const subjectText = project.subject?.text || '';
+  const style = (presetId && PRESET_VISUALS[presetId]) || {
+    textFont: project.subject.textFont,
+    textColor: presetProject?.texts?.[0]?.color || '#eef4fb',
+    textBg: presetProject?.texts?.[0]?.bg || 'rgba(8, 16, 22, 0.78)',
+    animation: presetProject?.texts?.[0]?.animation || 'wave',
+    outline: Boolean(presetProject?.texts?.[0]?.outline),
+  };
+
+  if (!subjectText.trim()) return;
+
+  if (Array.isArray(presetProject?.texts)) {
+    presetProject.texts = presetProject.texts.map((text, index) => {
+      if (index !== 0) return text;
+      return {
+        ...text,
+        content: subjectText,
+        color: style.textColor,
+        bg: style.textBg,
+        animation: style.animation,
+        outline: style.outline,
+        enabled: true,
+      };
+    });
+  }
+
+  presetProject.subject = {
+    ...(presetProject.subject || {}),
+    ...(project.subject || {}),
+    type: 'text',
+    text: subjectText,
+    textFont: style.textFont || project.subject.textFont || '900',
+    bgIntensity: project.subject?.bgIntensity ?? 0.08,
+    padding: project.subject?.padding ?? 4,
+  };
+}
+
 function bindButtons() {
+  bindPresetControls();
+  ensureSubjectDefaults();
+
   dom.playPauseBtn.addEventListener('click', () => {
     isPlaying = !isPlaying;
     dom.playPauseBtn.textContent = isPlaying ? 'Pause' : 'Play';
@@ -213,33 +311,6 @@ function bindButtons() {
   dom.refreshFrameBtn.addEventListener('click', () => {
     refreshFrameOutput(true);
     setStatus('ASCII text snapshot refreshed');
-  });
-
-  dom.presetSelect.addEventListener('change', () => {
-    const value = dom.presetSelect.value;
-    if (!value) return;
-
-    if (value.startsWith('builtin:')) {
-      const preset = getPresetById(value.replace('builtin:', ''));
-      if (preset) {
-        project = normalizeProject(preset);
-        selectedLayerId = project.layers[0]?.id || selectedLayerId;
-        selectedTextId = project.texts[0]?.id || selectedTextId;
-        applyProject(project, { keepPresetSelection: true, status: `Loaded ${preset.projectName || 'preset'}` });
-      }
-      return;
-    }
-
-    if (value.startsWith('saved:')) {
-      const presets = getSavedPresets();
-      const preset = presets.find((item) => item.id === value.replace('saved:', ''));
-      if (preset) {
-        project = normalizeProject(preset.project);
-        selectedLayerId = project.layers[0]?.id || selectedLayerId;
-        selectedTextId = project.texts[0]?.id || selectedTextId;
-        applyProject(project, { keepPresetSelection: true, status: `Loaded ${preset.name}` });
-      }
-    }
   });
 
   dom.addLayerBtn.addEventListener('click', () => {

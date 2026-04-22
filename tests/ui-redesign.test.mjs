@@ -69,10 +69,7 @@ function startStaticServer(root) {
 
     server.listen(0, '127.0.0.1', () => {
       const address = server.address();
-      resolve({
-        server,
-        baseUrl: `http://127.0.0.1:${address.port}`,
-      });
+      resolve({ server, baseUrl: `http://127.0.0.1:${address.port}` });
     });
 
     server.on('error', reject);
@@ -99,6 +96,23 @@ async function isVisible(page, selector) {
   });
 }
 
+async function topElementInside(page, selector, xRatio = 0.3, yRatio = 0.3) {
+  return page.evaluate(({ selector, xRatio, yRatio }) => {
+    const element = document.querySelector(selector);
+    if (!element) return null;
+    const rect = element.getBoundingClientRect();
+    const x = Math.min(window.innerWidth - 4, Math.max(4, rect.left + rect.width * xRatio));
+    const y = Math.min(window.innerHeight - 4, Math.max(4, rect.top + rect.height * yRatio));
+    const top = document.elementFromPoint(x, y);
+    return top ? {
+      id: top.id,
+      className: top.className,
+      inside: Boolean(top.closest(selector)),
+      tagName: top.tagName,
+    } : null;
+  }, { selector, xRatio, yRatio });
+}
+
 test.before(async () => {
   ({ server, baseUrl } = await startStaticServer(rootDir));
   browser = await chromium.launch({ headless: true });
@@ -115,85 +129,113 @@ test('desktop keeps settings and preview visible side by side without page scrol
 
   const metrics = await page.evaluate(() => {
     const rect = (selector) => document.querySelector(selector)?.getBoundingClientRect().toJSON() || null;
-    const styleVisible = (selector) => {
-      const element = document.querySelector(selector);
-      if (!element) return false;
-      const style = window.getComputedStyle(element);
-      return style.display !== 'none' && style.visibility !== 'hidden' && !element.hidden;
-    };
-
     return {
       scrollHeight: document.documentElement.scrollHeight,
       innerHeight: window.innerHeight,
-      controls: rect('#controlsPanel'),
-      layers: rect('#layersPanel'),
+      editorRail: rect('.editor-rail'),
       stage: rect('.stage-area'),
       subject: rect('#subjectTextInput'),
-      backdropVisible: styleVisible('#settingsBackdrop'),
-      settingsToggleVisible: styleVisible('#settingsToggleBtn'),
-      inlineSettingsVisible: styleVisible('#openSettingsInlineBtn'),
     };
   });
 
-  assert.ok(metrics.controls, 'controls panel should exist');
-  assert.ok(metrics.layers, 'layers panel should exist');
+  assert.ok(metrics.editorRail, 'editor rail should exist');
   assert.ok(metrics.stage, 'preview stage should exist');
   assert.ok(metrics.subject, 'subject input should exist');
   assert.ok(metrics.scrollHeight <= metrics.innerHeight + 2, 'desktop layout should fit in one viewport without page scrolling');
-  assert.ok(metrics.controls.right < metrics.stage.left, 'controls should stay beside the preview, not above it');
-  assert.ok(metrics.layers.right < metrics.stage.left, 'layers panel should stay beside the preview, not below it');
+  assert.ok(metrics.editorRail.right < metrics.stage.left, 'left rail should stay beside the preview');
   assert.ok(metrics.stage.top < 220, 'preview should start near the top of the workspace');
   assert.ok(metrics.stage.bottom <= metrics.innerHeight - 16, 'preview should remain fully visible while editing');
-  assert.equal(metrics.backdropVisible, false, 'desktop editing should not use a blur backdrop');
-  assert.equal(metrics.settingsToggleVisible, false, 'desktop editing should not depend on a settings drawer toggle');
-  assert.equal(metrics.inlineSettingsVisible, false, 'desktop editing should not require a second inline settings CTA');
   assert.deepEqual(pageErrors, []);
 
   await page.close();
 });
 
-test('left rail behaves like a single-open accordion', async () => {
+test('left rail behaves like a single-open accordion and contains presets', async () => {
   const { page, pageErrors } = await openPage({ width: 1440, height: 960 });
   await page.waitForTimeout(120);
 
-  assert.equal(await page.locator('[data-accordion-trigger="subject"]').count(), 1, 'subject accordion trigger should exist');
-  assert.equal(await page.locator('[data-accordion-trigger="controls"]').count(), 1, 'controls accordion trigger should exist');
-  assert.equal(await page.locator('[data-accordion-trigger="layers"]').count(), 1, 'layers accordion trigger should exist');
+  for (const key of ['subject', 'presets', 'controls', 'layers']) {
+    assert.equal(await page.locator(`[data-accordion-trigger="${key}"]`).count(), 1, `${key} accordion trigger should exist`);
+  }
 
   assert.equal(await isVisible(page, '#subjectAccordionBody'), true, 'subject panel should be open by default');
+  assert.equal(await isVisible(page, '#presetsAccordionBody'), false, 'presets panel should be closed by default');
   assert.equal(await isVisible(page, '#controlsAccordionBody'), false, 'controls panel should be closed by default');
   assert.equal(await isVisible(page, '#layersAccordionBody'), false, 'layers panel should be closed by default');
 
+  await page.click('[data-accordion-trigger="presets"]');
+  await page.waitForTimeout(120);
+  assert.equal(await isVisible(page, '#subjectAccordionBody'), false, 'opening presets should close subject');
+  assert.equal(await isVisible(page, '#presetsAccordionBody'), true, 'presets should open after clicking its header');
+  assert.equal(await page.locator('#presetSelect').isVisible(), true, 'preset selector should live inside the presets accordion');
+  assert.equal(await page.locator('#presetsGalleryBtn').isVisible(), true, 'preset gallery button should live inside the presets accordion');
+
   await page.click('[data-accordion-trigger="controls"]');
   await page.waitForTimeout(120);
-  assert.equal(await isVisible(page, '#subjectAccordionBody'), false, 'opening controls should close subject');
+  assert.equal(await isVisible(page, '#presetsAccordionBody'), false, 'opening controls should close presets');
   assert.equal(await isVisible(page, '#controlsAccordionBody'), true, 'controls should open after clicking its header');
   assert.equal(await isVisible(page, '#layersAccordionBody'), false, 'opening controls should keep layers closed');
-
-  await page.click('[data-accordion-trigger="layers"]');
-  await page.waitForTimeout(120);
-  assert.equal(await isVisible(page, '#subjectAccordionBody'), false, 'opening layers should keep subject closed');
-  assert.equal(await isVisible(page, '#controlsAccordionBody'), false, 'opening layers should close controls');
-  assert.equal(await isVisible(page, '#layersAccordionBody'), true, 'layers should open after clicking its header');
   assert.deepEqual(pageErrors, []);
 
   await page.close();
 });
 
-test('typing into the main text field auto-activates text mode and survives randomize', async () => {
+test('selecting a preset keeps typed subject text alive and themed', async () => {
   const { page, pageErrors } = await openPage({ width: 1440, height: 960 });
 
   await page.fill('#subjectTextInput', 'LOW GAME');
-  await page.waitForTimeout(100);
+  await page.click('[data-accordion-trigger="presets"]');
+  await page.waitForTimeout(120);
+  await page.selectOption('#presetSelect', 'builtin:matrix-cathedral');
+  await page.waitForTimeout(160);
 
-  assert.equal(await page.locator('#activateTextBtn').evaluate((element) => element.classList.contains('active')), true, 'typing should automatically switch subject mode to text');
-  assert.equal(await page.locator('#subjectTextInput').evaluate((element) => element.classList.contains('active-subject')), true, 'text input should be visibly active after typing');
+  assert.equal(await page.locator('#subjectTextInput').inputValue(), 'LOW GAME', 'preset changes should not wipe the main subject text');
+  assert.equal(await page.locator('#activateTextBtn').evaluate((element) => element.classList.contains('active')), true, 'text mode should stay active after preset changes');
+  assert.equal(await page.locator('#subjectTextInput').evaluate((element) => element.classList.contains('active-subject')), true, 'text input should stay visually active after preset changes');
+  assert.equal(await page.locator('#subjectTextInput').evaluate((element) => element.value.length > 0), true, 'subject text should still exist after loading a preset');
+  assert.equal(await page.locator('#subjectFontWeight').inputValue(), '900', 'preset selection should push subject styling toward the preset look');
+  assert.deepEqual(pageErrors, []);
 
-  await page.click('#randomizeBtn');
-  await page.waitForTimeout(100);
+  await page.close();
+});
 
-  assert.equal(await page.locator('#subjectTextInput').inputValue(), 'LOW GAME', 'randomize should not wipe the main text');
-  assert.equal(await page.locator('#activateTextBtn').evaluate((element) => element.classList.contains('active')), true, 'text mode should stay active after randomize');
+test('stage uses the ASCII background itself without a separate static backdrop', async () => {
+  const { page, pageErrors } = await openPage({ width: 1440, height: 960 });
+  await page.waitForTimeout(120);
+
+  const visuals = await page.evaluate(() => {
+    const stage = document.querySelector('.stage-area');
+    const bgCanvas = document.getElementById('bgCanvas');
+    const stageStyle = window.getComputedStyle(stage);
+    const bgStyle = window.getComputedStyle(bgCanvas);
+    return {
+      stageBackgroundImage: stageStyle.backgroundImage,
+      stageBackgroundColor: stageStyle.backgroundColor,
+      bgCanvasPosition: bgStyle.position,
+      bgCanvasInset: bgStyle.inset,
+      bgCanvasOpacity: bgStyle.opacity,
+    };
+  });
+
+  assert.equal(visuals.stageBackgroundImage, 'none', 'stage area should not add a separate static gradient behind the ASCII background');
+  assert.equal(visuals.stageBackgroundColor, 'rgba(0, 0, 0, 0)', 'stage area should not paint a flat fallback background');
+  assert.equal(visuals.bgCanvasPosition, 'absolute', 'ASCII background should be rendered by the dedicated canvas layer');
+  assert.equal(visuals.bgCanvasInset, '0px', 'ASCII background canvas should fill the game area exactly');
+  assert.notEqual(visuals.bgCanvasOpacity, '0', 'ASCII background canvas should remain visible');
+  assert.deepEqual(pageErrors, []);
+
+  await page.close();
+});
+
+test('export menu opens above the game area instead of behind it', async () => {
+  const { page, pageErrors } = await openPage({ width: 1440, height: 960 });
+
+  await page.click('#exportMenuBtn');
+  await page.waitForTimeout(120);
+
+  const topElement = await topElementInside(page, '#exportDropdown', 0.8, 0.55);
+  assert.ok(topElement, 'should find a hit-tested element inside the export dropdown');
+  assert.equal(topElement.inside, true, 'export dropdown should sit above the stage and receive pointer hits');
   assert.deepEqual(pageErrors, []);
 
   await page.close();

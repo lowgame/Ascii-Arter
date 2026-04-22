@@ -33,9 +33,7 @@
 html, body {
   height: 100%;
   margin: 0;
-  background:
-    radial-gradient(circle at top, rgba(115, 240, 199, 0.08), transparent 30%),
-    linear-gradient(180deg, #091019 0%, #060c12 100%);
+  background: #060c12;
   color: var(--text);
   font-family: var(--font);
   overflow: hidden;
@@ -80,6 +78,8 @@ textarea {
 }
 
 .app-header {
+  position: relative;
+  z-index: 40;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -218,13 +218,14 @@ input[type="range"]:focus {
 
 .export-group {
   position: relative;
+  z-index: 200;
 }
 
 .dropdown {
   position: absolute;
   top: calc(100% + 10px);
   right: 0;
-  z-index: 50;
+  z-index: 250;
   min-width: 220px;
   display: none;
   gap: 6px;
@@ -269,7 +270,7 @@ input[type="range"]:focus {
 
 .editor-rail {
   display: grid;
-  grid-template-rows: repeat(3, minmax(64px, auto));
+  grid-template-rows: repeat(4, minmax(64px, auto));
   gap: 12px;
   align-content: start;
 }
@@ -334,19 +335,28 @@ input[type="range"]:focus {
   overflow: hidden;
 }
 
+.subject-layout {
+  display: grid;
+  gap: 14px;
+  padding-bottom: 18px;
+}
+
 .subject-card-head {
   display: flex;
-  justify-content: flex-end;
-  padding: 0 18px;
+  justify-content: flex-start;
+  padding: 14px 18px 0;
 }
 
 .card-head-actions,
 .subject-panel-actions,
 .inline-actions,
-.snapshot-bar {
+.snapshot-bar,
+.subject-action-row,
+.preset-action-row {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 .subject-tab {
@@ -364,11 +374,20 @@ input[type="range"]:focus {
 }
 
 .subject-panel {
-  padding: 16px 18px 0;
+  padding: 0 18px;
+}
+
+.subject-field-label,
+.preset-hint,
+.preset-picker span {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--muted);
+  font-size: 0.84rem;
 }
 
 .main-input {
-  min-height: 116px;
+  min-height: 124px;
   font-size: 1rem;
 }
 
@@ -388,40 +407,48 @@ input[type="range"]:focus {
   box-shadow: 0 0 0 4px rgba(115, 240, 199, 0.12);
 }
 
-.subject-options {
-  display: flex;
-  align-items: end;
+.subject-control-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
-  flex-wrap: wrap;
-  padding: 16px 18px 18px;
+  padding: 0 18px;
 }
 
 .mini-control {
   display: grid;
   gap: 8px;
-  min-width: 120px;
+  min-width: 0;
   color: var(--muted);
   font-size: 0.84rem;
 }
 
 .slider-control {
-  min-width: 156px;
+  min-width: 0;
 }
 
-.mini-control span {
-  font-weight: 600;
+.subject-action-row {
+  grid-column: 1 / -1;
+  justify-content: flex-end;
+}
+
+.preset-panel-body {
+  display: grid;
+  gap: 14px;
+}
+
+.preset-picker {
+  display: grid;
+  gap: 8px;
+}
+
+.preset-hint {
+  margin: 0;
+  line-height: 1.45;
 }
 
 input[type="range"] {
   width: 100%;
   accent-color: var(--accent-strong);
-}
-
-.subject-quick-actions {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-left: auto;
 }
 
 .tool-panel {
@@ -690,7 +717,7 @@ details > *:not(summary) {
 
 .preview-frame {
   min-height: 0;
-  padding: 16px;
+  padding: 0;
 }
 
 .stage-area {
@@ -699,11 +726,9 @@ details > *:not(summary) {
   height: 100%;
   min-height: 0;
   border: 1px solid var(--border);
-  border-radius: calc(var(--radius-xl) - 6px);
+  border-radius: 0;
   overflow: hidden;
-  background:
-    radial-gradient(circle at 20% 18%, rgba(115, 240, 199, 0.08), transparent 24%),
-    linear-gradient(180deg, rgba(8, 12, 18, 0.96), rgba(5, 9, 13, 1));
+  background: none;
 }
 
 #bgCanvas {
@@ -711,7 +736,7 @@ details > *:not(summary) {
   inset: 0;
   width: 100%;
   height: 100%;
-  opacity: 0.08;
+  opacity: 0.18;
   pointer-events: none;
 }
 
@@ -940,7 +965,7 @@ details > *:not(summary) {
   }
 
   .editor-rail {
-    grid-template-rows: auto auto auto;
+    grid-template-rows: auto auto auto auto;
   }
 
   .accordion-card.is-open {
@@ -962,14 +987,15 @@ details > *:not(summary) {
   .card-head,
   .presets-modal-header,
   .subject-panel,
-  .subject-options,
   .panel-body,
   .preview-frame,
   .stats-bar,
   .embed-modal-body,
   .presets-grid,
   .accordion-trigger,
-  .subject-card-head {
+  .subject-card-head,
+  .subject-control-grid,
+  .preset-panel-body {
     padding-left: 14px;
     padding-right: 14px;
   }
@@ -991,7 +1017,8 @@ details > *:not(summary) {
   }
 
   .card-head-actions,
-  .subject-quick-actions,
+  .subject-action-row,
+  .preset-action-row,
   .stats-bar,
   .stats-main,
   .stats-inline {
@@ -999,14 +1026,8 @@ details > *:not(summary) {
     justify-content: flex-start;
   }
 
-  .subject-options {
-    align-items: stretch;
-  }
-
-  .mini-control,
-  .slider-control {
-    min-width: min(100%, 180px);
-    flex: 1 1 180px;
+  .subject-control-grid {
+    grid-template-columns: 1fr;
   }
 
   .presets-modal-overlay {

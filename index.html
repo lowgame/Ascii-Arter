@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ASCII Arter</title>
   <meta name="description" content="Gerçek zamanlı ASCII art scene editor." />
-  <link rel="stylesheet" href="./css/main.css?v=ui-realtime-2" />
+  <link rel="stylesheet" href="./css/main.css?v=ui-realtime-3" />
 </head>
 <body>
   <div id="appShell" class="app-shell">
@@ -20,8 +20,6 @@
       <div class="header-actions">
         <button id="playPauseBtn" class="btn btn-ghost" type="button">Pause</button>
         <button id="randomizeBtn" class="btn btn-primary" type="button">Randomize</button>
-        <button id="presetsGalleryBtn" class="btn" type="button">Presets</button>
-        <button id="savePresetBtn" class="btn btn-ghost" type="button">Save preset</button>
 
         <div class="export-group">
           <button class="btn" id="exportMenuBtn" type="button" aria-haspopup="true" aria-expanded="false">Export</button>
@@ -39,7 +37,6 @@
         <button id="settingsToggleBtn" class="btn" type="button" hidden aria-pressed="false">Ayarlar</button>
         <button id="openSettingsInlineBtn" class="btn" type="button" hidden>İnce ayarlar</button>
         <button id="settingsCloseBtn" class="btn" type="button" hidden>Kapat</button>
-        <select id="presetSelect" class="select-compact" hidden></select>
         <input id="importProjectInput" type="file" accept="application/json" hidden />
       </div>
     </header>
@@ -56,50 +53,82 @@
           </button>
 
           <div id="subjectAccordionBody" class="accordion-body">
-            <div class="subject-card-head">
-              <div class="card-head-actions">
-                <button class="subject-tab active" data-type="text" id="activateTextBtn" type="button">Text</button>
-                <button class="subject-tab" data-type="svg" id="activateSvgBtn" type="button">SVG</button>
+            <div class="subject-layout">
+              <div class="subject-card-head">
+                <div class="card-head-actions">
+                  <button class="subject-tab active" data-type="text" id="activateTextBtn" type="button">Text</button>
+                  <button class="subject-tab" data-type="svg" id="activateSvgBtn" type="button">SVG</button>
+                </div>
+              </div>
+
+              <div id="subjectTextArea" class="subject-panel">
+                <label class="subject-field-label" for="subjectTextInput">Ana yazı</label>
+                <textarea id="subjectTextInput" class="main-input" placeholder="Ana metni yaz. Preset değişse bile bu yazı kalır ve preset stiline bürünür." rows="3" spellcheck="false"></textarea>
+              </div>
+
+              <div id="subjectSvgArea" class="subject-panel" hidden>
+                <label class="subject-field-label" for="subjectSvgInput">SVG içeriği</label>
+                <textarea id="subjectSvgInput" class="main-input main-input-mono" placeholder="<svg>...</svg> yapıştır" rows="3" spellcheck="false"></textarea>
+                <div class="subject-panel-actions">
+                  <button class="btn btn-ghost btn-sm" id="subjectSvgUpload" type="button">SVG yükle</button>
+                  <input id="subjectSvgFileInput" type="file" accept=".svg,image/svg+xml" hidden />
+                </div>
+              </div>
+
+              <div id="subjectOptions" class="subject-control-grid">
+                <label class="mini-control">
+                  <span>Weight</span>
+                  <select id="subjectFontWeight" class="select-compact">
+                    <option value="bold">Bold</option>
+                    <option value="900">Extra Bold</option>
+                    <option value="normal">Normal</option>
+                  </select>
+                </label>
+
+                <label class="mini-control slider-control">
+                  <span>BG</span>
+                  <input type="range" id="subjectBgIntensity" min="0" max="0.5" step="0.01" value="0.08" />
+                </label>
+
+                <label class="mini-control slider-control">
+                  <span>Padding</span>
+                  <input type="range" id="subjectPadding" min="0" max="12" step="1" value="4" />
+                </label>
+
+                <div class="subject-action-row">
+                  <button class="btn btn-ghost btn-sm" id="shuffleCharsetBtn" type="button">Charset</button>
+                  <button class="btn btn-ghost btn-sm" id="subjectClearBtn" type="button">Clear</button>
+                </div>
               </div>
             </div>
+          </div>
+        </section>
 
-            <div id="subjectTextArea" class="subject-panel">
-              <textarea id="subjectTextInput" class="main-input" placeholder="Ana metni yaz. Preview bunu direkt merkez subject olarak kullanacak." rows="3" spellcheck="false"></textarea>
-            </div>
+        <section class="accordion-card" data-accordion-item="presets">
+          <button class="accordion-trigger" type="button" data-accordion-trigger="presets" aria-expanded="false" aria-controls="presetsAccordionBody">
+            <span class="accordion-trigger-copy">
+              <span class="eyebrow">Presetler</span>
+              <span class="accordion-title">Hazır stiller</span>
+            </span>
+            <span class="accordion-arrow" aria-hidden="true">›</span>
+          </button>
 
-            <div id="subjectSvgArea" class="subject-panel" hidden>
-              <textarea id="subjectSvgInput" class="main-input main-input-mono" placeholder="<svg>...</svg> yapıştır" rows="3" spellcheck="false"></textarea>
-              <div class="subject-panel-actions">
-                <button class="btn btn-ghost btn-sm" id="subjectSvgUpload" type="button">SVG yükle</button>
-                <input id="subjectSvgFileInput" type="file" accept=".svg,image/svg+xml" hidden />
+          <div id="presetsAccordionBody" class="accordion-body" hidden>
+            <section class="tool-panel tool-panel-embedded">
+              <div class="panel-body preset-panel-body">
+                <label class="mini-control preset-picker">
+                  <span>Preset seç</span>
+                  <select id="presetSelect" class="select-compact"></select>
+                </label>
+
+                <div class="preset-action-row">
+                  <button id="presetsGalleryBtn" class="btn" type="button">Galeriyi aç</button>
+                  <button id="savePresetBtn" class="btn btn-ghost" type="button">Kaydet</button>
+                </div>
+
+                <p class="preset-hint">Preset seçince ana yazın kaybolmaz. Stil presetten gelir, içerik senden kalır.</p>
               </div>
-            </div>
-
-            <div id="subjectOptions" class="subject-options">
-              <label class="mini-control">
-                <span>Weight</span>
-                <select id="subjectFontWeight" class="select-compact">
-                  <option value="bold">Bold</option>
-                  <option value="900">Extra Bold</option>
-                  <option value="normal">Normal</option>
-                </select>
-              </label>
-
-              <label class="mini-control slider-control">
-                <span>BG</span>
-                <input type="range" id="subjectBgIntensity" min="0" max="0.5" step="0.01" value="0.08" />
-              </label>
-
-              <label class="mini-control slider-control">
-                <span>Padding</span>
-                <input type="range" id="subjectPadding" min="0" max="12" step="1" value="4" />
-              </label>
-
-              <div class="subject-quick-actions">
-                <button class="btn btn-ghost btn-sm" id="shuffleCharsetBtn" type="button">Charset</button>
-                <button class="btn btn-ghost btn-sm" id="subjectClearBtn" type="button">Clear</button>
-              </div>
-            </div>
+            </section>
           </div>
         </section>
 
@@ -319,6 +348,6 @@ AsciiBackground.mount('#my-element', project);</pre>
     })();
   </script>
 
-  <script type="module" src="./js/main.js?v=ui-realtime-2"></script>
+  <script type="module" src="./js/main.js?v=ui-realtime-3"></script>
 </body>
 </html>
