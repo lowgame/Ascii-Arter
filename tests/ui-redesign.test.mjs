@@ -152,14 +152,29 @@ test('desktop keeps settings and preview visible side by side without page scrol
   await page.close();
 });
 
-test('desktop shows core editing controls immediately', async () => {
+test('left rail behaves like a single-open accordion', async () => {
   const { page, pageErrors } = await openPage({ width: 1440, height: 960 });
   await page.waitForTimeout(120);
 
-  assert.equal(await isVisible(page, '#controlsPanel'), true, 'scene controls should be visible immediately');
-  assert.equal(await isVisible(page, '#layersPanel'), true, 'layer controls should be visible immediately');
-  assert.equal(await page.locator('#subjectTextInput').isVisible(), true, 'main text input should be visible immediately');
-  assert.equal(await page.locator('#stageCanvas').isVisible(), true, 'preview canvas should be visible immediately');
+  assert.equal(await page.locator('[data-accordion-trigger="subject"]').count(), 1, 'subject accordion trigger should exist');
+  assert.equal(await page.locator('[data-accordion-trigger="controls"]').count(), 1, 'controls accordion trigger should exist');
+  assert.equal(await page.locator('[data-accordion-trigger="layers"]').count(), 1, 'layers accordion trigger should exist');
+
+  assert.equal(await isVisible(page, '#subjectAccordionBody'), true, 'subject panel should be open by default');
+  assert.equal(await isVisible(page, '#controlsAccordionBody'), false, 'controls panel should be closed by default');
+  assert.equal(await isVisible(page, '#layersAccordionBody'), false, 'layers panel should be closed by default');
+
+  await page.click('[data-accordion-trigger="controls"]');
+  await page.waitForTimeout(120);
+  assert.equal(await isVisible(page, '#subjectAccordionBody'), false, 'opening controls should close subject');
+  assert.equal(await isVisible(page, '#controlsAccordionBody'), true, 'controls should open after clicking its header');
+  assert.equal(await isVisible(page, '#layersAccordionBody'), false, 'opening controls should keep layers closed');
+
+  await page.click('[data-accordion-trigger="layers"]');
+  await page.waitForTimeout(120);
+  assert.equal(await isVisible(page, '#subjectAccordionBody'), false, 'opening layers should keep subject closed');
+  assert.equal(await isVisible(page, '#controlsAccordionBody'), false, 'opening layers should close controls');
+  assert.equal(await isVisible(page, '#layersAccordionBody'), true, 'layers should open after clicking its header');
   assert.deepEqual(pageErrors, []);
 
   await page.close();

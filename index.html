@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ASCII Arter</title>
   <meta name="description" content="Gerçek zamanlı ASCII art scene editor." />
-  <link rel="stylesheet" href="./css/main.css?v=ui-realtime-1" />
+  <link rel="stylesheet" href="./css/main.css?v=ui-realtime-2" />
 </head>
 <body>
   <div id="appShell" class="app-shell">
@@ -46,135 +46,152 @@
 
     <main class="workspace">
       <aside class="editor-rail">
-        <section class="composer-card">
-          <div class="card-head">
-            <div>
-              <p class="eyebrow">Ana içerik</p>
-              <h1>Metin / SVG</h1>
+        <section class="accordion-card is-open" data-accordion-item="subject">
+          <button class="accordion-trigger" type="button" data-accordion-trigger="subject" aria-expanded="true" aria-controls="subjectAccordionBody">
+            <span class="accordion-trigger-copy">
+              <span class="eyebrow">Ana içerik</span>
+              <span class="accordion-title">Metin / SVG</span>
+            </span>
+            <span class="accordion-arrow" aria-hidden="true">›</span>
+          </button>
+
+          <div id="subjectAccordionBody" class="accordion-body">
+            <div class="subject-card-head">
+              <div class="card-head-actions">
+                <button class="subject-tab active" data-type="text" id="activateTextBtn" type="button">Text</button>
+                <button class="subject-tab" data-type="svg" id="activateSvgBtn" type="button">SVG</button>
+              </div>
             </div>
-            <div class="card-head-actions">
-              <button class="subject-tab active" data-type="text" id="activateTextBtn" type="button">Text</button>
-              <button class="subject-tab" data-type="svg" id="activateSvgBtn" type="button">SVG</button>
+
+            <div id="subjectTextArea" class="subject-panel">
+              <textarea id="subjectTextInput" class="main-input" placeholder="Ana metni yaz. Preview bunu direkt merkez subject olarak kullanacak." rows="3" spellcheck="false"></textarea>
             </div>
-          </div>
 
-          <div id="subjectTextArea" class="subject-panel">
-            <textarea id="subjectTextInput" class="main-input" placeholder="Ana metni yaz. Preview bunu direkt merkez subject olarak kullanacak." rows="3" spellcheck="false"></textarea>
-          </div>
-
-          <div id="subjectSvgArea" class="subject-panel" hidden>
-            <textarea id="subjectSvgInput" class="main-input main-input-mono" placeholder="<svg>...</svg> yapıştır" rows="3" spellcheck="false"></textarea>
-            <div class="subject-panel-actions">
-              <button class="btn btn-ghost btn-sm" id="subjectSvgUpload" type="button">SVG yükle</button>
-              <input id="subjectSvgFileInput" type="file" accept=".svg,image/svg+xml" hidden />
+            <div id="subjectSvgArea" class="subject-panel" hidden>
+              <textarea id="subjectSvgInput" class="main-input main-input-mono" placeholder="<svg>...</svg> yapıştır" rows="3" spellcheck="false"></textarea>
+              <div class="subject-panel-actions">
+                <button class="btn btn-ghost btn-sm" id="subjectSvgUpload" type="button">SVG yükle</button>
+                <input id="subjectSvgFileInput" type="file" accept=".svg,image/svg+xml" hidden />
+              </div>
             </div>
-          </div>
 
-          <div id="subjectOptions" class="subject-options">
-            <label class="mini-control">
-              <span>Weight</span>
-              <select id="subjectFontWeight" class="select-compact">
-                <option value="bold">Bold</option>
-                <option value="900">Extra Bold</option>
-                <option value="normal">Normal</option>
-              </select>
-            </label>
+            <div id="subjectOptions" class="subject-options">
+              <label class="mini-control">
+                <span>Weight</span>
+                <select id="subjectFontWeight" class="select-compact">
+                  <option value="bold">Bold</option>
+                  <option value="900">Extra Bold</option>
+                  <option value="normal">Normal</option>
+                </select>
+              </label>
 
-            <label class="mini-control slider-control">
-              <span>BG</span>
-              <input type="range" id="subjectBgIntensity" min="0" max="0.5" step="0.01" value="0.08" />
-            </label>
+              <label class="mini-control slider-control">
+                <span>BG</span>
+                <input type="range" id="subjectBgIntensity" min="0" max="0.5" step="0.01" value="0.08" />
+              </label>
 
-            <label class="mini-control slider-control">
-              <span>Padding</span>
-              <input type="range" id="subjectPadding" min="0" max="12" step="1" value="4" />
-            </label>
+              <label class="mini-control slider-control">
+                <span>Padding</span>
+                <input type="range" id="subjectPadding" min="0" max="12" step="1" value="4" />
+              </label>
 
-            <div class="subject-quick-actions">
-              <button class="btn btn-ghost btn-sm" id="shuffleCharsetBtn" type="button">Charset</button>
-              <button class="btn btn-ghost btn-sm" id="subjectClearBtn" type="button">Clear</button>
+              <div class="subject-quick-actions">
+                <button class="btn btn-ghost btn-sm" id="shuffleCharsetBtn" type="button">Charset</button>
+                <button class="btn btn-ghost btn-sm" id="subjectClearBtn" type="button">Clear</button>
+              </div>
             </div>
           </div>
         </section>
 
-        <div id="settingsDrawer" class="editor-panels" aria-hidden="false">
-          <section id="controlsPanel" class="tool-panel">
-            <div class="panel-header">
-              <div>
-                <p class="eyebrow">Sahne</p>
-                <span>Global controls</span>
+        <section class="accordion-card" data-accordion-item="controls">
+          <button class="accordion-trigger" type="button" data-accordion-trigger="controls" aria-expanded="false" aria-controls="controlsAccordionBody">
+            <span class="accordion-trigger-copy">
+              <span class="eyebrow">Sahne</span>
+              <span class="accordion-title">Global controls</span>
+            </span>
+            <span class="accordion-arrow" aria-hidden="true">›</span>
+          </button>
+
+          <div id="controlsAccordionBody" class="accordion-body" hidden>
+            <section id="controlsPanel" class="tool-panel tool-panel-embedded">
+              <div class="panel-body">
+                <div id="controlsContent"></div>
               </div>
-            </div>
-            <div class="panel-body">
-              <div id="controlsContent"></div>
-            </div>
-          </section>
+            </section>
+          </div>
+        </section>
 
-          <section id="layersPanel" class="tool-panel">
-            <div class="panel-header">
-              <div>
-                <p class="eyebrow">Katmanlar</p>
-                <span>Layers, text, snapshot</span>
+        <section class="accordion-card" data-accordion-item="layers">
+          <button class="accordion-trigger" type="button" data-accordion-trigger="layers" aria-expanded="false" aria-controls="layersAccordionBody">
+            <span class="accordion-trigger-copy">
+              <span class="eyebrow">Katmanlar</span>
+              <span class="accordion-title">Layers, text, snapshot</span>
+            </span>
+            <span class="accordion-arrow" aria-hidden="true">›</span>
+          </button>
+
+          <div id="layersAccordionBody" class="accordion-body" hidden>
+            <section id="layersPanel" class="tool-panel tool-panel-embedded">
+              <div class="panel-body layers-panel-body">
+                <details open>
+                  <summary>
+                    <span>Animation Layers</span>
+                    <span class="summary-actions" onclick="event.stopPropagation()">
+                      <button id="moveLayerUpBtn" class="icon-btn" type="button" title="Move Up">↑</button>
+                      <button id="moveLayerDownBtn" class="icon-btn" type="button" title="Move Down">↓</button>
+                      <button id="duplicateLayerBtn" class="icon-btn" type="button" title="Duplicate">⎘</button>
+                      <button id="removeLayerBtn" class="icon-btn danger" type="button" title="Remove">−</button>
+                      <button id="addLayerBtn" class="icon-btn primary" type="button" title="Add">＋</button>
+                    </span>
+                  </summary>
+                  <div id="layersList" class="list-stack"></div>
+                  <div id="layerInspector" class="inspector"></div>
+                </details>
+
+                <details>
+                  <summary>
+                    <span>Text Layers</span>
+                    <span class="summary-actions" onclick="event.stopPropagation()">
+                      <button id="duplicateTextBtn" class="icon-btn" type="button" title="Duplicate">⎘</button>
+                      <button id="removeTextBtn" class="icon-btn danger" type="button" title="Remove">−</button>
+                      <button id="addTextBtn" class="icon-btn primary" type="button" title="Add">＋</button>
+                    </span>
+                  </summary>
+                  <div id="textsList" class="list-stack"></div>
+                  <div id="textInspector" class="inspector"></div>
+                </details>
+
+                <details id="svgLayersSection">
+                  <summary>
+                    <span>SVG Layers</span>
+                    <span class="summary-actions" onclick="event.stopPropagation()">
+                      <button id="removeSvgLayerBtn" class="icon-btn danger" type="button" title="Remove">−</button>
+                      <button id="addSvgLayerBtn" class="icon-btn primary" type="button" title="Add SVG Layer">＋</button>
+                    </span>
+                  </summary>
+                  <div id="svgLayersList" class="list-stack"></div>
+                  <div class="inline-actions">
+                    <input id="svgUploadInput" type="file" accept=".svg,image/svg+xml" hidden />
+                    <button class="btn btn-ghost btn-sm" type="button" onclick="document.getElementById('svgUploadInput').click()">Upload SVG</button>
+                  </div>
+                  <div id="svgLayerInspector" class="inspector"></div>
+                </details>
+
+                <details>
+                  <summary>ASCII Snapshot</summary>
+                  <div class="snapshot-bar">
+                    <button id="refreshFrameBtn" class="btn btn-ghost btn-sm" type="button">Refresh</button>
+                  </div>
+                  <textarea id="frameOutput" spellcheck="false" aria-label="ASCII frame output"></textarea>
+                </details>
               </div>
-            </div>
-            <div class="panel-body layers-panel-body">
-              <details open>
-                <summary>
-                  <span>Animation Layers</span>
-                  <span class="summary-actions" onclick="event.stopPropagation()">
-                    <button id="moveLayerUpBtn" class="icon-btn" type="button" title="Move Up">↑</button>
-                    <button id="moveLayerDownBtn" class="icon-btn" type="button" title="Move Down">↓</button>
-                    <button id="duplicateLayerBtn" class="icon-btn" type="button" title="Duplicate">⎘</button>
-                    <button id="removeLayerBtn" class="icon-btn danger" type="button" title="Remove">−</button>
-                    <button id="addLayerBtn" class="icon-btn primary" type="button" title="Add">＋</button>
-                  </span>
-                </summary>
-                <div id="layersList" class="list-stack"></div>
-                <div id="layerInspector" class="inspector"></div>
-              </details>
+            </section>
+          </div>
+        </section>
 
-              <details>
-                <summary>
-                  <span>Text Layers</span>
-                  <span class="summary-actions" onclick="event.stopPropagation()">
-                    <button id="duplicateTextBtn" class="icon-btn" type="button" title="Duplicate">⎘</button>
-                    <button id="removeTextBtn" class="icon-btn danger" type="button" title="Remove">−</button>
-                    <button id="addTextBtn" class="icon-btn primary" type="button" title="Add">＋</button>
-                  </span>
-                </summary>
-                <div id="textsList" class="list-stack"></div>
-                <div id="textInspector" class="inspector"></div>
-              </details>
-
-              <details id="svgLayersSection">
-                <summary>
-                  <span>SVG Layers</span>
-                  <span class="summary-actions" onclick="event.stopPropagation()">
-                    <button id="removeSvgLayerBtn" class="icon-btn danger" type="button" title="Remove">−</button>
-                    <button id="addSvgLayerBtn" class="icon-btn primary" type="button" title="Add SVG Layer">＋</button>
-                  </span>
-                </summary>
-                <div id="svgLayersList" class="list-stack"></div>
-                <div class="inline-actions">
-                  <input id="svgUploadInput" type="file" accept=".svg,image/svg+xml" hidden />
-                  <button class="btn btn-ghost btn-sm" type="button" onclick="document.getElementById('svgUploadInput').click()">Upload SVG</button>
-                </div>
-                <div id="svgLayerInspector" class="inspector"></div>
-              </details>
-
-              <details>
-                <summary>ASCII Snapshot</summary>
-                <div class="snapshot-bar">
-                  <button id="refreshFrameBtn" class="btn btn-ghost btn-sm" type="button">Refresh</button>
-                </div>
-                <textarea id="frameOutput" spellcheck="false" aria-label="ASCII frame output"></textarea>
-              </details>
-            </div>
-          </section>
-
-          <button class="panel-tab panel-tab-left" id="controlsTab" data-panel="controlsPanel" type="button" hidden>Controls</button>
-          <button class="panel-tab panel-tab-right" id="layersTab" data-panel="layersPanel" type="button" hidden>Layers</button>
-        </div>
+        <div id="settingsDrawer" hidden aria-hidden="true"></div>
+        <button class="panel-tab panel-tab-left" id="controlsTab" data-panel="controlsPanel" type="button" hidden>Controls</button>
+        <button class="panel-tab panel-tab-right" id="layersTab" data-panel="layersPanel" type="button" hidden>Layers</button>
       </aside>
 
       <section class="preview-pane">
@@ -257,6 +274,26 @@ AsciiBackground.mount('#my-element', project);</pre>
     (() => {
       const exportBtn = document.getElementById('exportMenuBtn');
       const exportDropdown = document.getElementById('exportDropdown');
+      const accordionItems = Array.from(document.querySelectorAll('[data-accordion-item]'));
+
+      function openAccordion(key) {
+        accordionItems.forEach((item) => {
+          const isOpen = item.dataset.accordionItem === key;
+          const trigger = item.querySelector('[data-accordion-trigger]');
+          const body = item.querySelector('.accordion-body');
+          item.classList.toggle('is-open', isOpen);
+          if (trigger) trigger.setAttribute('aria-expanded', String(isOpen));
+          if (body) body.hidden = !isOpen;
+        });
+      }
+
+      accordionItems.forEach((item) => {
+        const trigger = item.querySelector('[data-accordion-trigger]');
+        if (!trigger) return;
+        trigger.addEventListener('click', () => openAccordion(item.dataset.accordionItem));
+      });
+
+      openAccordion('subject');
 
       if (!exportBtn || !exportDropdown) return;
 
@@ -282,6 +319,6 @@ AsciiBackground.mount('#my-element', project);</pre>
     })();
   </script>
 
-  <script type="module" src="./js/main.js?v=ui-realtime-1"></script>
+  <script type="module" src="./js/main.js?v=ui-realtime-2"></script>
 </body>
 </html>
