@@ -115,58 +115,12 @@ const clamp01 = (value) => clamp(value, 0, 1);
 const fract = (value) => value - Math.floor(value);
 
 // ── BACKGROUND ASCII CANVAS ──
-// Renders a separate, always-running animation behind the main canvas
+// Disabled: the preview should be fully driven by the stage animation itself
 function initBgCanvas() {
   const canvas = document.getElementById('bgCanvas');
-  if (!canvas) return;
-  const BG_COLS = 80, BG_ROWS = 28;
-  const bgRenderer = new AsciiRenderer(canvas);
-  const bgBuffer = new FrameBuffer(BG_COLS, BG_ROWS);
-  const bgCharset = ' .,:;+x#@';
-  const bgCharLen = bgCharset.length - 1;
-  let bgTime = 0, bgLast = 0;
-  const sin = Math.sin, cos = Math.cos, PI = Math.PI;
-
-  // Size canvas to fill its CSS box
-  function resizeBg() {
-    const w = canvas.parentElement?.clientWidth || window.innerWidth;
-    const h = canvas.parentElement?.clientHeight || window.innerHeight;
-    const fw = Math.ceil(w / BG_COLS);
-    const fh = Math.ceil(h / BG_ROWS);
-    const fs = Math.max(fw, Math.ceil(fh / 1.22));
-    bgRenderer.resize(BG_COLS, BG_ROWS, fs);
+  if (canvas) {
+    canvas.hidden = true;
   }
-  resizeBg();
-  window.addEventListener('resize', resizeBg);
-
-  function bgLoop(now) {
-    requestAnimationFrame(bgLoop);
-    const dt = now - bgLast;
-    if (dt < 1000 / 20) return; // 20 fps cap
-    bgLast = now;
-    bgTime += dt / 1000;
-    bgBuffer.clear('transparent');
-
-    for (let y = 0; y < BG_ROWS; y++) {
-      const ny = (y / (BG_ROWS - 1)) * 2 - 1;
-      for (let x = 0; x < BG_COLS; x++) {
-        const nx = (x / (BG_COLS - 1)) * 2 - 1;
-        const r = Math.sqrt(nx * nx + ny * ny);
-        const a = Math.atan2(ny, nx);
-        const v = clamp01(
-          0.5 + 0.5 * sin(r * 4 - bgTime * 0.9 + sin(a * 3 + bgTime * 0.4) * 1.2)
-        );
-        const ci = clamp(Math.floor(v * bgCharLen), 0, bgCharLen);
-        const ch = v < 0.12 ? ' ' : bgCharset[ci];
-        // soft purple/blue color
-        const hue = 250 + sin(bgTime * 0.2 + r * 2) * 30;
-        const light = 20 + v * 35;
-        bgBuffer.setCell(x, y, ch, `hsl(${hue},60%,${light}%)`, 'transparent');
-      }
-    }
-    bgRenderer.render(bgBuffer, { background: '#0d0d0f', glow: 0 });
-  }
-  requestAnimationFrame(bgLoop);
 }
 
 window.addEventListener('DOMContentLoaded', init);

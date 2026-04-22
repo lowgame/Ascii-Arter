@@ -328,6 +328,36 @@ test('main randomize cycles through different curated moods across repeated clic
   await page.close();
 });
 
+test('stage background animation fills the preview div instead of behaving like a fixed backdrop', async () => {
+  const { page, pageErrors } = await openPage({ width: 1440, height: 960 });
+  await page.waitForTimeout(140);
+
+  const metrics = await page.evaluate(() => {
+    const stage = document.querySelector('.stage-area');
+    const bgCanvas = document.getElementById('bgCanvas');
+    const stageRect = stage?.getBoundingClientRect();
+    const bgRect = bgCanvas?.getBoundingClientRect();
+    return {
+      stageRect: stageRect ? { width: stageRect.width, height: stageRect.height, left: stageRect.left, top: stageRect.top } : null,
+      bgRect: bgRect ? { width: bgRect.width, height: bgRect.height, left: bgRect.left, top: bgRect.top } : null,
+      position: bgCanvas ? getComputedStyle(bgCanvas).position : null,
+      inset: bgCanvas ? getComputedStyle(bgCanvas).inset : null,
+    };
+  });
+
+  assert.ok(metrics.stageRect, 'stage rect should exist');
+  assert.ok(metrics.bgRect, 'background canvas rect should exist');
+  assert.equal(metrics.position, 'absolute', 'background canvas should stay inside the preview stage');
+  assert.equal(metrics.inset, '0px', 'background canvas should be anchored to the stage edges');
+  assert.ok(Math.abs(metrics.stageRect.width - metrics.bgRect.width) < 1, 'background canvas width should match the preview div');
+  assert.ok(Math.abs(metrics.stageRect.height - metrics.bgRect.height) < 1, 'background canvas height should match the preview div');
+  assert.ok(Math.abs(metrics.stageRect.left - metrics.bgRect.left) < 1, 'background canvas should align to the left edge of the preview div');
+  assert.ok(Math.abs(metrics.stageRect.top - metrics.bgRect.top) < 1, 'background canvas should align to the top edge of the preview div');
+  assert.deepEqual(pageErrors, []);
+
+  await page.close();
+});
+
 test('stage uses the ASCII background itself without a separate static backdrop', async () => {
   const { page, pageErrors } = await openPage({ width: 1440, height: 960 });
   await page.waitForTimeout(120);
