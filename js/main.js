@@ -32,6 +32,7 @@ const PRESET_VISUALS = {
   'deep-ocean': { textFont: 'bold', textColor: '#dff6ff', textBg: 'rgba(5, 30, 42, 0.82)', animation: 'drift', outline: false },
   'terminal-monolith': { textFont: '900', textColor: '#ffffff', textBg: 'rgba(18, 18, 18, 0.84)', animation: 'static', outline: false }
 };
+const SUBJECT_FONT_OPTIONS = ['normal', 'bold', '900'];
 
 const dom = {};
 let project = createDefaultProject();
@@ -221,6 +222,31 @@ function ensureSubjectDefaults() {
   project.subject.bgIntensity = project.subject.bgIntensity ?? 0.08;
 }
 
+function hasActiveSubject() {
+  const subject = project.subject || {};
+  return Boolean((subject.type === 'text' && subject.text?.trim()) || (subject.type === 'svg' && subject.svgContent?.trim()));
+}
+
+function updateRandomizeButtonLabel() {
+  if (!dom.randomizeBtn) return;
+  dom.randomizeBtn.textContent = hasActiveSubject() ? 'Combo Randomize' : 'BG Randomize';
+}
+
+function createRandomSubjectStyle() {
+  const paletteName = pick(Object.keys(PALETTES));
+  const textColor = samplePalette(paletteName, Math.random(), randomBetween(0.95, 1.2), randomBetween(-24, 24));
+  const bgBase = hexToRgb(samplePalette(paletteName, Math.random(), 1, 0));
+  return {
+    textFont: pick(SUBJECT_FONT_OPTIONS),
+    bgIntensity: Number(randomBetween(0.06, 0.28).toFixed(2)),
+    padding: Math.round(randomBetween(2, 10)),
+    textColor,
+    textBg: `rgba(${Math.round(bgBase.r * 0.22)}, ${Math.round(bgBase.g * 0.22)}, ${Math.round(bgBase.b * 0.22)}, 0.84)`,
+    animation: pick(TEXT_ANIMATIONS).value,
+    outline: Math.random() > 0.52,
+  };
+}
+
 function applyPresetVisuals(presetId, presetProject) {
   ensureSubjectDefaults();
   const subjectText = project.subject?.text || '';
@@ -234,8 +260,14 @@ function applyPresetVisuals(presetId, presetProject) {
 
   if (!subjectText.trim()) return;
 
-  if (Array.isArray(presetProject?.texts)) {
-    presetProject.texts = presetProject.texts.map((text, index) => {
+  applySubjectStyleToProject(presetProject, style, subjectText);
+}
+
+function applySubjectStyleToProject(targetProject, style, subjectText = project.subject?.text || '') {
+  if (!targetProject || !subjectText.trim()) return;
+
+  if (Array.isArray(targetProject.texts)) {
+    targetProject.texts = targetProject.texts.map((text, index) => {
       if (index !== 0) return text;
       return {
         ...text,
@@ -249,20 +281,21 @@ function applyPresetVisuals(presetId, presetProject) {
     });
   }
 
-  presetProject.subject = {
-    ...(presetProject.subject || {}),
+  targetProject.subject = {
+    ...(targetProject.subject || {}),
     ...(project.subject || {}),
     type: 'text',
     text: subjectText,
-    textFont: style.textFont || project.subject.textFont || '900',
-    bgIntensity: project.subject?.bgIntensity ?? 0.08,
-    padding: project.subject?.padding ?? 4,
+    textFont: style.textFont || project.subject?.textFont || '900',
+    bgIntensity: style.bgIntensity ?? project.subject?.bgIntensity ?? 0.08,
+    padding: style.padding ?? project.subject?.padding ?? 4,
   };
 }
 
 function bindButtons() {
   bindPresetControls();
   ensureSubjectDefaults();
+  updateRandomizeButtonLabel();
 
   dom.playPauseBtn.addEventListener('click', () => {
     isPlaying = !isPlaying;
@@ -477,6 +510,7 @@ function bindButtons() {
         project.subject.svgContent = '';
       }
       setSubjectType('none');
+      updateRandomizeButtonLabel();
       subjectDirty = true;
       needsRedraw = true;
     });
@@ -490,6 +524,7 @@ function bindButtons() {
       if (subjectTextInput.value.trim()) {
         setSubjectType('text');
       }
+      updateRandomizeButtonLabel();
       subjectDirty = true;
       needsRedraw = true;
     });
@@ -503,6 +538,7 @@ function bindButtons() {
       if (subjectSvgInput.value.trim()) {
         setSubjectType('svg');
       }
+      updateRandomizeButtonLabel();
       subjectDirty = true;
       needsRedraw = true;
     });
@@ -522,6 +558,7 @@ function bindButtons() {
       if (text.trim()) {
         setSubjectType('svg');
       }
+      updateRandomizeButtonLabel();
       subjectDirty = true;
       needsRedraw = true;
       e.target.value = '';
@@ -590,6 +627,7 @@ function buildGlobalControls() {
 function createField(control, value, onChange) {
   const wrapper = document.createElement('label');
   wrapper.className = control.type === 'checkbox' ? 'checkboxField' : 'field';
+  wrapper.dataset.controlKey = control.key;
 
   const labelRow = document.createElement('div');
   labelRow.className = 'fieldLabelRow';
@@ -1225,6 +1263,7 @@ function syncGlobalControls() {
     if (field.valueEl) field.valueEl.textContent = formatValue(value, field.control);
   });
   syncSubjectUI();
+  updateRandomizeButtonLabel();
 }
 
 function syncSubjectUI() {
@@ -1314,6 +1353,7 @@ async function handleImportProject(event) {
 function randomizeProject() {
   // Save subject before randomizing — user content is sacred
   const savedSubject = project.subject ? { ...project.subject } : null;
+  const subjectActive = Boolean(savedSubject && ((savedSubject.type === 'text' && savedSubject.text?.trim()) || (savedSubject.type === 'svg' && savedSubject.svgContent?.trim())));
 
   const palettes = Object.keys(PALETTES);
   const charSets = Object.keys(CHARSETS);
@@ -1387,11 +1427,24 @@ function randomizeProject() {
     });
   });
 
+  if (subjectActive && savedSubject?.text?.trim()) {
+    const comboStyle = createRandomSubjectStyle();
+    project.subject = {
+      ...savedSubject,
+      type: 'text',
+      text: savedSubject.text,
+      textFont: comboStyle.textFont,
+      bgIntensity: comboStyle.bgIntensity,
+      padding: comboStyle.padding,
+    };
+    applySubjectStyleToProject(project, comboStyle, savedSubject.text);
+  } else if (savedSubject) {
+    project.subject = savedSubject;
+  }
+
   selectedLayerId = project.layers[0].id;
   selectedTextId = project.texts[0].id;
-
-  // Restore subject — user content is never randomized
-  if (savedSubject) project.subject = savedSubject;
+  updateRandomizeButtonLabel();
   subjectDirty = true; // re-render mask with potentially new dimensions
 }
 

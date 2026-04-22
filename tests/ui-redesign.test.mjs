@@ -113,6 +113,26 @@ async function topElementInside(page, selector, xRatio = 0.3, yRatio = 0.3) {
   }, { selector, xRatio, yRatio });
 }
 
+async function readComboState(page) {
+  return page.evaluate(() => {
+    const value = (selector) => document.querySelector(selector)?.value ?? null;
+    const text = (selector) => document.querySelector(selector)?.textContent?.trim() ?? null;
+    return {
+      randomizeLabel: text('#randomizeBtn'),
+      subject: {
+        fontWeight: value('#subjectFontWeight'),
+        bgIntensity: value('#subjectBgIntensity'),
+        padding: value('#subjectPadding'),
+      },
+      scene: {
+        palette: document.querySelector('[data-control-key="palette"]')?.value ?? null,
+        charSet: document.querySelector('[data-control-key="charSet"]')?.value ?? null,
+        seed: document.querySelector('[data-control-key="seed"]')?.value ?? null,
+      },
+    };
+  });
+}
+
 test.before(async () => {
   ({ server, baseUrl } = await startStaticServer(rootDir));
   browser = await chromium.launch({ headless: true });
@@ -194,6 +214,49 @@ test('selecting a preset keeps typed subject text alive and themed', async () =>
   assert.equal(await page.locator('#subjectTextInput').evaluate((element) => element.classList.contains('active-subject')), true, 'text input should stay visually active after preset changes');
   assert.equal(await page.locator('#subjectTextInput').evaluate((element) => element.value.length > 0), true, 'subject text should still exist after loading a preset');
   assert.equal(await page.locator('#subjectFontWeight').inputValue(), '900', 'preset selection should push subject styling toward the preset look');
+  assert.deepEqual(pageErrors, []);
+
+  await page.close();
+});
+
+test('randomize without subject only changes the background scene', async () => {
+  const { page, pageErrors } = await openPage({ width: 1440, height: 960 });
+
+  await page.click('[data-accordion-trigger="controls"]');
+  await page.waitForTimeout(120);
+  const before = await readComboState(page);
+
+  await page.click('#randomizeBtn');
+  await page.waitForTimeout(160);
+  const after = await readComboState(page);
+
+  assert.equal(await page.locator('#subjectTextInput').inputValue(), '', 'empty subject should stay empty after randomize');
+  assert.equal(before.subject.fontWeight, after.subject.fontWeight, 'no subject means text styling should not be remixed');
+  assert.equal(before.subject.bgIntensity, after.subject.bgIntensity, 'no subject means subject background intensity should stay put');
+  assert.equal(before.subject.padding, after.subject.padding, 'no subject means subject padding should stay put');
+  assert.equal(after.randomizeLabel, 'BG Randomize', 'empty state should expose background-only randomize intent');
+  assert.deepEqual(pageErrors, []);
+
+  await page.close();
+});
+
+test('randomize with subject creates a fresh text plus background combo', async () => {
+  const { page, pageErrors } = await openPage({ width: 1440, height: 960 });
+
+  await page.fill('#subjectTextInput', 'LOW GAME');
+  await page.waitForTimeout(80);
+  await page.click('[data-accordion-trigger="controls"]');
+  await page.waitForTimeout(120);
+  const before = await readComboState(page);
+
+  await page.click('#randomizeBtn');
+  await page.waitForTimeout(180);
+  const after = await readComboState(page);
+
+  assert.equal(await page.locator('#subjectTextInput').inputValue(), 'LOW GAME', 'randomize should still preserve the typed subject');
+  assert.equal(await page.locator('#activateTextBtn').evaluate((element) => element.classList.contains('active')), true, 'typed subject should remain in text mode after randomize');
+  assert.equal(after.randomizeLabel, 'Combo Randomize', 'subject-present state should expose combo randomize intent');
+  assert.equal(before.subject.fontWeight === after.subject.fontWeight && before.subject.bgIntensity === after.subject.bgIntensity && before.subject.padding === after.subject.padding, false, 'subject styling should remix when a subject exists');
   assert.deepEqual(pageErrors, []);
 
   await page.close();
