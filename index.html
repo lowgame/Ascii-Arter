@@ -4,23 +4,24 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ASCII Arter</title>
-  <meta name="description" content="Minimal, odaklı ASCII art scene creator." />
-  <link rel="stylesheet" href="./css/main.css?v=ui-simple-2" />
+  <meta name="description" content="Gerçek zamanlı ASCII art scene editor." />
+  <link rel="stylesheet" href="./css/main.css?v=ui-realtime-1" />
 </head>
 <body>
   <div id="appShell" class="app-shell">
-    <div id="settingsBackdrop" class="settings-backdrop" hidden></div>
+    <div id="settingsBackdrop" hidden></div>
 
     <header class="app-header">
       <div class="brand-block">
         <span class="brand">ASCII Arter</span>
-        <span class="brand-subtitle">Dağınık panel yok. Tek giriş, büyük preview, tüm gelişmiş ayarlar tek çekmecede.</span>
+        <span class="brand-subtitle">Ayar yaparken preview hep gözünün önünde kalsın. Menü değil, çalışma masası.</span>
       </div>
 
       <div class="header-actions">
         <button id="playPauseBtn" class="btn btn-ghost" type="button">Pause</button>
         <button id="randomizeBtn" class="btn btn-primary" type="button">Randomize</button>
         <button id="presetsGalleryBtn" class="btn" type="button">Presets</button>
+        <button id="savePresetBtn" class="btn btn-ghost" type="button">Save preset</button>
 
         <div class="export-group">
           <button class="btn" id="exportMenuBtn" type="button" aria-haspopup="true" aria-expanded="false">Export</button>
@@ -35,19 +36,21 @@
           </div>
         </div>
 
-        <button id="settingsToggleBtn" class="btn btn-ghost" type="button" aria-pressed="false">Ayarlar</button>
+        <button id="settingsToggleBtn" class="btn" type="button" hidden aria-pressed="false">Ayarlar</button>
+        <button id="openSettingsInlineBtn" class="btn" type="button" hidden>İnce ayarlar</button>
+        <button id="settingsCloseBtn" class="btn" type="button" hidden>Kapat</button>
         <select id="presetSelect" class="select-compact" hidden></select>
         <input id="importProjectInput" type="file" accept="application/json" hidden />
       </div>
     </header>
 
     <main class="workspace">
-      <div class="workspace-main">
+      <aside class="editor-rail">
         <section class="composer-card">
           <div class="card-head">
             <div>
               <p class="eyebrow">Ana içerik</p>
-              <h1>Tek giriş alanı</h1>
+              <h1>Metin / SVG</h1>
             </div>
             <div class="card-head-actions">
               <button class="subject-tab active" data-type="text" id="activateTextBtn" type="button">Text</button>
@@ -56,13 +59,13 @@
           </div>
 
           <div id="subjectTextArea" class="subject-panel">
-            <textarea id="subjectTextInput" class="main-input" placeholder="Ana metni yaz. Preview bunu merkez nesne olarak kullanacak." rows="3" spellcheck="false"></textarea>
+            <textarea id="subjectTextInput" class="main-input" placeholder="Ana metni yaz. Preview bunu direkt merkez subject olarak kullanacak." rows="3" spellcheck="false"></textarea>
           </div>
 
           <div id="subjectSvgArea" class="subject-panel" hidden>
             <textarea id="subjectSvgInput" class="main-input main-input-mono" placeholder="<svg>...</svg> yapıştır" rows="3" spellcheck="false"></textarea>
             <div class="subject-panel-actions">
-              <button class="btn btn-ghost" id="subjectSvgUpload" type="button">SVG yükle</button>
+              <button class="btn btn-ghost btn-sm" id="subjectSvgUpload" type="button">SVG yükle</button>
               <input id="subjectSvgFileInput" type="file" accept=".svg,image/svg+xml" hidden />
             </div>
           </div>
@@ -87,65 +90,32 @@
               <input type="range" id="subjectPadding" min="0" max="12" step="1" value="4" />
             </label>
 
-            <button class="btn btn-ghost" id="shuffleCharsetBtn" type="button">Charset</button>
-            <button class="btn btn-ghost" id="subjectClearBtn" type="button">Clear</button>
+            <div class="subject-quick-actions">
+              <button class="btn btn-ghost btn-sm" id="shuffleCharsetBtn" type="button">Charset</button>
+              <button class="btn btn-ghost btn-sm" id="subjectClearBtn" type="button">Clear</button>
+            </div>
           </div>
         </section>
 
-        <section class="preview-card">
-          <div class="card-head preview-head">
-            <div>
-              <p class="eyebrow">Canlı preview</p>
-              <h2>Büyük sahne</h2>
-            </div>
-            <button class="btn btn-soft" id="openSettingsInlineBtn" type="button">İnce ayarları aç</button>
-          </div>
-
-          <div class="preview-frame">
-            <div class="stage-area">
-              <canvas id="bgCanvas" aria-hidden="true"></canvas>
-              <div class="canvas-wrap">
-                <canvas id="stageCanvas" aria-label="ASCII preview canvas"></canvas>
-              </div>
-            </div>
-          </div>
-
-          <footer class="stats-bar">
-            <span id="fpsStat" hidden>FPS: —</span>
-            <span id="renderStat" hidden>Render: — ms</span>
-            <span id="cellsStat" hidden>Cells: —</span>
-            <span id="layersStat" hidden>Layers: —</span>
-            <span id="projectTitleLabel" class="stats-title">ASCII Arter</span>
-            <span id="statusStat" class="stats-status">Ready</span>
-          </footer>
-        </section>
-      </div>
-
-      <aside id="settingsDrawer" class="settings-drawer" aria-hidden="true">
-        <div class="settings-header">
-          <div>
-            <p class="eyebrow">Gelişmiş alan</p>
-            <h3>Ayarlar ve katmanlar</h3>
-          </div>
-          <div class="settings-header-actions">
-            <button id="savePresetBtn" class="btn btn-ghost" type="button">Save preset</button>
-            <button id="settingsCloseBtn" class="btn btn-ghost" type="button">Kapat</button>
-          </div>
-        </div>
-
-        <div class="settings-grid">
-          <section class="drawer-panel" id="controlsPanel" hidden>
+        <div id="settingsDrawer" class="editor-panels" aria-hidden="false">
+          <section id="controlsPanel" class="tool-panel">
             <div class="panel-header">
-              <span>Scene controls</span>
+              <div>
+                <p class="eyebrow">Sahne</p>
+                <span>Global controls</span>
+              </div>
             </div>
             <div class="panel-body">
               <div id="controlsContent"></div>
             </div>
           </section>
 
-          <section class="drawer-panel" id="layersPanel" hidden>
+          <section id="layersPanel" class="tool-panel">
             <div class="panel-header">
-              <span>Layers & output</span>
+              <div>
+                <p class="eyebrow">Katmanlar</p>
+                <span>Layers, text, snapshot</span>
+              </div>
             </div>
             <div class="panel-body layers-panel-body">
               <details open>
@@ -201,11 +171,47 @@
               </details>
             </div>
           </section>
-        </div>
 
-        <button class="panel-tab panel-tab-left" id="controlsTab" data-panel="controlsPanel" type="button" hidden>Controls</button>
-        <button class="panel-tab panel-tab-right" id="layersTab" data-panel="layersPanel" type="button" hidden>Layers</button>
+          <button class="panel-tab panel-tab-left" id="controlsTab" data-panel="controlsPanel" type="button" hidden>Controls</button>
+          <button class="panel-tab panel-tab-right" id="layersTab" data-panel="layersPanel" type="button" hidden>Layers</button>
+        </div>
       </aside>
+
+      <section class="preview-pane">
+        <section class="preview-card">
+          <div class="card-head preview-head">
+            <div>
+              <p class="eyebrow">Canlı preview</p>
+              <h2>Değiştirirken izle</h2>
+            </div>
+            <div class="preview-head-side">
+              <span class="preview-note">Tüm değişiklikler burada anlık yansır.</span>
+            </div>
+          </div>
+
+          <div class="preview-frame">
+            <div class="stage-area">
+              <canvas id="bgCanvas" aria-hidden="true"></canvas>
+              <div class="canvas-wrap">
+                <canvas id="stageCanvas" aria-label="ASCII preview canvas"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <footer class="stats-bar">
+            <div class="stats-main">
+              <span id="projectTitleLabel" class="stats-title">ASCII Arter</span>
+              <span id="statusStat" class="stats-status">Ready</span>
+            </div>
+            <div class="stats-inline">
+              <span id="fpsStat" hidden>FPS: —</span>
+              <span id="renderStat" hidden>Render: — ms</span>
+              <span id="cellsStat" hidden>Cells: —</span>
+              <span id="layersStat" hidden>Layers: —</span>
+            </div>
+          </footer>
+        </section>
+      </section>
     </main>
 
     <div id="presetsModal" class="presets-modal-overlay" hidden>
@@ -249,42 +255,10 @@ AsciiBackground.mount('#my-element', project);</pre>
 
   <script>
     (() => {
-      const appShell = document.getElementById('appShell');
-      const settingsToggleBtn = document.getElementById('settingsToggleBtn');
-      const openSettingsInlineBtn = document.getElementById('openSettingsInlineBtn');
-      const settingsCloseBtn = document.getElementById('settingsCloseBtn');
-      const settingsDrawer = document.getElementById('settingsDrawer');
-      const settingsBackdrop = document.getElementById('settingsBackdrop');
-      const controlsPanel = document.getElementById('controlsPanel');
-      const layersPanel = document.getElementById('layersPanel');
       const exportBtn = document.getElementById('exportMenuBtn');
       const exportDropdown = document.getElementById('exportDropdown');
 
-      function setSettingsOpen(open) {
-        appShell.classList.toggle('settings-open', open);
-        settingsDrawer.setAttribute('aria-hidden', String(!open));
-        settingsToggleBtn.setAttribute('aria-pressed', String(open));
-        settingsToggleBtn.textContent = open ? 'Ayarları Gizle' : 'Ayarlar';
-        controlsPanel.hidden = !open;
-        layersPanel.hidden = !open;
-        settingsBackdrop.hidden = !open;
-      }
-
-      settingsToggleBtn.addEventListener('click', () => {
-        setSettingsOpen(!appShell.classList.contains('settings-open'));
-      });
-
-      openSettingsInlineBtn.addEventListener('click', () => setSettingsOpen(true));
-      settingsCloseBtn.addEventListener('click', () => setSettingsOpen(false));
-      settingsBackdrop.addEventListener('click', () => setSettingsOpen(false));
-
-      document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape') {
-          setSettingsOpen(false);
-          exportDropdown.classList.remove('open');
-          exportBtn.setAttribute('aria-expanded', 'false');
-        }
-      });
+      if (!exportBtn || !exportDropdown) return;
 
       exportBtn.addEventListener('click', (event) => {
         event.stopPropagation();
@@ -299,10 +273,15 @@ AsciiBackground.mount('#my-element', project);</pre>
         }
       });
 
-      setSettingsOpen(false);
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+          exportDropdown.classList.remove('open');
+          exportBtn.setAttribute('aria-expanded', 'false');
+        }
+      });
     })();
   </script>
 
-  <script type="module" src="./js/main.js?v=ui-simple-1"></script>
+  <script type="module" src="./js/main.js?v=ui-realtime-1"></script>
 </body>
 </html>

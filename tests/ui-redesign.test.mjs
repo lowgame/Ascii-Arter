@@ -99,23 +99,6 @@ async function isVisible(page, selector) {
   });
 }
 
-async function topElementInsideDrawer(page) {
-  return page.evaluate(() => {
-    const drawer = document.getElementById('settingsDrawer');
-    if (!drawer) return null;
-    const rect = drawer.getBoundingClientRect();
-    const x = Math.min(window.innerWidth - 4, Math.max(4, rect.left + Math.min(rect.width * 0.5, 48)));
-    const y = Math.min(window.innerHeight - 4, Math.max(4, rect.top + Math.min(rect.height * 0.25, 120)));
-    const top = document.elementFromPoint(x, y);
-    return top ? {
-      id: top.id,
-      className: top.className,
-      tagName: top.tagName,
-      insideDrawer: Boolean(top.closest('#settingsDrawer')),
-    } : null;
-  });
-}
-
 test.before(async () => {
   ({ server, baseUrl } = await startStaticServer(rootDir));
   browser = await chromium.launch({ headless: true });
@@ -126,55 +109,64 @@ test.after(async () => {
   await new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
 });
 
-test('desktop starts in a brutally simple mode with settings closed', async () => {
-  const { page, pageErrors } = await openPage();
-  await page.waitForTimeout(100);
+test('desktop keeps settings and preview visible side by side without page scroll', async () => {
+  const { page, pageErrors } = await openPage({ width: 1440, height: 960 });
+  await page.waitForTimeout(120);
 
-  assert.equal(await page.locator('#settingsToggleBtn').count(), 1, 'single settings toggle should exist');
-  assert.equal(await page.locator('#appShell').evaluate((element) => element.classList.contains('settings-open')), false, 'settings should be closed by default');
-  assert.equal(await isVisible(page, '#controlsPanel'), false, 'global controls panel should be hidden by default');
-  assert.equal(await isVisible(page, '#layersPanel'), false, 'layers panel should be hidden by default');
-  assert.equal(await isVisible(page, '#controlsTab'), false, 'legacy controls tab should not be exposed');
-  assert.equal(await isVisible(page, '#layersTab'), false, 'legacy layers tab should not be exposed');
-  assert.equal(await page.locator('#subjectTextInput').isVisible(), true, 'main text input should stay visible');
+  const metrics = await page.evaluate(() => {
+    const rect = (selector) => document.querySelector(selector)?.getBoundingClientRect().toJSON() || null;
+    const styleVisible = (selector) => {
+      const element = document.querySelector(selector);
+      if (!element) return false;
+      const style = window.getComputedStyle(element);
+      return style.display !== 'none' && style.visibility !== 'hidden' && !element.hidden;
+    };
+
+    return {
+      scrollHeight: document.documentElement.scrollHeight,
+      innerHeight: window.innerHeight,
+      controls: rect('#controlsPanel'),
+      layers: rect('#layersPanel'),
+      stage: rect('.stage-area'),
+      subject: rect('#subjectTextInput'),
+      backdropVisible: styleVisible('#settingsBackdrop'),
+      settingsToggleVisible: styleVisible('#settingsToggleBtn'),
+      inlineSettingsVisible: styleVisible('#openSettingsInlineBtn'),
+    };
+  });
+
+  assert.ok(metrics.controls, 'controls panel should exist');
+  assert.ok(metrics.layers, 'layers panel should exist');
+  assert.ok(metrics.stage, 'preview stage should exist');
+  assert.ok(metrics.subject, 'subject input should exist');
+  assert.ok(metrics.scrollHeight <= metrics.innerHeight + 2, 'desktop layout should fit in one viewport without page scrolling');
+  assert.ok(metrics.controls.right < metrics.stage.left, 'controls should stay beside the preview, not above it');
+  assert.ok(metrics.layers.right < metrics.stage.left, 'layers panel should stay beside the preview, not below it');
+  assert.ok(metrics.stage.top < 220, 'preview should start near the top of the workspace');
+  assert.ok(metrics.stage.bottom <= metrics.innerHeight - 16, 'preview should remain fully visible while editing');
+  assert.equal(metrics.backdropVisible, false, 'desktop editing should not use a blur backdrop');
+  assert.equal(metrics.settingsToggleVisible, false, 'desktop editing should not depend on a settings drawer toggle');
+  assert.equal(metrics.inlineSettingsVisible, false, 'desktop editing should not require a second inline settings CTA');
   assert.deepEqual(pageErrors, []);
 
   await page.close();
 });
 
-test('settings toggle opens the advanced drawer without breaking legacy panels', async () => {
-  const { page, pageErrors } = await openPage();
+test('desktop shows core editing controls immediately', async () => {
+  const { page, pageErrors } = await openPage({ width: 1440, height: 960 });
+  await page.waitForTimeout(120);
 
-  await page.click('#settingsToggleBtn');
-  await page.waitForTimeout(150);
-
-  assert.equal(await page.locator('#appShell').evaluate((element) => element.classList.contains('settings-open')), true, 'settings shell should open after clicking the toggle');
-  assert.equal(await isVisible(page, '#controlsPanel'), true, 'controls panel should become visible inside settings shell');
-  assert.equal(await isVisible(page, '#layersPanel'), true, 'layers panel should become visible inside settings shell');
-  assert.equal(await page.locator('#settingsToggleBtn').getAttribute('aria-pressed'), 'true');
-  assert.match(await page.locator('#settingsToggleBtn').innerText(), /gizle|hide/i);
-  assert.deepEqual(pageErrors, []);
-
-  await page.close();
-});
-
-test('settings drawer stays above the blur backdrop so its contents remain visible and clickable', async () => {
-  const { page, pageErrors } = await openPage({ width: 390, height: 844 });
-
-  await page.click('#settingsToggleBtn');
-  await page.waitForTimeout(150);
-
-  const topElement = await topElementInsideDrawer(page);
-  assert.ok(topElement, 'should find a hit-tested element inside the drawer');
-  assert.notEqual(topElement.id, 'settingsBackdrop', 'blur backdrop must not sit above the drawer');
-  assert.equal(topElement.insideDrawer, true, 'hit-tested content inside the drawer should belong to the drawer itself');
+  assert.equal(await isVisible(page, '#controlsPanel'), true, 'scene controls should be visible immediately');
+  assert.equal(await isVisible(page, '#layersPanel'), true, 'layer controls should be visible immediately');
+  assert.equal(await page.locator('#subjectTextInput').isVisible(), true, 'main text input should be visible immediately');
+  assert.equal(await page.locator('#stageCanvas').isVisible(), true, 'preview canvas should be visible immediately');
   assert.deepEqual(pageErrors, []);
 
   await page.close();
 });
 
 test('typing into the main text field auto-activates text mode and survives randomize', async () => {
-  const { page, pageErrors } = await openPage();
+  const { page, pageErrors } = await openPage({ width: 1440, height: 960 });
 
   await page.fill('#subjectTextInput', 'LOW GAME');
   await page.waitForTimeout(100);
