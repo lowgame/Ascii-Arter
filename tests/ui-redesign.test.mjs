@@ -99,6 +99,23 @@ async function isVisible(page, selector) {
   });
 }
 
+async function topElementInsideDrawer(page) {
+  return page.evaluate(() => {
+    const drawer = document.getElementById('settingsDrawer');
+    if (!drawer) return null;
+    const rect = drawer.getBoundingClientRect();
+    const x = Math.min(window.innerWidth - 4, Math.max(4, rect.left + Math.min(rect.width * 0.5, 48)));
+    const y = Math.min(window.innerHeight - 4, Math.max(4, rect.top + Math.min(rect.height * 0.25, 120)));
+    const top = document.elementFromPoint(x, y);
+    return top ? {
+      id: top.id,
+      className: top.className,
+      tagName: top.tagName,
+      insideDrawer: Boolean(top.closest('#settingsDrawer')),
+    } : null;
+  });
+}
+
 test.before(async () => {
   ({ server, baseUrl } = await startStaticServer(rootDir));
   browser = await chromium.launch({ headless: true });
@@ -136,6 +153,21 @@ test('settings toggle opens the advanced drawer without breaking legacy panels',
   assert.equal(await isVisible(page, '#layersPanel'), true, 'layers panel should become visible inside settings shell');
   assert.equal(await page.locator('#settingsToggleBtn').getAttribute('aria-pressed'), 'true');
   assert.match(await page.locator('#settingsToggleBtn').innerText(), /gizle|hide/i);
+  assert.deepEqual(pageErrors, []);
+
+  await page.close();
+});
+
+test('settings drawer stays above the blur backdrop so its contents remain visible and clickable', async () => {
+  const { page, pageErrors } = await openPage({ width: 390, height: 844 });
+
+  await page.click('#settingsToggleBtn');
+  await page.waitForTimeout(150);
+
+  const topElement = await topElementInsideDrawer(page);
+  assert.ok(topElement, 'should find a hit-tested element inside the drawer');
+  assert.notEqual(topElement.id, 'settingsBackdrop', 'blur backdrop must not sit above the drawer');
+  assert.equal(topElement.insideDrawer, true, 'hit-tested content inside the drawer should belong to the drawer itself');
   assert.deepEqual(pageErrors, []);
 
   await page.close();

@@ -219,7 +219,6 @@ input[type="range"]:focus {
 
 .workspace {
   position: relative;
-  z-index: 5;
   margin-top: 18px;
 }
 
