@@ -84,8 +84,8 @@ async function openPage(viewport = { width: 1440, height: 960 }) {
   const page = await browser.newPage({ viewport });
   const pageErrors = [];
   page.on('pageerror', (error) => pageErrors.push(error.message));
-  await page.goto(baseUrl, { waitUntil: 'load' });
-  await page.waitForSelector('#subjectTextInput');
+  await page.goto(baseUrl, { waitUntil: 'domcontentloaded', timeout: 15000 });
+  await page.waitForSelector('#subjectTextInput', { timeout: 15000 });
   return { page, pageErrors };
 }
 
@@ -117,8 +117,11 @@ async function readComboState(page) {
   return page.evaluate(() => {
     const value = (selector) => document.querySelector(selector)?.value ?? null;
     const text = (selector) => document.querySelector(selector)?.textContent?.trim() ?? null;
+    const randomizeBtn = document.querySelector('#randomizeBtn');
     return {
       randomizeLabel: text('#randomizeBtn'),
+      randomizeProfile: randomizeBtn?.dataset.randomizeProfile ?? null,
+      status: text('#statusStat'),
       subject: {
         fontWeight: value('#subjectFontWeight'),
         bgIntensity: value('#subjectBgIntensity'),
@@ -235,6 +238,8 @@ test('randomize without subject only changes the background scene', async () => 
   assert.equal(before.subject.bgIntensity, after.subject.bgIntensity, 'no subject means subject background intensity should stay put');
   assert.equal(before.subject.padding, after.subject.padding, 'no subject means subject padding should stay put');
   assert.equal(after.randomizeLabel, 'BG Randomize', 'empty state should expose background-only randomize intent');
+  assert.ok(after.randomizeProfile, 'background randomize should expose a curated profile tag');
+  assert.notEqual(after.status, before.status, 'background randomize should announce a new mood/status');
   assert.deepEqual(pageErrors, []);
 
   await page.close();
@@ -256,7 +261,68 @@ test('randomize with subject creates a fresh text plus background combo', async 
   assert.equal(await page.locator('#subjectTextInput').inputValue(), 'LOW GAME', 'randomize should still preserve the typed subject');
   assert.equal(await page.locator('#activateTextBtn').evaluate((element) => element.classList.contains('active')), true, 'typed subject should remain in text mode after randomize');
   assert.equal(after.randomizeLabel, 'Combo Randomize', 'subject-present state should expose combo randomize intent');
+  assert.ok(after.randomizeProfile, 'combo randomize should expose a curated profile tag');
+  assert.notEqual(after.status, before.status, 'combo randomize should announce the selected mood');
   assert.equal(before.subject.fontWeight === after.subject.fontWeight && before.subject.bgIntensity === after.subject.bgIntensity && before.subject.padding === after.subject.padding, false, 'subject styling should remix when a subject exists');
+  assert.deepEqual(pageErrors, []);
+
+  await page.close();
+});
+
+test('combo randomize keeps svg active when svg subject is the current mode', async () => {
+  const { page, pageErrors } = await openPage({ width: 1440, height: 960 });
+
+  await page.fill('#subjectTextInput', 'LOW GAME');
+  await page.click('#activateSvgBtn');
+  await page.fill('#subjectSvgInput', '<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><circle cx="16" cy="16" r="10" fill="white"/></svg>');
+  await page.waitForTimeout(100);
+
+  const before = await page.evaluate(() => ({
+    type: document.querySelector('#activateSvgBtn')?.classList.contains('active') ? 'svg' : 'text',
+    svg: document.querySelector('#subjectSvgInput')?.value || '',
+    text: document.querySelector('#subjectTextInput')?.value || '',
+  }));
+
+  await page.click('#randomizeBtn');
+  await page.waitForTimeout(200);
+
+  const after = await page.evaluate(() => ({
+    type: document.querySelector('#activateSvgBtn')?.classList.contains('active') ? 'svg' : 'text',
+    svg: document.querySelector('#subjectSvgInput')?.value || '',
+    text: document.querySelector('#subjectTextInput')?.value || '',
+    svgVisible: !document.querySelector('#subjectSvgArea')?.hidden,
+    textVisible: !document.querySelector('#subjectTextArea')?.hidden,
+  }));
+
+  assert.equal(before.type, 'svg', 'setup should switch subject mode to svg');
+  assert.equal(after.type, 'svg', 'combo randomize should keep the active svg mode instead of forcing text');
+  assert.equal(after.svgVisible, true, 'svg panel should stay visible after combo randomize');
+  assert.equal(after.textVisible, false, 'text panel should stay hidden while svg mode is active');
+  assert.equal(after.svg, before.svg, 'svg content should be preserved during combo randomize');
+  assert.equal(after.text, before.text, 'background randomization should not wipe the text field either');
+  assert.deepEqual(pageErrors, []);
+
+  await page.close();
+});
+
+test('main randomize cycles through different curated moods across repeated clicks', async () => {
+  const { page, pageErrors } = await openPage({ width: 1440, height: 960 });
+
+  await page.fill('#subjectTextInput', 'LOW GAME');
+  await page.waitForTimeout(80);
+
+  const profiles = new Set();
+  const statuses = new Set();
+  for (let i = 0; i < 6; i += 1) {
+    await page.click('#randomizeBtn');
+    await page.waitForTimeout(180);
+    const state = await readComboState(page);
+    profiles.add(state.randomizeProfile);
+    statuses.add(state.status);
+  }
+
+  assert.ok(profiles.size >= 3, 'main randomize should surface several distinct curated mood profiles');
+  assert.ok(statuses.size >= 3, 'main randomize should produce clearly different mood labels');
   assert.deepEqual(pageErrors, []);
 
   await page.close();

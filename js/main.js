@@ -32,6 +32,59 @@ const PRESET_VISUALS = {
   'deep-ocean': { textFont: 'bold', textColor: '#dff6ff', textBg: 'rgba(5, 30, 42, 0.82)', animation: 'drift', outline: false },
   'terminal-monolith': { textFont: '900', textColor: '#ffffff', textBg: 'rgba(18, 18, 18, 0.84)', animation: 'static', outline: false }
 };
+const RANDOMIZE_MOODS = {
+  matrix: {
+    label: 'Matrix Cathedral',
+    palettes: ['matrix', 'radar', 'cyber'],
+    charSets: ['matrix', 'dense', 'technical'],
+    background: { r: [0, 10], g: [10, 28], b: [4, 18] },
+    scene: { brightness: [-0.12, 0.04], contrast: [1.15, 1.8], gamma: [0.82, 1.08], saturation: [0.85, 1.2], hueShift: [-18, 18], density: [0.95, 1.7], glow: [8, 22], trail: [0.18, 0.42], backgroundMix: [0.08, 0.22], speed: [0.8, 1.55], zoom: [0.85, 1.3], rotation: [-10, 10], amplitude: [0.7, 1.4], frequency: [0.9, 1.7], turbulence: [0.6, 1.2], offsetX: [-0.12, 0.12], offsetY: [-0.12, 0.12] },
+    layers: { count: [3, 5], modes: ['matrix-rain', 'bytefall', 'code-cascade', 'mesh-rain', 'circuit-bloom', 'radar-sweep'], intensity: [0.75, 1.45], speed: [0.55, 1.4], scale: [0.75, 1.5], warp: [0.55, 1.4], charBias: [-0.12, 0.2] },
+    text: { count: [1, 2], animations: ['pulse', 'drift', 'orbit', 'marquee'], amplitude: [1, 6], speed: [0.6, 1.7], rainbowChance: 0.18, outlineChance: 0.3, glow: [0, 8] },
+    subject: { fonts: ['bold', '900'], bgIntensity: [0.05, 0.16], padding: [2, 6], textColor: ['#d7ffe9', '#9effc9'], textBg: ['rgba(1, 18, 8, 0.88)', 'rgba(4, 26, 12, 0.84)'], animations: ['pulse', 'drift', 'static'], outlineChance: 0.2 },
+  },
+  neon: {
+    label: 'Neon Dream',
+    palettes: ['neon', 'synthwave', 'candy'],
+    charSets: ['neon', 'dense', 'technical'],
+    background: { r: [8, 30], g: [0, 14], b: [22, 55] },
+    scene: { brightness: [-0.02, 0.14], contrast: [1.05, 1.6], gamma: [0.88, 1.16], saturation: [1.2, 1.9], hueShift: [-48, 48], density: [0.75, 1.35], glow: [10, 24], trail: [0.08, 0.26], backgroundMix: [0.18, 0.42], speed: [0.75, 1.7], zoom: [0.8, 1.4], rotation: [-24, 24], amplitude: [0.9, 1.8], frequency: [0.9, 1.9], turbulence: [0.9, 1.8], offsetX: [-0.25, 0.25], offsetY: [-0.22, 0.22] },
+    layers: { count: [2, 4], modes: ['synth-spiral', 'neon-tunnel', 'plasma-wave', 'plasma-arc', 'orbital-weave', 'pulse-vortex', 'kaleido'], intensity: [0.65, 1.35], speed: [0.6, 1.8], scale: [0.7, 1.7], warp: [0.8, 1.9], charBias: [-0.2, 0.25] },
+    text: { count: [1, 2], animations: ['marquee', 'wave', 'bounce', 'orbit', 'glitch'], amplitude: [2, 9], speed: [0.8, 2.3], rainbowChance: 0.52, outlineChance: 0.58, glow: [2, 14] },
+    subject: { fonts: ['bold', '900'], bgIntensity: [0.08, 0.24], padding: [3, 9], textColor: ['#fff2cc', '#ff9de1', '#8ef7ff'], textBg: ['rgba(57, 8, 68, 0.84)', 'rgba(20, 8, 60, 0.86)', 'rgba(48, 6, 32, 0.82)'], animations: ['marquee', 'wave', 'orbit', 'glitch'], outlineChance: 0.62 },
+  },
+  storm: {
+    label: 'Storm Signal',
+    palettes: ['cyber', 'aurora', 'ocean', 'ice'],
+    charSets: ['dense', 'technical', 'wire'],
+    background: { r: [2, 14], g: [8, 28], b: [18, 48] },
+    scene: { brightness: [-0.08, 0.06], contrast: [1.08, 1.7], gamma: [0.84, 1.14], saturation: [0.9, 1.45], hueShift: [-32, 32], density: [0.82, 1.45], glow: [6, 18], trail: [0.12, 0.34], backgroundMix: [0.12, 0.28], speed: [0.85, 1.8], zoom: [0.75, 1.45], rotation: [-28, 28], amplitude: [1.1, 2.1], frequency: [1.1, 2.2], turbulence: [1.1, 2.1], offsetX: [-0.24, 0.24], offsetY: [-0.24, 0.24] },
+    layers: { count: [3, 5], modes: ['stormfront', 'thunderlines', 'wavepackets', 'vector-scan', 'signal-coast', 'tidal-scan', 'radar-sweep'], intensity: [0.7, 1.5], speed: [0.7, 1.9], scale: [0.65, 1.55], warp: [1.0, 2.0], charBias: [-0.18, 0.18] },
+    text: { count: [1, 2], animations: ['drift', 'orbit', 'pulse', 'glitch'], amplitude: [1, 7], speed: [0.7, 2.1], rainbowChance: 0.28, outlineChance: 0.42, glow: [1, 12] },
+    subject: { fonts: ['normal', 'bold', '900'], bgIntensity: [0.06, 0.2], padding: [2, 8], textColor: ['#caf0f8', '#dff6ff', '#9fe7ff'], textBg: ['rgba(7, 25, 37, 0.84)', 'rgba(3, 18, 30, 0.88)', 'rgba(10, 28, 44, 0.82)'], animations: ['drift', 'pulse', 'orbit'], outlineChance: 0.36 },
+  },
+  ember: {
+    label: 'Solar Ember',
+    palettes: ['fire', 'ember', 'gold', 'sunset'],
+    charSets: ['dense', 'technical', 'blocks'],
+    background: { r: [20, 55], g: [4, 18], b: [0, 10] },
+    scene: { brightness: [-0.04, 0.16], contrast: [1.12, 1.85], gamma: [0.82, 1.12], saturation: [1.05, 1.8], hueShift: [-26, 18], density: [0.88, 1.55], glow: [8, 24], trail: [0.1, 0.28], backgroundMix: [0.08, 0.24], speed: [0.7, 1.55], zoom: [0.8, 1.35], rotation: [-18, 18], amplitude: [0.8, 1.6], frequency: [0.75, 1.55], turbulence: [0.8, 1.6], offsetX: [-0.18, 0.18], offsetY: [-0.18, 0.18] },
+    layers: { count: [2, 4], modes: ['fire-column', 'ember-drift', 'sunflare', 'gravity-well', 'solar-breach', 'heartbeat'], intensity: [0.72, 1.48], speed: [0.55, 1.5], scale: [0.75, 1.6], warp: [0.65, 1.6], charBias: [-0.08, 0.22] },
+    text: { count: [1, 2], animations: ['pulse', 'bounce', 'marquee', 'wave'], amplitude: [1, 7], speed: [0.7, 2.0], rainbowChance: 0.24, outlineChance: 0.6, glow: [2, 14] },
+    subject: { fonts: ['bold', '900'], bgIntensity: [0.08, 0.22], padding: [3, 8], textColor: ['#fff4cc', '#ffd166', '#ffb36b'], textBg: ['rgba(45, 12, 1, 0.84)', 'rgba(52, 20, 0, 0.86)', 'rgba(30, 10, 2, 0.82)'], animations: ['pulse', 'bounce', 'wave'], outlineChance: 0.66 },
+  },
+  mono: {
+    label: 'Monolith Brutal',
+    palettes: ['mono', 'matrix', 'gold'],
+    charSets: ['technical', 'dense', 'hex', 'binary'],
+    background: { r: [0, 10], g: [0, 10], b: [0, 12] },
+    scene: { brightness: [-0.16, 0.02], contrast: [1.25, 2.1], gamma: [0.72, 1.02], saturation: [0.15, 0.65], hueShift: [-8, 8], density: [1.0, 1.85], glow: [2, 10], trail: [0.16, 0.4], backgroundMix: [0.02, 0.12], speed: [0.6, 1.25], zoom: [0.9, 1.3], rotation: [-8, 8], amplitude: [0.5, 1.3], frequency: [0.8, 1.4], turbulence: [0.45, 1.1], offsetX: [-0.1, 0.1], offsetY: [-0.1, 0.1] },
+    layers: { count: [2, 4], modes: ['signal-loss', 'static-burst', 'monolith', 'binary-wave', 'moire-lattice', 'cyber-checker'], intensity: [0.82, 1.55], speed: [0.45, 1.1], scale: [0.9, 1.8], warp: [0.35, 1.1], charBias: [-0.25, 0.08] },
+    text: { count: [1, 1], animations: ['static', 'drift', 'pulse'], amplitude: [1, 4], speed: [0.45, 1.2], rainbowChance: 0.04, outlineChance: 0.22, glow: [0, 6] },
+    subject: { fonts: ['normal', 'bold', '900'], bgIntensity: [0.04, 0.14], padding: [2, 6], textColor: ['#ffffff', '#f5f5f5', '#d7d7d7'], textBg: ['rgba(18, 18, 18, 0.9)', 'rgba(8, 8, 8, 0.88)', 'rgba(26, 26, 26, 0.84)'], animations: ['static', 'drift', 'pulse'], outlineChance: 0.18 },
+  },
+};
+const RANDOMIZE_MOOD_KEYS = Object.keys(RANDOMIZE_MOODS);
 const SUBJECT_FONT_OPTIONS = ['normal', 'bold', '900'];
 
 const dom = {};
@@ -230,20 +283,107 @@ function hasActiveSubject() {
 function updateRandomizeButtonLabel() {
   if (!dom.randomizeBtn) return;
   dom.randomizeBtn.textContent = hasActiveSubject() ? 'Combo Randomize' : 'BG Randomize';
+  if (!dom.randomizeBtn.dataset.randomizeProfile) {
+    dom.randomizeBtn.dataset.randomizeProfile = hasActiveSubject() ? 'combo-ready' : 'bg-ready';
+  }
 }
 
-function createRandomSubjectStyle() {
+function randomInRange([min, max]) {
+  return randomBetween(min, max);
+}
+
+function randomIntInRange([min, max]) {
+  return Math.round(randomBetween(min, max));
+}
+
+function pickFrom(items) {
+  return pick(Array.isArray(items) ? items : []);
+}
+
+function applyMoodScene(mood) {
+  project.palette = pickFrom(mood.palettes) || project.palette;
+  project.charSet = pickFrom(mood.charSets) || project.charSet;
+  const bg = mood.background;
+  project.background = rgbToHex({
+    r: randomIntInRange(bg.r),
+    g: randomIntInRange(bg.g),
+    b: randomIntInRange(bg.b),
+  });
+  Object.entries(mood.scene).forEach(([key, range]) => {
+    project[key] = key === 'rotation' || key === 'hueShift'
+      ? randomIntInRange(range)
+      : Number(randomInRange(range).toFixed(2));
+  });
+  project.seed = randomIntInRange([1, 9999]);
+  project.mirrorX = Math.random() > 0.7;
+  project.mirrorY = Math.random() > 0.74;
+}
+
+function buildMoodLayers(mood) {
+  const count = randomIntInRange(mood.layers.count);
+  project.layers = Array.from({ length: count }, (_, index) => createDefaultLayer({
+    name: `Layer ${index + 1}`,
+    mode: pickFrom(mood.layers.modes) || pick(ANIMATION_MODES).id,
+    palette: Math.random() > 0.35 ? pickFrom(mood.palettes) : 'inherit',
+    blend: pick(BLEND_MODES).value,
+    intensity: Number(randomInRange(mood.layers.intensity).toFixed(2)),
+    speed: Number(randomInRange(mood.layers.speed).toFixed(2)),
+    scale: Number(randomInRange(mood.layers.scale).toFixed(2)),
+    phase: Number(randomBetween(-3.14, 3.14).toFixed(2)),
+    offsetX: Number(randomBetween(-0.6, 0.6).toFixed(2)),
+    offsetY: Number(randomBetween(-0.6, 0.6).toFixed(2)),
+    warp: Number(randomInRange(mood.layers.warp).toFixed(2)),
+    hueShift: randomIntInRange([-52, 52]),
+    charBias: Number(randomInRange(mood.layers.charBias).toFixed(2)),
+  }));
+}
+
+function buildMoodTexts(mood) {
+  const bgOptions = [
+    () => {
+      const c = hexToRgb(samplePalette(project.palette, Math.random(), 1, 0));
+      return `rgba(${Math.round(c.r * 0.18)},${Math.round(c.g * 0.18)},${Math.round(c.b * 0.18)},0.82)`;
+    },
+    () => 'rgba(0,0,0,0.72)',
+    () => {
+      const c = hexToRgb(project.background);
+      return `rgba(${Math.min(255, c.r + 10)},${Math.min(255, c.g + 10)},${Math.min(255, c.b + 18)},0.86)`;
+    },
+  ];
+  const count = randomIntInRange(mood.text.count);
+  project.texts = Array.from({ length: count }, () => createDefaultText({
+    content: '',
+    animation: pickFrom(mood.text.animations) || pick(TEXT_ANIMATIONS).value,
+    x: Math.floor(randomBetween(4, project.cols * 0.45)),
+    y: Math.floor(randomBetween(2, project.rows * 0.5)),
+    speed: Number(randomInRange(mood.text.speed).toFixed(2)),
+    amplitude: Number(randomInRange(mood.text.amplitude).toFixed(2)),
+    color: samplePalette(project.palette, Math.random(), 1.2, 0),
+    bg: pick(bgOptions)(),
+    repeat: Math.random() > 0.72,
+    rainbow: Math.random() < mood.text.rainbowChance,
+    outline: Math.random() < mood.text.outlineChance,
+    glow: Number(randomInRange(mood.text.glow).toFixed(2)),
+  }));
+}
+
+function createRandomSubjectStyle(mood = null) {
+  const subjectMood = mood?.subject;
   const paletteName = pick(Object.keys(PALETTES));
-  const textColor = samplePalette(paletteName, Math.random(), randomBetween(0.95, 1.2), randomBetween(-24, 24));
+  const textColor = subjectMood?.textColor?.length
+    ? pickFrom(subjectMood.textColor)
+    : samplePalette(paletteName, Math.random(), randomBetween(0.95, 1.2), randomBetween(-24, 24));
   const bgBase = hexToRgb(samplePalette(paletteName, Math.random(), 1, 0));
   return {
-    textFont: pick(SUBJECT_FONT_OPTIONS),
-    bgIntensity: Number(randomBetween(0.06, 0.28).toFixed(2)),
-    padding: Math.round(randomBetween(2, 10)),
+    textFont: pickFrom(subjectMood?.fonts || SUBJECT_FONT_OPTIONS),
+    bgIntensity: Number((subjectMood ? randomInRange(subjectMood.bgIntensity) : randomBetween(0.06, 0.28)).toFixed(2)),
+    padding: subjectMood ? randomIntInRange(subjectMood.padding) : Math.round(randomBetween(2, 10)),
     textColor,
-    textBg: `rgba(${Math.round(bgBase.r * 0.22)}, ${Math.round(bgBase.g * 0.22)}, ${Math.round(bgBase.b * 0.22)}, 0.84)`,
-    animation: pick(TEXT_ANIMATIONS).value,
-    outline: Math.random() > 0.52,
+    textBg: subjectMood?.textBg?.length
+      ? pickFrom(subjectMood.textBg)
+      : `rgba(${Math.round(bgBase.r * 0.22)}, ${Math.round(bgBase.g * 0.22)}, ${Math.round(bgBase.b * 0.22)}, 0.84)`,
+    animation: pickFrom(subjectMood?.animations || TEXT_ANIMATIONS.map((item) => item.value)),
+    outline: subjectMood ? Math.random() < subjectMood.outlineChance : Math.random() > 0.52,
   };
 }
 
@@ -306,7 +446,7 @@ function bindButtons() {
 
   dom.randomizeBtn.addEventListener('click', () => {
     randomizeProject();
-    applyProject(project, { keepPresetSelection: false, status: 'Randomized scene' });
+    applyProject(project, { keepPresetSelection: false, status: dom.statusStat.textContent || 'Randomized scene' });
   });
 
   dom.shuffleCharsetBtn.addEventListener('click', () => {
@@ -1351,84 +1491,21 @@ async function handleImportProject(event) {
 }
 
 function randomizeProject() {
-  // Save subject before randomizing — user content is sacred
   const savedSubject = project.subject ? { ...project.subject } : null;
-  const subjectActive = Boolean(savedSubject && ((savedSubject.type === 'text' && savedSubject.text?.trim()) || (savedSubject.type === 'svg' && savedSubject.svgContent?.trim())));
-
-  const palettes = Object.keys(PALETTES);
-  const charSets = Object.keys(CHARSETS);
-  const layerCount = 2 + Math.floor(Math.random() * 3);
-  const textCount = 1 + Math.floor(Math.random() * 2);
+  const activeSubjectType = savedSubject?.type;
+  const hasTextSubject = Boolean(savedSubject?.type === 'text' && savedSubject?.text?.trim());
+  const hasSvgSubject = Boolean(savedSubject?.type === 'svg' && savedSubject?.svgContent?.trim());
+  const subjectActive = hasTextSubject || hasSvgSubject;
+  const moodKey = pick(RANDOMIZE_MOOD_KEYS);
+  const mood = RANDOMIZE_MOODS[moodKey];
 
   project.projectName = project.projectName || 'Ascii Arter';
-  project.palette = pick(palettes);
-  project.charSet = pick(charSets);
-  project.background = rgbToHex({ r: Math.floor(Math.random() * 22), g: Math.floor(Math.random() * 22), b: Math.floor(Math.random() * 38) });
-  project.brightness = randomBetween(-0.08, 0.12);
-  project.contrast = randomBetween(0.95, 1.45);
-  project.gamma = randomBetween(0.85, 1.35);
-  project.saturation = randomBetween(0.75, 1.65);
-  project.hueShift = randomBetween(-60, 60);
-  project.density = randomBetween(0.7, 1.5);
-  project.glow = randomBetween(4, 18);
-  project.trail = randomBetween(0.06, 0.34);
-  project.backgroundMix = randomBetween(0.12, 0.42);
-  project.speed = randomBetween(0.75, 1.6);
-  project.zoom = randomBetween(0.7, 1.5);
-  project.rotation = randomBetween(-35, 35);
-  project.amplitude = randomBetween(0.6, 1.8);
-  project.frequency = randomBetween(0.7, 1.8);
-  project.turbulence = randomBetween(0.6, 1.8);
-  project.offsetX = randomBetween(-0.3, 0.3);
-  project.offsetY = randomBetween(-0.3, 0.3);
-  project.seed = Math.floor(randomBetween(1, 9999));
-  project.mirrorX = Math.random() > 0.72;
-  project.mirrorY = Math.random() > 0.74;
+  applyMoodScene(mood);
+  buildMoodLayers(mood);
+  buildMoodTexts(mood);
 
-  project.layers = Array.from({ length: layerCount }, (_, index) => createDefaultLayer({
-    name: `Layer ${index + 1}`,
-    mode: pick(ANIMATION_MODES).id,
-    palette: Math.random() > 0.4 ? pick(palettes) : 'inherit',
-    blend: pick(BLEND_MODES).value,
-    intensity: randomBetween(0.4, 1.4),
-    speed: randomBetween(0.4, 1.8),
-    scale: randomBetween(0.6, 1.8),
-    phase: randomBetween(-3.14, 3.14),
-    offsetX: randomBetween(-0.6, 0.6),
-    offsetY: randomBetween(-0.6, 0.6),
-    warp: randomBetween(0.6, 1.8),
-    hueShift: randomBetween(-60, 60),
-    charBias: randomBetween(-0.3, 0.3)
-  }));
-
-  // Pick a nice bg color per text — dark tinted version of its text color
-  const bgOptions = [
-    () => { const c = hexToRgb(samplePalette(project.palette, Math.random(), 1, 0)); return `rgba(${Math.round(c.r*0.18)},${Math.round(c.g*0.18)},${Math.round(c.b*0.18)},0.82)`; },
-    () => 'rgba(0,0,0,0.7)',
-    () => { const c = hexToRgb(project.background); return `rgba(${Math.min(255,c.r+8)},${Math.min(255,c.g+8)},${Math.min(255,c.b+18)},0.85)`; },
-  ];
-
-  project.texts = Array.from({ length: textCount }, (_, index) => {
-    const textColor = samplePalette(project.palette, Math.random(), 1.2, 0);
-    const bgFn = pick(bgOptions);
-    return createDefaultText({
-      content: '',  // never overwrite user content
-      animation: pick(TEXT_ANIMATIONS).value,
-      x: Math.floor(randomBetween(4, project.cols * 0.45)),
-      y: Math.floor(randomBetween(2, project.rows * 0.5)),
-      speed: randomBetween(0.7, 2.2),
-      amplitude: randomBetween(1, 8),
-      color: textColor,
-      bg: bgFn(),
-      repeat: Math.random() > 0.72,
-      rainbow: Math.random() > 0.62,
-      outline: Math.random() > 0.5,
-      glow: randomBetween(0, 10),
-    });
-  });
-
-  if (subjectActive && savedSubject?.text?.trim()) {
-    const comboStyle = createRandomSubjectStyle();
+  if (hasTextSubject) {
+    const comboStyle = createRandomSubjectStyle(mood);
     project.subject = {
       ...savedSubject,
       type: 'text',
@@ -1438,14 +1515,29 @@ function randomizeProject() {
       padding: comboStyle.padding,
     };
     applySubjectStyleToProject(project, comboStyle, savedSubject.text);
+  } else if (hasSvgSubject) {
+    const svgSubjectMood = mood.subject;
+    project.subject = {
+      ...savedSubject,
+      type: 'svg',
+      svgContent: savedSubject.svgContent,
+      bgIntensity: Number(randomInRange(svgSubjectMood?.bgIntensity || [0.06, 0.2]).toFixed(2)),
+      padding: randomIntInRange(svgSubjectMood?.padding || [2, 8]),
+    };
   } else if (savedSubject) {
     project.subject = savedSubject;
   }
 
+  if (project.subject && activeSubjectType && subjectActive) {
+    project.subject.type = activeSubjectType;
+  }
+
   selectedLayerId = project.layers[0].id;
   selectedTextId = project.texts[0].id;
+  if (dom.randomizeBtn) dom.randomizeBtn.dataset.randomizeProfile = moodKey;
   updateRandomizeButtonLabel();
-  subjectDirty = true; // re-render mask with potentially new dimensions
+  setStatus(`${mood.label} mood loaded`);
+  subjectDirty = true;
 }
 
 function moveLayer(direction) {
