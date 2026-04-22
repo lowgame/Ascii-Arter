@@ -42,6 +42,7 @@ let subjectDirty = true;
 const controlRefs = new Map();
 const paletteCache = new Map(Object.entries(PALETTES).map(([name, stops]) => [name, stops.map(hexToRgb)]));
 const embedJsonCatalog = new Map();
+let isSettingsOpen = false;
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 const clamp01 = (value) => clamp(value, 0, 1);
@@ -115,6 +116,7 @@ function init() {
   buildGlobalControls();
   populatePresetSelect();
   bindButtons();
+  initializeSettingsPanel();
   resizeScene();
   renderLists();
   renderInspectors();
@@ -128,7 +130,7 @@ function init() {
 
 function bindDom() {
   const ids = [
-    'presetSelect', 'controlsContent', 'projectTitleLabel', 'stageCanvas', 'frameOutput',
+    'appShell', 'presetSelect', 'controlsContent', 'projectTitleLabel', 'stageCanvas', 'frameOutput',
     'fpsStat', 'renderStat', 'cellsStat', 'layersStat', 'statusStat', 'playPauseBtn',
     'randomizeBtn', 'shuffleCharsetBtn', 'savePresetBtn', 'importBtn', 'exportProjectBtn',
     'importProjectInput', 'copyFrameBtn', 'exportTxtBtn', 'exportPngBtn', 'exportHtmlBtn',
@@ -137,7 +139,7 @@ function bindDom() {
     'addTextBtn', 'removeTextBtn', 'duplicateTextBtn',
     'svgLayersList', 'svgLayerInspector', 'addSvgLayerBtn', 'removeSvgLayerBtn',
     'svgUploadInput', 'presetsGalleryBtn', 'presetsModal', 'presetsModalClose', 'presetsGrid',
-    'jsonTestBtn',
+    'jsonTestBtn', 'settingsToggleBtn',
     'embedCodeBtn', 'embedModal', 'embedModalClose', 'embedJsonTextarea', 'embedCopyJsonBtn', 'embedCopySnippetBtn',
     'embedPasteJsonTextarea', 'embedApplyJsonBtn',
     'embedPresetJsonSelect', 'embedLoadPresetJsonBtn', 'embedApplyPresetJsonBtn', 'embedPresetJsonPreview', 'embedExportTesterJsonBtn',
@@ -156,6 +158,12 @@ function bindButtons() {
     setStatus(isPlaying ? 'Playback resumed' : 'Playback paused');
     needsRedraw = true;
   });
+
+  if (dom.settingsToggleBtn) {
+    dom.settingsToggleBtn.addEventListener('click', () => {
+      toggleSettingsPanel();
+    });
+  }
 
   dom.randomizeBtn.addEventListener('click', () => {
     randomizeProject();
@@ -539,6 +547,21 @@ function bindButtons() {
       needsRedraw = true;
     });
   }
+}
+
+function toggleSettingsPanel(forceState) {
+  if (!dom.appShell || !dom.settingsToggleBtn) return;
+
+  isSettingsOpen = typeof forceState === 'boolean' ? forceState : !isSettingsOpen;
+  dom.appShell.classList.toggle('settings-open', isSettingsOpen);
+  dom.settingsToggleBtn.classList.toggle('btn-primary', isSettingsOpen);
+  dom.settingsToggleBtn.setAttribute('aria-pressed', String(isSettingsOpen));
+  dom.settingsToggleBtn.textContent = isSettingsOpen ? 'Ayarları Gizle' : 'Ayarlar';
+}
+
+function initializeSettingsPanel() {
+  if (!dom.settingsToggleBtn) return;
+  toggleSettingsPanel(false);
 }
 
 function buildGlobalControls() {
