@@ -41,8 +41,6 @@ let subjectMask = null; // Float32Array | null
 let subjectDirty = true;
 const controlRefs = new Map();
 const paletteCache = new Map(Object.entries(PALETTES).map(([name, stops]) => [name, stops.map(hexToRgb)]));
-const embedJsonCatalog = new Map();
-let isSettingsOpen = false;
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 const clamp01 = (value) => clamp(value, 0, 1);
@@ -116,7 +114,6 @@ function init() {
   buildGlobalControls();
   populatePresetSelect();
   bindButtons();
-  initializeSettingsPanel();
   resizeScene();
   renderLists();
   renderInspectors();
@@ -130,7 +127,7 @@ function init() {
 
 function bindDom() {
   const ids = [
-    'appShell', 'presetSelect', 'controlsContent', 'projectTitleLabel', 'stageCanvas', 'frameOutput',
+    'presetSelect', 'controlsContent', 'projectTitleLabel', 'stageCanvas', 'frameOutput',
     'fpsStat', 'renderStat', 'cellsStat', 'layersStat', 'statusStat', 'playPauseBtn',
     'randomizeBtn', 'shuffleCharsetBtn', 'savePresetBtn', 'importBtn', 'exportProjectBtn',
     'importProjectInput', 'copyFrameBtn', 'exportTxtBtn', 'exportPngBtn', 'exportHtmlBtn',
@@ -139,16 +136,33 @@ function bindDom() {
     'addTextBtn', 'removeTextBtn', 'duplicateTextBtn',
     'svgLayersList', 'svgLayerInspector', 'addSvgLayerBtn', 'removeSvgLayerBtn',
     'svgUploadInput', 'presetsGalleryBtn', 'presetsModal', 'presetsModalClose', 'presetsGrid',
-    'jsonTestBtn', 'settingsToggleBtn',
-    'embedCodeBtn', 'embedModal', 'embedModalClose', 'embedJsonTextarea', 'embedCopyJsonBtn', 'embedCopySnippetBtn',
-    'embedPasteJsonTextarea', 'embedApplyJsonBtn',
-    'embedPresetJsonSelect', 'embedLoadPresetJsonBtn', 'embedApplyPresetJsonBtn', 'embedPresetJsonPreview', 'embedExportTesterJsonBtn',
-    'embedExportJsonBtn'
+    'embedCodeBtn', 'embedModal', 'embedModalClose', 'embedJsonTextarea', 'embedCopyJsonBtn', 'embedCopySnippetBtn'
   ];
 
   ids.forEach((id) => {
     dom[id] = document.getElementById(id);
   });
+}
+
+function setSubjectType(type) {
+  if (!project.subject) project.subject = {};
+  project.subject.type = type;
+
+  document.querySelectorAll('.subject-tab').forEach((button) => {
+    button.classList.toggle('active', button.dataset.type === type);
+  });
+
+  const textTA = document.getElementById('subjectTextInput');
+  const svgTA = document.getElementById('subjectSvgInput');
+  if (textTA) textTA.classList.toggle('active-subject', type === 'text');
+  if (svgTA) svgTA.classList.toggle('active-subject', type === 'svg');
+
+  const textArea = document.getElementById('subjectTextArea');
+  const svgArea = document.getElementById('subjectSvgArea');
+  const opts = document.getElementById('subjectOptions');
+  if (textArea) textArea.hidden = type === 'svg';
+  if (svgArea) svgArea.hidden = type !== 'svg';
+  if (opts) opts.hidden = false;
 }
 
 function bindButtons() {
@@ -158,12 +172,6 @@ function bindButtons() {
     setStatus(isPlaying ? 'Playback resumed' : 'Playback paused');
     needsRedraw = true;
   });
-
-  if (dom.settingsToggleBtn) {
-    dom.settingsToggleBtn.addEventListener('click', () => {
-      toggleSettingsPanel();
-    });
-  }
 
   dom.randomizeBtn.addEventListener('click', () => {
     randomizeProject();
@@ -319,9 +327,6 @@ function bindButtons() {
   dom.presetsModalClose.addEventListener('click', () => closePresetsModal());
   dom.presetsModal.addEventListener('click', (e) => { if (e.target === dom.presetsModal) closePresetsModal(); });
 
-  // Main menu shortcut to JSON testing area
-  dom.jsonTestBtn.addEventListener('click', () => openEmbedModal());
-
   // Embed modal
   dom.embedCodeBtn.addEventListener('click', () => openEmbedModal());
   dom.embedModalClose.addEventListener('click', () => closeEmbedModal());
@@ -332,77 +337,12 @@ function bindButtons() {
       setTimeout(() => { dom.embedCopyJsonBtn.textContent = '📋 Copy JSON'; }, 1500);
     });
   });
-  dom.embedExportJsonBtn.addEventListener('click', () => {
-    const json = dom.embedJsonTextarea.value || exportProjectJSON(project);
-    const file = `${slugify(project.projectName || 'ascii-arter')}.json`;
-    downloadText(file, json);
-    setStatus(`Exported JSON: ${file}`);
-  });
   dom.embedCopySnippetBtn.addEventListener('click', () => {
     const snippet = `import AsciiBackground from 'ascii-bg';\nimport project from './my-project.json'; // your exported JSON\n\nAsciiBackground.mount('#my-element', project);`;
     navigator.clipboard.writeText(snippet).then(() => {
       dom.embedCopySnippetBtn.textContent = '✅ Copied!';
       setTimeout(() => { dom.embedCopySnippetBtn.textContent = '📋 Copy Snippet'; }, 1500);
     });
-  });
-  dom.embedPresetJsonSelect.addEventListener('change', () => {
-    const key = dom.embedPresetJsonSelect.value;
-    if (!key) return;
-    const selected = embedJsonCatalog.get(key);
-    if (!selected) return;
-    dom.embedPresetJsonPreview.value = selected.json;
-  });
-  dom.embedLoadPresetJsonBtn.addEventListener('click', () => {
-    const key = dom.embedPresetJsonSelect.value;
-    if (!key) {
-      setStatus('Select an existing JSON first');
-      return;
-    }
-    const selected = embedJsonCatalog.get(key);
-    if (!selected) return;
-    dom.embedPasteJsonTextarea.value = selected.json;
-    setStatus(`Loaded ${selected.label} into paste area`);
-  });
-  dom.embedApplyPresetJsonBtn.addEventListener('click', () => {
-    const key = dom.embedPresetJsonSelect.value;
-    if (!key) {
-      setStatus('Select an existing JSON first');
-      return;
-    }
-    const selected = embedJsonCatalog.get(key);
-    if (!selected) return;
-    applyProject(cloneProject(selected.project), { keepPresetSelection: false, status: `${selected.label} applied` });
-    dom.embedJsonTextarea.value = exportProjectJSON(project);
-    dom.embedPasteJsonTextarea.value = dom.embedJsonTextarea.value;
-    dom.embedPresetJsonPreview.value = dom.embedJsonTextarea.value;
-    const currentKey = `current:${slugify(project.projectName || 'project')}`;
-    embedJsonCatalog.set(currentKey, { label: 'Current Project', project: cloneProject(project), json: dom.embedJsonTextarea.value });
-    setStatus(`${selected.label} applied`);
-  });
-  dom.embedExportTesterJsonBtn.addEventListener('click', () => {
-    const json = dom.embedPresetJsonPreview.value || dom.embedJsonTextarea.value || exportProjectJSON(project);
-    const file = `${slugify(project.projectName || 'ascii-arter-tested')}-tested.json`;
-    downloadText(file, json);
-    setStatus(`Exported tested JSON: ${file}`);
-  });
-  dom.embedApplyJsonBtn.addEventListener('click', () => {
-    const raw = dom.embedPasteJsonTextarea.value.trim();
-    if (!raw) {
-      setStatus('Paste area is empty');
-      return;
-    }
-    try {
-      const parsed = JSON.parse(raw);
-      applyProject(parsed, { keepPresetSelection: false, status: 'Pasted JSON applied' });
-      dom.embedJsonTextarea.value = exportProjectJSON(project);
-      dom.embedApplyJsonBtn.textContent = '✅ Applied!';
-      setTimeout(() => { dom.embedApplyJsonBtn.textContent = '✅ Apply Pasted JSON'; }, 1200);
-    } catch (error) {
-      console.error(error);
-      setStatus('Paste failed: invalid JSON');
-      dom.embedApplyJsonBtn.textContent = '❌ Invalid JSON';
-      setTimeout(() => { dom.embedApplyJsonBtn.textContent = '✅ Apply Pasted JSON'; }, 1500);
-    }
   });
 
   // SVG Layers
@@ -446,22 +386,7 @@ function bindButtons() {
   document.querySelectorAll('.subject-tab').forEach((btn) => {
     btn.addEventListener('click', () => {
       const type = btn.dataset.type;
-      if (!project.subject) project.subject = {};
-      project.subject.type = type;
-      // Sync all subject-tab active states
-      document.querySelectorAll('.subject-tab').forEach((b) => b.classList.toggle('active', b.dataset.type === type));
-      // Highlight the active textarea
-      const textTA = document.getElementById('subjectTextInput');
-      const svgTA = document.getElementById('subjectSvgInput');
-      if (textTA) textTA.classList.toggle('active-subject', type === 'text');
-      if (svgTA) svgTA.classList.toggle('active-subject', type === 'svg');
-      // Legacy hidden sections (if they still exist)
-      const textArea = document.getElementById('subjectTextArea');
-      const svgArea = document.getElementById('subjectSvgArea');
-      const opts = document.getElementById('subjectOptions');
-      if (textArea) textArea.style.display = type === 'text' ? '' : 'none';
-      if (svgArea) svgArea.style.display = type === 'svg' ? '' : 'none';
-      if (opts) opts.style.display = type !== 'none' ? '' : 'none';
+      setSubjectType(type);
       subjectDirty = true;
       needsRedraw = true;
     });
@@ -473,10 +398,14 @@ function bindButtons() {
     subjectClearBtn.addEventListener('click', () => {
       const textTA = document.getElementById('subjectTextInput');
       const svgTA = document.getElementById('subjectSvgInput');
-      if (textTA) { textTA.value = ''; textTA.classList.remove('active-subject'); }
-      if (svgTA) { svgTA.value = ''; svgTA.classList.remove('active-subject'); }
-      if (project.subject) { project.subject.type = 'none'; project.subject.text = ''; project.subject.svgContent = ''; }
-      document.querySelectorAll('.subject-tab').forEach((b) => b.classList.toggle('active', b.dataset.type === 'none'));
+      if (textTA) textTA.value = '';
+      if (svgTA) svgTA.value = '';
+      if (project.subject) {
+        project.subject.type = 'none';
+        project.subject.text = '';
+        project.subject.svgContent = '';
+      }
+      setSubjectType('none');
       subjectDirty = true;
       needsRedraw = true;
     });
@@ -487,6 +416,9 @@ function bindButtons() {
     subjectTextInput.addEventListener('input', () => {
       if (!project.subject) project.subject = {};
       project.subject.text = subjectTextInput.value;
+      if (subjectTextInput.value.trim()) {
+        setSubjectType('text');
+      }
       subjectDirty = true;
       needsRedraw = true;
     });
@@ -497,6 +429,9 @@ function bindButtons() {
     subjectSvgInput.addEventListener('input', () => {
       if (!project.subject) project.subject = {};
       project.subject.svgContent = subjectSvgInput.value;
+      if (subjectSvgInput.value.trim()) {
+        setSubjectType('svg');
+      }
       subjectDirty = true;
       needsRedraw = true;
     });
@@ -513,6 +448,9 @@ function bindButtons() {
       if (subjectSvgInput) subjectSvgInput.value = text;
       if (!project.subject) project.subject = {};
       project.subject.svgContent = text;
+      if (text.trim()) {
+        setSubjectType('svg');
+      }
       subjectDirty = true;
       needsRedraw = true;
       e.target.value = '';
@@ -547,21 +485,6 @@ function bindButtons() {
       needsRedraw = true;
     });
   }
-}
-
-function toggleSettingsPanel(forceState) {
-  if (!dom.appShell || !dom.settingsToggleBtn) return;
-
-  isSettingsOpen = typeof forceState === 'boolean' ? forceState : !isSettingsOpen;
-  dom.appShell.classList.toggle('settings-open', isSettingsOpen);
-  dom.settingsToggleBtn.classList.toggle('btn-primary', isSettingsOpen);
-  dom.settingsToggleBtn.setAttribute('aria-pressed', String(isSettingsOpen));
-  dom.settingsToggleBtn.textContent = isSettingsOpen ? 'Ayarları Gizle' : 'Ayarlar';
-}
-
-function initializeSettingsPanel() {
-  if (!dom.settingsToggleBtn) return;
-  toggleSettingsPanel(false);
 }
 
 function buildGlobalControls() {
@@ -997,43 +920,7 @@ function closePresetsModal() {
 }
 
 function openEmbedModal() {
-  const currentJson = exportProjectJSON(project);
-  dom.embedJsonTextarea.value = currentJson;
-  dom.embedPasteJsonTextarea.value = currentJson;
-  dom.embedApplyJsonBtn.textContent = '✅ Apply Pasted JSON';
-  dom.embedApplyPresetJsonBtn.textContent = '✅ Apply Selected';
-
-  // Build existing JSON catalog (current + builtins + saved)
-  embedJsonCatalog.clear();
-  dom.embedPresetJsonSelect.innerHTML = '';
-
-  const addOption = (key, label) => {
-    const option = document.createElement('option');
-    option.value = key;
-    option.textContent = label;
-    dom.embedPresetJsonSelect.appendChild(option);
-  };
-
-  const currentKey = `current:${slugify(project.projectName || 'project')}`;
-  embedJsonCatalog.set(currentKey, { label: 'Current Project', project: cloneProject(project), json: currentJson });
-  addOption(currentKey, 'Current Project');
-
-  BUILTIN_PRESETS.forEach((preset) => {
-    const key = `builtin:${preset.id}`;
-    const proj = cloneProject(preset.project);
-    embedJsonCatalog.set(key, { label: `Built-in: ${preset.name}`, project: proj, json: JSON.stringify(proj, null, 2) });
-    addOption(key, `Built-in: ${preset.name}`);
-  });
-
-  getSavedPresets().forEach((preset) => {
-    const key = `saved:${preset.id}`;
-    const proj = cloneProject(preset.project);
-    embedJsonCatalog.set(key, { label: `Saved: ${preset.name}`, project: proj, json: JSON.stringify(proj, null, 2) });
-    addOption(key, `Saved: ${preset.name}`);
-  });
-
-  dom.embedPresetJsonSelect.value = currentKey;
-  dom.embedPresetJsonPreview.value = currentJson;
+  dom.embedJsonTextarea.value = exportProjectJSON(project);
   dom.embedModal.hidden = false;
 }
 
@@ -1271,24 +1158,18 @@ function syncGlobalControls() {
 
 function syncSubjectUI() {
   const subject = project.subject || {};
-  const type = subject.type || 'none';
+  let type = subject.type || 'none';
 
-  // Keep hidden controls in sync for simplified UI
-  const subjectType = project.subject?.type || 'text';
-  const activateTextBtn = document.getElementById('activateTextBtn');
-  const activateSvgBtn = document.getElementById('activateSvgBtn');
-  if (activateTextBtn) activateTextBtn.classList.toggle('active', subjectType === 'text');
-  if (activateSvgBtn) activateSvgBtn.classList.toggle('active', subjectType === 'svg');
+  if (subject.text?.trim() && type === 'none') {
+    type = 'text';
+    subject.type = 'text';
+  } else if (subject.svgContent?.trim() && type === 'none') {
+    type = 'svg';
+    subject.type = 'svg';
+  }
 
-  // Show/hide sections
-  const textArea = document.getElementById('subjectTextArea');
-  const svgArea = document.getElementById('subjectSvgArea');
-  const opts = document.getElementById('subjectOptions');
-  if (textArea) textArea.style.display = type === 'text' ? '' : 'none';
-  if (svgArea) svgArea.style.display = type === 'svg' ? '' : 'none';
-  if (opts) opts.style.display = type !== 'none' ? '' : 'none';
+  setSubjectType(type);
 
-  // Sync values
   const subjectTextInput = document.getElementById('subjectTextInput');
   if (subjectTextInput) subjectTextInput.value = subject.text || '';
   const subjectSvgInput = document.getElementById('subjectSvgInput');
@@ -1461,10 +1342,7 @@ function refreshFrameOutput(force = false) {
 }
 
 function updateProjectLabel() {
-  const title = project.projectName || 'Ascii Arter';
-  dom.projectTitleLabel.textContent = title;
-  const inline = document.getElementById('projectTitleLabelInline');
-  if (inline) inline.textContent = title;
+  dom.projectTitleLabel.textContent = project.projectName || 'Ascii Arter';
 }
 
 function updateStats() {
@@ -1476,8 +1354,6 @@ function updateStats() {
 
 function setStatus(message) {
   dom.statusStat.textContent = message;
-  const inline = document.getElementById('statusStatInline');
-  if (inline) inline.textContent = message;
 }
 
 function ensureBuffers() {

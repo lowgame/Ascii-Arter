@@ -1,183 +1,218 @@
 <!doctype html>
-<html lang="en">
+<html lang="tr">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ASCII Arter</title>
-  <meta name="description" content="Pure JavaScript ASCII art animation creator." />
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <meta http-equiv="Pragma" content="no-cache" />
-  <meta http-equiv="Expires" content="0" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./css/main.css?v=ultra-simple-4" />
+  <meta name="description" content="Minimal, odaklı ASCII art scene creator." />
+  <link rel="stylesheet" href="./css/main.css?v=ui-simple-1" />
 </head>
 <body>
-  <div id="appShell" class="aa-shell">
+  <div id="appShell" class="app-shell">
+    <div id="settingsBackdrop" class="settings-backdrop" hidden></div>
 
-    <header class="topbar">
-      <div class="topbar-left">
-        <span class="logo">ASCII Arter</span>
-        <span class="topbar-subtitle">Create → Test JSON → Export</span>
+    <header class="app-header">
+      <div class="brand-block">
+        <span class="brand">ASCII Arter</span>
+        <span class="brand-subtitle">Dağınık panel yok. Tek giriş, büyük preview, tüm gelişmiş ayarlar tek çekmecede.</span>
       </div>
 
-      <div class="topbar-center" hidden>
-        <button id="playPauseBtn" class="btn btn-primary" hidden>Pause</button>
-        <button id="shuffleCharsetBtn" class="btn" hidden>Charset</button>
-      </div>
-
-      <div class="topbar-right">
-        <select id="presetSelect" class="select-compact" hidden></select>
-        <button id="jsonTestBtn" class="btn btn-accent-soft">JSON Test</button>
-        <button id="randomizeBtn" class="btn btn-accent">Randomize</button>
-        <button id="presetsGalleryBtn" class="btn">Presets</button>
-        <button id="settingsToggleBtn" class="btn" title="Ayar panelini aç/kapat">Ayarlar</button>
-        <button id="savePresetBtn" class="btn" hidden>Save</button>
+      <div class="header-actions">
+        <button id="playPauseBtn" class="btn btn-ghost" type="button">Pause</button>
+        <button id="randomizeBtn" class="btn btn-primary" type="button">Randomize</button>
+        <button id="presetsGalleryBtn" class="btn" type="button">Presets</button>
 
         <div class="export-group">
-          <button class="btn" id="exportMenuBtn">Export</button>
+          <button class="btn" id="exportMenuBtn" type="button" aria-haspopup="true" aria-expanded="false">Export</button>
           <div class="dropdown" id="exportDropdown">
-            <button id="exportProjectBtn">Export JSON</button>
-            <button id="exportPngBtn">Export PNG</button>
-            <button id="importBtn">Import JSON</button>
-            <button id="copyFrameBtn" hidden>Copy Frame</button>
-            <button id="exportTxtBtn" hidden>Export TXT</button>
-            <button id="exportHtmlBtn" hidden>Export HTML</button>
-            <button id="embedCodeBtn" hidden>Open JSON Test / Embed</button>
+            <button id="copyFrameBtn" type="button">Copy frame</button>
+            <button id="exportTxtBtn" type="button">Export TXT</button>
+            <button id="exportPngBtn" type="button">Export PNG</button>
+            <button id="exportHtmlBtn" type="button">Export HTML</button>
+            <button id="exportProjectBtn" type="button">Export JSON</button>
+            <button id="importBtn" type="button">Import JSON</button>
+            <button id="embedCodeBtn" type="button">Embed code</button>
           </div>
         </div>
+
+        <button id="settingsToggleBtn" class="btn btn-ghost" type="button" aria-pressed="false">Ayarlar</button>
+        <select id="presetSelect" class="select-compact" hidden></select>
         <input id="importProjectInput" type="file" accept="application/json" hidden />
       </div>
     </header>
 
-    <section class="subject-strip">
-      <div class="subject-card">
-        <label class="subject-label" for="subjectTextInput">Main Text</label>
-        <textarea id="subjectTextInput" class="subject-textarea" rows="4" spellcheck="false" placeholder="Write text"></textarea>
-        <div class="subject-actions">
-          <button class="subject-tab active" data-type="text" id="activateTextBtn" hidden>Use Text</button>
-          <button class="btn btn-sm" id="subjectClearBtn">Clear</button>
-          <select id="subjectFontWeight" class="select-compact" hidden>
-            <option value="bold">Bold</option>
-            <option value="900">Extra Bold</option>
-            <option value="normal">Normal</option>
-          </select>
-          <input type="range" id="subjectBgIntensity" min="0" max="0.5" step="0.01" value="0.08" hidden />
-          <input type="range" id="subjectPadding" min="0" max="12" step="1" value="4" hidden />
-        </div>
-      </div>
-
-      <div class="subject-card" hidden>
-        <label class="subject-label" for="subjectSvgInput">SVG Subject</label>
-        <textarea id="subjectSvgInput" class="subject-textarea" rows="3" spellcheck="false" placeholder="Paste <svg>...</svg>"></textarea>
-        <div class="subject-actions">
-          <button class="btn btn-sm" id="subjectSvgUpload">Upload SVG</button>
-          <input id="subjectSvgFileInput" type="file" accept=".svg,image/svg+xml" hidden />
-          <button class="subject-tab" data-type="svg" id="activateSvgBtn">Use SVG</button>
-        </div>
-      </div>
-
-      <div class="subject-options" hidden>
-        <label class="subject-label">Subject Options</label>
-        <label class="opt-row">
-          <span>BG</span>
-          <input type="range" min="0" max="0.5" step="0.01" value="0.08" disabled />
-        </label>
-        <label class="opt-row">
-          <span>Pad</span>
-          <input type="range" min="0" max="12" step="1" value="4" disabled />
-        </label>
-      </div>
-    </section>
-
     <main class="workspace">
-      <aside class="panel panel-controls" id="settingsPanel" hidden>
-        <div class="panel-head">
-          <h2>Ayarlar</h2>
-          <p>Gelişmiş kontroller burada.</p>
-        </div>
-        <div class="panel-body">
-          <div id="controlsContent"></div>
-        </div>
-      </aside>
+      <div class="workspace-main">
+        <section class="composer-card">
+          <div class="card-head">
+            <div>
+              <p class="eyebrow">Ana içerik</p>
+              <h1>Tek giriş alanı</h1>
+            </div>
+            <div class="card-head-actions">
+              <button class="subject-tab active" data-type="text" id="activateTextBtn" type="button">Text</button>
+              <button class="subject-tab" data-type="svg" id="activateSvgBtn" type="button">SVG</button>
+            </div>
+          </div>
 
-      <section class="stage-area">
-        <div class="stage-wrap">
-          <canvas id="bgCanvas" aria-hidden="true"></canvas>
-          <div class="canvas-wrap">
-            <canvas id="stageCanvas" aria-label="ASCII preview canvas"></canvas>
+          <div id="subjectTextArea" class="subject-panel">
+            <textarea id="subjectTextInput" class="main-input" placeholder="Ana metni yaz. Preview bunu merkez nesne olarak kullanacak." rows="3" spellcheck="false"></textarea>
+          </div>
+
+          <div id="subjectSvgArea" class="subject-panel" hidden>
+            <textarea id="subjectSvgInput" class="main-input main-input-mono" placeholder="<svg>...</svg> yapıştır" rows="3" spellcheck="false"></textarea>
+            <div class="subject-panel-actions">
+              <button class="btn btn-ghost" id="subjectSvgUpload" type="button">SVG yükle</button>
+              <input id="subjectSvgFileInput" type="file" accept=".svg,image/svg+xml" hidden />
+            </div>
+          </div>
+
+          <div id="subjectOptions" class="subject-options">
+            <label class="mini-control">
+              <span>Weight</span>
+              <select id="subjectFontWeight" class="select-compact">
+                <option value="bold">Bold</option>
+                <option value="900">Extra Bold</option>
+                <option value="normal">Normal</option>
+              </select>
+            </label>
+
+            <label class="mini-control slider-control">
+              <span>BG</span>
+              <input type="range" id="subjectBgIntensity" min="0" max="0.5" step="0.01" value="0.08" />
+            </label>
+
+            <label class="mini-control slider-control">
+              <span>Padding</span>
+              <input type="range" id="subjectPadding" min="0" max="12" step="1" value="4" />
+            </label>
+
+            <button class="btn btn-ghost" id="shuffleCharsetBtn" type="button">Charset</button>
+            <button class="btn btn-ghost" id="subjectClearBtn" type="button">Clear</button>
+          </div>
+        </section>
+
+        <section class="preview-card">
+          <div class="card-head preview-head">
+            <div>
+              <p class="eyebrow">Canlı preview</p>
+              <h2>Büyük sahne</h2>
+            </div>
+            <button class="btn btn-soft" id="openSettingsInlineBtn" type="button">İnce ayarları aç</button>
+          </div>
+
+          <div class="preview-frame">
+            <div class="stage-area">
+              <canvas id="bgCanvas" aria-hidden="true"></canvas>
+              <div class="canvas-wrap">
+                <canvas id="stageCanvas" aria-label="ASCII preview canvas"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <footer class="stats-bar">
+            <span id="fpsStat" hidden>FPS: —</span>
+            <span id="renderStat" hidden>Render: — ms</span>
+            <span id="cellsStat" hidden>Cells: —</span>
+            <span id="layersStat" hidden>Layers: —</span>
+            <span id="projectTitleLabel" class="stats-title">ASCII Arter</span>
+            <span id="statusStat" class="stats-status">Ready</span>
+          </footer>
+        </section>
+      </div>
+
+      <aside id="settingsDrawer" class="settings-drawer" aria-hidden="true">
+        <div class="settings-header">
+          <div>
+            <p class="eyebrow">Gelişmiş alan</p>
+            <h3>Ayarlar ve katmanlar</h3>
+          </div>
+          <div class="settings-header-actions">
+            <button id="savePresetBtn" class="btn btn-ghost" type="button">Save preset</button>
+            <button id="settingsCloseBtn" class="btn btn-ghost" type="button">Kapat</button>
           </div>
         </div>
-      </section>
 
-      <aside class="panel panel-layers" id="layersPanel" hidden>
-        <div class="panel-head">
-          <h2>Layers</h2>
-          <p>Animation, text and SVG stacks.</p>
-        </div>
-
-        <div class="panel-body">
-          <details open>
-            <summary>
-              <span>Animation Layers</span>
-              <span class="summary-actions" onclick="event.stopPropagation()">
-                <button id="moveLayerUpBtn" class="icon-btn" title="Move Up">↑</button>
-                <button id="moveLayerDownBtn" class="icon-btn" title="Move Down">↓</button>
-                <button id="duplicateLayerBtn" class="icon-btn" title="Duplicate">⎘</button>
-                <button id="removeLayerBtn" class="icon-btn danger" title="Remove">−</button>
-                <button id="addLayerBtn" class="icon-btn primary" title="Add">＋</button>
-              </span>
-            </summary>
-            <div id="layersList" class="list-stack"></div>
-            <div id="layerInspector" class="inspector"></div>
-          </details>
-
-          <details>
-            <summary>
-              <span>Text Layers</span>
-              <span class="summary-actions" onclick="event.stopPropagation()">
-                <button id="duplicateTextBtn" class="icon-btn" title="Duplicate">⎘</button>
-                <button id="removeTextBtn" class="icon-btn danger" title="Remove">−</button>
-                <button id="addTextBtn" class="icon-btn primary" title="Add">＋</button>
-              </span>
-            </summary>
-            <div id="textsList" class="list-stack"></div>
-            <div id="textInspector" class="inspector"></div>
-          </details>
-
-          <details id="svgLayersSection">
-            <summary>
-              <span>SVG Layers</span>
-              <span class="summary-actions" onclick="event.stopPropagation()">
-                <button id="removeSvgLayerBtn" class="icon-btn danger" title="Remove">−</button>
-                <button id="addSvgLayerBtn" class="icon-btn primary" title="Add SVG Layer">＋</button>
-              </span>
-            </summary>
-            <div id="svgLayersList" class="list-stack"></div>
-            <label class="upload-svg-label">
-              <input id="svgUploadInput" type="file" accept=".svg,image/svg+xml" hidden />
-              <button class="btn btn-sm" onclick="document.getElementById('svgUploadInput').click()">Upload SVG Layer</button>
-            </label>
-            <div id="svgLayerInspector" class="inspector"></div>
-          </details>
-
-          <details>
-            <summary>ASCII Snapshot</summary>
-            <div class="snapshot-bar">
-              <button id="refreshFrameBtn" class="btn btn-sm">Refresh</button>
+        <div class="settings-grid">
+          <section class="drawer-panel" id="controlsPanel" hidden>
+            <div class="panel-header">
+              <span>Scene controls</span>
             </div>
-            <textarea id="frameOutput" spellcheck="false" aria-label="ASCII frame output"></textarea>
-          </details>
+            <div class="panel-body">
+              <div id="controlsContent"></div>
+            </div>
+          </section>
+
+          <section class="drawer-panel" id="layersPanel" hidden>
+            <div class="panel-header">
+              <span>Layers & output</span>
+            </div>
+            <div class="panel-body layers-panel-body">
+              <details open>
+                <summary>
+                  <span>Animation Layers</span>
+                  <span class="summary-actions" onclick="event.stopPropagation()">
+                    <button id="moveLayerUpBtn" class="icon-btn" type="button" title="Move Up">↑</button>
+                    <button id="moveLayerDownBtn" class="icon-btn" type="button" title="Move Down">↓</button>
+                    <button id="duplicateLayerBtn" class="icon-btn" type="button" title="Duplicate">⎘</button>
+                    <button id="removeLayerBtn" class="icon-btn danger" type="button" title="Remove">−</button>
+                    <button id="addLayerBtn" class="icon-btn primary" type="button" title="Add">＋</button>
+                  </span>
+                </summary>
+                <div id="layersList" class="list-stack"></div>
+                <div id="layerInspector" class="inspector"></div>
+              </details>
+
+              <details>
+                <summary>
+                  <span>Text Layers</span>
+                  <span class="summary-actions" onclick="event.stopPropagation()">
+                    <button id="duplicateTextBtn" class="icon-btn" type="button" title="Duplicate">⎘</button>
+                    <button id="removeTextBtn" class="icon-btn danger" type="button" title="Remove">−</button>
+                    <button id="addTextBtn" class="icon-btn primary" type="button" title="Add">＋</button>
+                  </span>
+                </summary>
+                <div id="textsList" class="list-stack"></div>
+                <div id="textInspector" class="inspector"></div>
+              </details>
+
+              <details id="svgLayersSection">
+                <summary>
+                  <span>SVG Layers</span>
+                  <span class="summary-actions" onclick="event.stopPropagation()">
+                    <button id="removeSvgLayerBtn" class="icon-btn danger" type="button" title="Remove">−</button>
+                    <button id="addSvgLayerBtn" class="icon-btn primary" type="button" title="Add SVG Layer">＋</button>
+                  </span>
+                </summary>
+                <div id="svgLayersList" class="list-stack"></div>
+                <div class="inline-actions">
+                  <input id="svgUploadInput" type="file" accept=".svg,image/svg+xml" hidden />
+                  <button class="btn btn-ghost btn-sm" type="button" onclick="document.getElementById('svgUploadInput').click()">Upload SVG</button>
+                </div>
+                <div id="svgLayerInspector" class="inspector"></div>
+              </details>
+
+              <details>
+                <summary>ASCII Snapshot</summary>
+                <div class="snapshot-bar">
+                  <button id="refreshFrameBtn" class="btn btn-ghost btn-sm" type="button">Refresh</button>
+                </div>
+                <textarea id="frameOutput" spellcheck="false" aria-label="ASCII frame output"></textarea>
+              </details>
+            </div>
+          </section>
         </div>
+
+        <button class="panel-tab panel-tab-left" id="controlsTab" data-panel="controlsPanel" type="button" hidden>Controls</button>
+        <button class="panel-tab panel-tab-right" id="layersTab" data-panel="layersPanel" type="button" hidden>Layers</button>
       </aside>
     </main>
 
     <div id="presetsModal" class="presets-modal-overlay" hidden>
       <div class="presets-modal">
         <div class="presets-modal-header">
-          <span class="presets-modal-title">Choose a Preset</span>
-          <button id="presetsModalClose" class="panel-close" title="Close">✕</button>
+          <span class="presets-modal-title">Choose a preset</span>
+          <button id="presetsModalClose" class="panel-close" type="button" title="Close">✕</button>
         </div>
         <div id="presetsGrid" class="presets-grid"></div>
       </div>
@@ -186,92 +221,88 @@
     <div id="embedModal" class="presets-modal-overlay" hidden>
       <div class="presets-modal embed-modal">
         <div class="presets-modal-header">
-          <span class="presets-modal-title">JSON Test & Export</span>
-          <button id="embedModalClose" class="panel-close" title="Close">✕</button>
+          <span class="presets-modal-title">Embed</span>
+          <button id="embedModalClose" class="panel-close" type="button" title="Close">✕</button>
         </div>
-
         <div class="embed-modal-body">
           <div class="embed-step">
-            <div class="embed-step-label">NPM</div>
+            <div class="embed-step-label">Install the library</div>
             <pre class="embed-code-block">npm install ascii-bg</pre>
           </div>
-
           <div class="embed-step">
-            <div class="embed-step-label">Bundler</div>
+            <div class="embed-step-label">Bundler usage</div>
             <pre class="embed-code-block" id="embedSnippetBlock">import AsciiBackground from 'ascii-bg';
 import project from './my-project.json';
 
 AsciiBackground.mount('#my-element', project);</pre>
-            <button class="btn" id="embedCopySnippetBtn" hidden>Copy Snippet</button>
+            <button class="btn btn-ghost embed-copy-btn" id="embedCopySnippetBtn" type="button">Copy snippet</button>
           </div>
-
-          <div class="embed-step" hidden>
-            <div class="embed-step-label">CDN</div>
-            <pre class="embed-code-block" id="embedCdnBlock">&lt;script type="module"&gt;
-  import AsciiBackground from 'https://unpkg.com/ascii-bg/dist/ascii-bg.esm.js';
-  const project = { /* paste JSON */ };
-  AsciiBackground.mount('#my-element', project);
-&lt;/script&gt;</pre>
-          </div>
-
           <div class="embed-step">
-            <div class="embed-step-label">Current Project JSON</div>
+            <div class="embed-step-label">Current project JSON</div>
             <textarea id="embedJsonTextarea" class="embed-json-textarea" readonly></textarea>
-            <button class="btn" id="embedCopyJsonBtn">Copy JSON</button>
-            <button class="btn btn-primary" id="embedExportJsonBtn">Export JSON</button>
-          </div>
-
-          <div class="embed-step">
-            <div class="embed-step-label">Test Existing JSONs</div>
-            <div class="embed-inline-row" hidden>
-              <select id="embedPresetJsonSelect" class="select-compact embed-select"></select>
-              <button class="btn btn-primary" id="embedApplyPresetJsonBtn">Apply Selected</button>
-              <button class="btn" id="embedLoadPresetJsonBtn" hidden>Load to Paste</button>
-              <button class="btn" id="embedExportTesterJsonBtn" hidden>Export Tested JSON</button>
-            </div>
-            <textarea id="embedPresetJsonPreview" class="embed-json-textarea" readonly></textarea>
-          </div>
-
-          <div class="embed-step" hidden>
-            <div class="embed-step-label">Paste & Test</div>
-            <textarea id="embedPasteJsonTextarea" class="embed-json-textarea" placeholder="Paste project JSON"></textarea>
-            <button class="btn btn-primary" id="embedApplyJsonBtn">Apply Pasted JSON</button>
+            <button class="btn btn-ghost embed-copy-btn" id="embedCopyJsonBtn" type="button">Copy JSON</button>
           </div>
         </div>
       </div>
     </div>
-
-    <footer class="stats-bar" hidden>
-      <span id="fpsStat">FPS: —</span>
-      <span id="renderStat">Render: — ms</span>
-      <span id="cellsStat">Cells: —</span>
-      <span id="layersStat">Layers: —</span>
-      <span id="projectTitleLabel" class="stats-title">ASCII Arter</span>
-      <span id="statusStat" class="stats-status">Ready</span>
-    </footer>
-
-    <div class="simple-status">
-      <span id="projectTitleLabelInline">ASCII Arter</span>
-      <span id="statusStatInline">Ready</span>
-    </div>
   </div>
 
   <script>
-    const exportBtn = document.getElementById('exportMenuBtn');
-    const exportDropdown = document.getElementById('exportDropdown');
+    (() => {
+      const appShell = document.getElementById('appShell');
+      const settingsToggleBtn = document.getElementById('settingsToggleBtn');
+      const openSettingsInlineBtn = document.getElementById('openSettingsInlineBtn');
+      const settingsCloseBtn = document.getElementById('settingsCloseBtn');
+      const settingsDrawer = document.getElementById('settingsDrawer');
+      const settingsBackdrop = document.getElementById('settingsBackdrop');
+      const controlsPanel = document.getElementById('controlsPanel');
+      const layersPanel = document.getElementById('layersPanel');
+      const exportBtn = document.getElementById('exportMenuBtn');
+      const exportDropdown = document.getElementById('exportDropdown');
 
-    exportBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      exportDropdown.classList.toggle('open');
-    });
-
-    document.addEventListener('click', (e) => {
-      if (!exportDropdown.contains(e.target) && e.target !== exportBtn) {
-        exportDropdown.classList.remove('open');
+      function setSettingsOpen(open) {
+        appShell.classList.toggle('settings-open', open);
+        settingsDrawer.setAttribute('aria-hidden', String(!open));
+        settingsToggleBtn.setAttribute('aria-pressed', String(open));
+        settingsToggleBtn.textContent = open ? 'Ayarları Gizle' : 'Ayarlar';
+        controlsPanel.hidden = !open;
+        layersPanel.hidden = !open;
+        settingsBackdrop.hidden = !open;
       }
-    });
+
+      settingsToggleBtn.addEventListener('click', () => {
+        setSettingsOpen(!appShell.classList.contains('settings-open'));
+      });
+
+      openSettingsInlineBtn.addEventListener('click', () => setSettingsOpen(true));
+      settingsCloseBtn.addEventListener('click', () => setSettingsOpen(false));
+      settingsBackdrop.addEventListener('click', () => setSettingsOpen(false));
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+          setSettingsOpen(false);
+          exportDropdown.classList.remove('open');
+          exportBtn.setAttribute('aria-expanded', 'false');
+        }
+      });
+
+      exportBtn.addEventListener('click', (event) => {
+        event.stopPropagation();
+        const open = exportDropdown.classList.toggle('open');
+        exportBtn.setAttribute('aria-expanded', String(open));
+      });
+
+      document.addEventListener('click', (event) => {
+        if (!exportDropdown.contains(event.target) && event.target !== exportBtn) {
+          exportDropdown.classList.remove('open');
+          exportBtn.setAttribute('aria-expanded', 'false');
+        }
+      });
+
+      setSettingsOpen(false);
+    })();
   </script>
 
-  <script type="module" src="./js/main.js?v=desktop-fix-1"></script>
+  <script type="module" src="./js/main.js?v=ui-simple-1"></script>
 </body>
 </html>

@@ -298,5 +298,12 @@ export function normalizeProject(raw) {
       : [],
     subject: raw?.subject ? { ...base.subject, ...raw.subject } : base.subject
   };
+
+  if (project.subject?.text?.trim() && (!project.subject.type || project.subject.type === 'none')) {
+    project.subject.type = 'text';
+  } else if (project.subject?.svgContent?.trim() && (!project.subject.type || project.subject.type === 'none')) {
+    project.subject.type = 'svg';
+  }
+
   return project;
 }
