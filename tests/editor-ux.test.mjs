@@ -210,3 +210,30 @@ test('fullscreen button uses the real Fullscreen API for the preview area', asyn
 
   await page.close();
 });
+
+test('fullscreen view keeps a working randomize action inside the preview', async () => {
+  const { page, pageErrors } = await openPage();
+
+  await page.fill('#subjectTextInput', 'LOW GAME');
+  const before = await page.evaluate(() => document.querySelector('#statusStat')?.textContent?.trim() || null);
+
+  await page.click('#fullscreenBtn');
+  await page.waitForFunction(() => Boolean(document.fullscreenElement));
+
+  assert.equal(await page.locator('#fullscreenRandomizeBtn').count(), 1, 'fullscreen randomize button should exist');
+  await page.click('#fullscreenRandomizeBtn');
+  await page.waitForTimeout(180);
+
+  const after = await page.evaluate(() => ({
+    status: document.querySelector('#statusStat')?.textContent?.trim() || null,
+    fullscreenElement: document.fullscreenElement?.id || null,
+  }));
+
+  assert.equal(after.fullscreenElement, 'previewCard', 'randomize should keep the preview in fullscreen');
+  assert.notEqual(after.status, before, 'fullscreen randomize should update the scene/status');
+  assert.deepEqual(pageErrors, []);
+
+  await page.click('#fullscreenBtn');
+  await page.waitForFunction(() => !document.fullscreenElement);
+  await page.close();
+});

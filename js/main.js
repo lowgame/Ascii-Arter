@@ -158,7 +158,7 @@ function bindDom() {
   const ids = [
     'presetSelect', 'controlsContent', 'projectTitleLabel', 'stageCanvas', 'frameOutput', 'previewCard',
     'fpsStat', 'renderStat', 'cellsStat', 'layersStat', 'statusStat', 'playPauseBtn',
-    'randomizeBtn', 'shuffleCharsetBtn', 'savePresetBtn', 'importBtn', 'exportProjectBtn', 'fullscreenBtn',
+    'randomizeBtn', 'fullscreenRandomizeBtn', 'shuffleCharsetBtn', 'savePresetBtn', 'importBtn', 'exportProjectBtn', 'fullscreenBtn',
     'importProjectInput', 'copyFrameBtn', 'exportTxtBtn', 'exportPngBtn', 'exportHtmlBtn',
     'refreshFrameBtn', 'layersList', 'textsList', 'layerInspector', 'textInspector',
     'addLayerBtn', 'removeLayerBtn', 'duplicateLayerBtn', 'moveLayerUpBtn', 'moveLayerDownBtn',
@@ -306,11 +306,17 @@ function hasActiveSubject() {
 }
 
 function updateRandomizeButtonLabel() {
-  if (!dom.randomizeBtn) return;
-  dom.randomizeBtn.textContent = hasActiveSubject() ? 'Combo Randomize' : 'BG Randomize';
-  if (!dom.randomizeBtn.dataset.randomizeProfile) {
-    dom.randomizeBtn.dataset.randomizeProfile = hasActiveSubject() ? 'combo-ready' : 'bg-ready';
-  }
+  const nextLabel = hasActiveSubject() ? 'Combo Randomize' : 'BG Randomize';
+  const nextProfile = hasActiveSubject() ? 'combo-ready' : 'bg-ready';
+  [dom.randomizeBtn, dom.fullscreenRandomizeBtn].forEach((button) => {
+    if (!button) return;
+    button.textContent = nextLabel;
+    if (!button.dataset.randomizeProfile) {
+      button.dataset.randomizeProfile = nextProfile;
+    } else {
+      button.dataset.randomizeProfile = nextProfile;
+    }
+  });
 }
 
 function randomInRange([min, max]) {
@@ -462,6 +468,11 @@ function bindButtons() {
   ensureSubjectDefaults();
   updateRandomizeButtonLabel();
 
+  const runRandomize = () => {
+    randomizeProject();
+    applyProject(project, { keepPresetSelection: false, status: dom.statusStat.textContent || 'Randomized scene' });
+  };
+
   document.addEventListener('fullscreenchange', () => {
     syncFullscreenButton();
     updateFullscreenCanvasScale();
@@ -476,9 +487,14 @@ function bindButtons() {
   });
 
   dom.randomizeBtn.addEventListener('click', () => {
-    randomizeProject();
-    applyProject(project, { keepPresetSelection: false, status: dom.statusStat.textContent || 'Randomized scene' });
+    runRandomize();
   });
+
+  if (dom.fullscreenRandomizeBtn) {
+    dom.fullscreenRandomizeBtn.addEventListener('click', () => {
+      runRandomize();
+    });
+  }
 
   if (dom.fullscreenBtn) {
     dom.fullscreenBtn.addEventListener('click', () => {
