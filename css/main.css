@@ -474,9 +474,13 @@ input[type="range"] {
   display: grid;
   gap: 12px;
   align-content: start;
+  min-height: 0;
 }
 
 details {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
   border: 1px solid var(--border);
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.02);
@@ -515,8 +519,13 @@ summary > span:first-child {
   align-items: center;
 }
 
-details > *:not(summary) {
+.details-scroll {
+  min-height: 0;
+  overflow: auto;
+  max-height: min(44vh, 28rem);
   padding: 0 16px 16px;
+  display: grid;
+  gap: 12px;
 }
 
 .summary-actions {
@@ -658,6 +667,10 @@ details > *:not(summary) {
   font-size: 0.75rem;
 }
 
+.details-scroll #frameOutput {
+  min-height: 220px;
+}
+
 .snapshot-bar {
   justify-content: flex-end;
   padding: 6px 0 12px;
@@ -673,6 +686,37 @@ details > *:not(summary) {
   grid-template-rows: auto minmax(0, 1fr) auto;
   border-radius: var(--radius-xl);
   overflow: hidden;
+}
+
+#previewCard:fullscreen {
+  width: 100vw;
+  height: 100vh;
+  max-width: none;
+  border-radius: 0;
+  border: 0;
+  background: #04090d;
+}
+
+#previewCard:fullscreen::backdrop {
+  background: #04090d;
+}
+
+#previewCard:fullscreen .preview-frame {
+  min-height: 0;
+}
+
+#previewCard:fullscreen .stage-area {
+  height: 100%;
+  border: 0;
+}
+
+#previewCard:fullscreen .canvas-wrap {
+  padding: clamp(20px, 3vw, 40px);
+}
+
+#previewCard:fullscreen #stageCanvas {
+  max-width: calc(100vw - 48px);
+  max-height: calc(100vh - 160px);
 }
 
 .card-head,
@@ -708,6 +752,10 @@ details > *:not(summary) {
 
 .preview-head-side {
   margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .preview-note {

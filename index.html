@@ -76,6 +76,20 @@
               </div>
 
               <div id="subjectOptions" class="subject-control-grid">
+                <label class="mini-control slider-control">
+                  <span>Harf arası</span>
+                  <input type="range" id="subjectLetterSpacing" min="0" max="6" step="1" value="0" />
+                </label>
+
+                <label class="mini-control">
+                  <span>Font</span>
+                  <select id="subjectFontFamily" class="select-compact">
+                    <option value="mono">Mono</option>
+                    <option value="sans">Sans</option>
+                    <option value="serif">Serif</option>
+                  </select>
+                </label>
+
                 <label class="mini-control">
                   <span>Weight</span>
                   <select id="subjectFontWeight" class="select-compact">
@@ -162,7 +176,7 @@
           <div id="layersAccordionBody" class="accordion-body" hidden>
             <section id="layersPanel" class="tool-panel tool-panel-embedded">
               <div class="panel-body layers-panel-body">
-                <details open>
+                <details open id="layersAnimationSection">
                   <summary>
                     <span>Animation Layers</span>
                     <span class="summary-actions" onclick="event.stopPropagation()">
@@ -173,8 +187,10 @@
                       <button id="addLayerBtn" class="icon-btn primary" type="button" title="Add">＋</button>
                     </span>
                   </summary>
-                  <div id="layersList" class="list-stack"></div>
-                  <div id="layerInspector" class="inspector"></div>
+                  <div class="details-scroll" data-scroll-panel="layers-animation">
+                    <div id="layersList" class="list-stack"></div>
+                    <div id="layerInspector" class="inspector"></div>
+                  </div>
                 </details>
 
                 <details>
@@ -186,8 +202,10 @@
                       <button id="addTextBtn" class="icon-btn primary" type="button" title="Add">＋</button>
                     </span>
                   </summary>
-                  <div id="textsList" class="list-stack"></div>
-                  <div id="textInspector" class="inspector"></div>
+                  <div class="details-scroll" data-scroll-panel="layers-text">
+                    <div id="textsList" class="list-stack"></div>
+                    <div id="textInspector" class="inspector"></div>
+                  </div>
                 </details>
 
                 <details id="svgLayersSection">
@@ -198,20 +216,24 @@
                       <button id="addSvgLayerBtn" class="icon-btn primary" type="button" title="Add SVG Layer">＋</button>
                     </span>
                   </summary>
-                  <div id="svgLayersList" class="list-stack"></div>
-                  <div class="inline-actions">
-                    <input id="svgUploadInput" type="file" accept=".svg,image/svg+xml" hidden />
-                    <button class="btn btn-ghost btn-sm" type="button" onclick="document.getElementById('svgUploadInput').click()">Upload SVG</button>
+                  <div class="details-scroll" data-scroll-panel="layers-svg">
+                    <div id="svgLayersList" class="list-stack"></div>
+                    <div class="inline-actions">
+                      <input id="svgUploadInput" type="file" accept=".svg,image/svg+xml" hidden />
+                      <button class="btn btn-ghost btn-sm" type="button" onclick="document.getElementById('svgUploadInput').click()">Upload SVG</button>
+                    </div>
+                    <div id="svgLayerInspector" class="inspector"></div>
                   </div>
-                  <div id="svgLayerInspector" class="inspector"></div>
                 </details>
 
                 <details>
                   <summary>ASCII Snapshot</summary>
-                  <div class="snapshot-bar">
-                    <button id="refreshFrameBtn" class="btn btn-ghost btn-sm" type="button">Refresh</button>
+                  <div class="details-scroll" data-scroll-panel="layers-snapshot">
+                    <div class="snapshot-bar">
+                      <button id="refreshFrameBtn" class="btn btn-ghost btn-sm" type="button">Refresh</button>
+                    </div>
+                    <textarea id="frameOutput" spellcheck="false" aria-label="ASCII frame output"></textarea>
                   </div>
-                  <textarea id="frameOutput" spellcheck="false" aria-label="ASCII frame output"></textarea>
                 </details>
               </div>
             </section>
@@ -224,7 +246,7 @@
       </aside>
 
       <section class="preview-pane">
-        <section class="preview-card">
+        <section class="preview-card" id="previewCard">
           <div class="card-head preview-head">
             <div>
               <p class="eyebrow">Canlı preview</p>
@@ -232,6 +254,7 @@
             </div>
             <div class="preview-head-side">
               <span class="preview-note">Tüm değişiklikler burada anlık yansır.</span>
+              <button id="fullscreenBtn" class="btn" type="button" aria-pressed="false">Fullscreen</button>
             </div>
           </div>
 

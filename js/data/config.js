@@ -272,6 +272,7 @@ export function createDefaultProject() {
       fgCharSet: 'inherit',
       bgIntensity: 0.08,
       textFont: 'bold',
+      textFontFamily: 'mono',
       textLetterSpacing: 0,
       padding: 4,
     }

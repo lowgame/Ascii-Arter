@@ -18,6 +18,11 @@ import { ANIMATION_MODES, MODE_BY_ID, sampleMode } from './data/animations.js';
 import { BUILTIN_PRESETS, getPresetById } from './data/presets.js';
 import { AsciiRenderer, FrameBuffer } from './core/engine.js';
 import { downloadText, exportCanvasPNG, exportHTMLSnapshot, exportProjectJSON, importProjectJSON } from './core/exporters.js';
+import {
+  SUBJECT_FONT_FAMILY_OPTIONS,
+  buildSubjectCanvasFont,
+  getSpacedSubjectLines,
+} from './core/subject-text.js';
 
 const PRESET_VISUALS = {
   'matrix-cathedral': { textFont: '900', textColor: '#d7ffe9', textBg: 'rgba(1, 22, 12, 0.78)', animation: 'pulse', outline: false },
@@ -85,7 +90,7 @@ const RANDOMIZE_MOODS = {
   },
 };
 const RANDOMIZE_MOOD_KEYS = Object.keys(RANDOMIZE_MOODS);
-const SUBJECT_FONT_OPTIONS = ['normal', 'bold', '900'];
+const SUBJECT_FONT_WEIGHT_OPTIONS = ['normal', 'bold', '900'];
 
 const dom = {};
 let project = createDefaultProject();
@@ -141,6 +146,8 @@ function init() {
   renderInspectors();
   syncGlobalControls();
   updateProjectLabel();
+  syncFullscreenButton();
+  updateFullscreenCanvasScale();
   refreshFrameOutput(true);
 
   fpsWindow = performance.now();
@@ -149,9 +156,9 @@ function init() {
 
 function bindDom() {
   const ids = [
-    'presetSelect', 'controlsContent', 'projectTitleLabel', 'stageCanvas', 'frameOutput',
+    'presetSelect', 'controlsContent', 'projectTitleLabel', 'stageCanvas', 'frameOutput', 'previewCard',
     'fpsStat', 'renderStat', 'cellsStat', 'layersStat', 'statusStat', 'playPauseBtn',
-    'randomizeBtn', 'shuffleCharsetBtn', 'savePresetBtn', 'importBtn', 'exportProjectBtn',
+    'randomizeBtn', 'shuffleCharsetBtn', 'savePresetBtn', 'importBtn', 'exportProjectBtn', 'fullscreenBtn',
     'importProjectInput', 'copyFrameBtn', 'exportTxtBtn', 'exportPngBtn', 'exportHtmlBtn',
     'refreshFrameBtn', 'layersList', 'textsList', 'layerInspector', 'textInspector',
     'addLayerBtn', 'removeLayerBtn', 'duplicateLayerBtn', 'moveLayerUpBtn', 'moveLayerDownBtn',
@@ -159,7 +166,7 @@ function bindDom() {
     'svgLayersList', 'svgLayerInspector', 'addSvgLayerBtn', 'removeSvgLayerBtn',
     'svgUploadInput', 'presetsGalleryBtn', 'presetsModal', 'presetsModalClose', 'presetsGrid',
     'embedCodeBtn', 'embedModal', 'embedModalClose', 'embedJsonTextarea', 'embedCopyJsonBtn', 'embedCopySnippetBtn',
-    'subjectPresetLabel'
+    'subjectPresetLabel', 'subjectFontWeight', 'subjectFontFamily', 'subjectLetterSpacing'
   ];
 
   ids.forEach((id) => {
@@ -186,6 +193,68 @@ function setSubjectType(type) {
   if (textArea) textArea.hidden = type === 'svg';
   if (svgArea) svgArea.hidden = type !== 'svg';
   if (opts) opts.hidden = false;
+}
+
+function getFullscreenTarget() {
+  return dom.previewCard || null;
+}
+
+function isPreviewFullscreen() {
+  const target = getFullscreenTarget();
+  return Boolean(target && document.fullscreenElement === target);
+}
+
+function syncFullscreenButton() {
+  if (!dom.fullscreenBtn) return;
+  const active = isPreviewFullscreen();
+  dom.fullscreenBtn.textContent = active ? 'Exit Fullscreen' : 'Fullscreen';
+  dom.fullscreenBtn.setAttribute('aria-pressed', String(active));
+}
+
+function updateFullscreenCanvasScale() {
+  if (!dom.stageCanvas) return;
+
+  if (!isPreviewFullscreen()) {
+    dom.stageCanvas.style.transform = '';
+    dom.stageCanvas.style.transformOrigin = '';
+    return;
+  }
+
+  const canvasWrap = dom.stageCanvas.parentElement;
+  if (!canvasWrap) return;
+
+  const baseWidth = parseFloat(dom.stageCanvas.style.width) || dom.stageCanvas.clientWidth;
+  const baseHeight = parseFloat(dom.stageCanvas.style.height) || dom.stageCanvas.clientHeight;
+  if (!baseWidth || !baseHeight) return;
+
+  const availableWidth = Math.max(0, canvasWrap.clientWidth - 24);
+  const availableHeight = Math.max(0, canvasWrap.clientHeight - 24);
+  const scale = Math.max(1, Math.min(availableWidth / baseWidth, availableHeight / baseHeight));
+
+  dom.stageCanvas.style.transform = `scale(${scale})`;
+  dom.stageCanvas.style.transformOrigin = 'center center';
+}
+
+async function toggleFullscreen() {
+  const target = getFullscreenTarget();
+  if (!target || !dom.fullscreenBtn) return;
+
+  try {
+    if (isPreviewFullscreen()) {
+      await document.exitFullscreen();
+      return;
+    }
+
+    if (!target.requestFullscreen) {
+      setStatus('Fullscreen bu tarayıcıda desteklenmiyor');
+      return;
+    }
+
+    await target.requestFullscreen();
+  } catch (error) {
+    console.warn('Fullscreen toggle failed', error);
+    setStatus('Fullscreen açılamadı');
+  }
 }
 
 function bindPresetControls() {
@@ -225,6 +294,8 @@ function bindPresetControls() {
 function ensureSubjectDefaults() {
   if (!project.subject) project.subject = {};
   project.subject.textFont = project.subject.textFont || '900';
+  project.subject.textFontFamily = project.subject.textFontFamily || SUBJECT_FONT_FAMILY_OPTIONS[0].value;
+  project.subject.textLetterSpacing = project.subject.textLetterSpacing ?? 0;
   project.subject.padding = project.subject.padding ?? 4;
   project.subject.bgIntensity = project.subject.bgIntensity ?? 0.08;
 }
@@ -329,7 +400,7 @@ function createRandomSubjectStyle(mood = null) {
     : samplePalette(paletteName, Math.random(), randomBetween(0.95, 1.2), randomBetween(-24, 24));
   const bgBase = hexToRgb(samplePalette(paletteName, Math.random(), 1, 0));
   return {
-    textFont: pickFrom(subjectMood?.fonts || SUBJECT_FONT_OPTIONS),
+    textFont: pickFrom(subjectMood?.fonts || SUBJECT_FONT_WEIGHT_OPTIONS),
     bgIntensity: Number((subjectMood ? randomInRange(subjectMood.bgIntensity) : randomBetween(0.06, 0.28)).toFixed(2)),
     padding: subjectMood ? randomIntInRange(subjectMood.padding) : Math.round(randomBetween(2, 10)),
     textColor,
@@ -391,6 +462,12 @@ function bindButtons() {
   ensureSubjectDefaults();
   updateRandomizeButtonLabel();
 
+  document.addEventListener('fullscreenchange', () => {
+    syncFullscreenButton();
+    updateFullscreenCanvasScale();
+  });
+  window.addEventListener('resize', updateFullscreenCanvasScale);
+
   dom.playPauseBtn.addEventListener('click', () => {
     isPlaying = !isPlaying;
     dom.playPauseBtn.textContent = isPlaying ? 'Pause' : 'Play';
@@ -402,6 +479,12 @@ function bindButtons() {
     randomizeProject();
     applyProject(project, { keepPresetSelection: false, status: dom.statusStat.textContent || 'Randomized scene' });
   });
+
+  if (dom.fullscreenBtn) {
+    dom.fullscreenBtn.addEventListener('click', () => {
+      toggleFullscreen();
+    });
+  }
 
   dom.shuffleCharsetBtn.addEventListener('click', () => {
     const sets = Object.keys(CHARSETS);
@@ -664,6 +747,26 @@ function bindButtons() {
     subjectFontWeight.addEventListener('change', () => {
       if (!project.subject) project.subject = {};
       project.subject.textFont = subjectFontWeight.value;
+      subjectDirty = true;
+      needsRedraw = true;
+    });
+  }
+
+  const subjectFontFamily = document.getElementById('subjectFontFamily');
+  if (subjectFontFamily) {
+    subjectFontFamily.addEventListener('change', () => {
+      if (!project.subject) project.subject = {};
+      project.subject.textFontFamily = subjectFontFamily.value;
+      subjectDirty = true;
+      needsRedraw = true;
+    });
+  }
+
+  const subjectLetterSpacing = document.getElementById('subjectLetterSpacing');
+  if (subjectLetterSpacing) {
+    subjectLetterSpacing.addEventListener('input', () => {
+      if (!project.subject) project.subject = {};
+      project.subject.textLetterSpacing = Number(subjectLetterSpacing.value);
       subjectDirty = true;
       needsRedraw = true;
     });
@@ -993,12 +1096,18 @@ function buildSubjectMask() {
     const padding = subject.padding || 4;
     const maxW = project.cols - padding * 2;
     let fSize = project.rows * 0.72;
-    ctx.font = `${subject.textFont || 'bold'} ${fSize}px monospace`;
-    const lines = subject.text.split('\n').filter(Boolean);
+    const fontFamilyKey = subject.textFontFamily || SUBJECT_FONT_FAMILY_OPTIONS[0].value;
+    const lines = getSpacedSubjectLines(subject.text, subject.textLetterSpacing ?? 0);
+    if (!lines.length) {
+      subjectMask = null;
+      subjectDirty = false;
+      return;
+    }
+    ctx.font = buildSubjectCanvasFont({ weight: subject.textFont || 'bold', size: fSize, familyKey: fontFamilyKey });
     const longestLine = lines.reduce((a, b) => a.length > b.length ? a : b, '');
     while (ctx.measureText(longestLine).width > maxW && fSize > 4) {
       fSize -= 0.5;
-      ctx.font = `${subject.textFont || 'bold'} ${fSize}px monospace`;
+      ctx.font = buildSubjectCanvasFont({ weight: subject.textFont || 'bold', size: fSize, familyKey: fontFamilyKey });
     }
     ctx.fillStyle = '#ffffff';
     ctx.textBaseline = 'middle';
@@ -1345,6 +1454,7 @@ function resizeScene() {
   renderer.resize(project.cols, project.rows, project.fontSize);
   buffer.resize(project.cols, project.rows);
   frameValues = new Float32Array(project.cols * project.rows);
+  updateFullscreenCanvasScale();
   needsRedraw = true;
   updateStats();
 }
@@ -1380,6 +1490,10 @@ function syncSubjectUI() {
   if (subjectSvgInput) subjectSvgInput.value = subject.svgContent || '';
   const subjectFontWeight = document.getElementById('subjectFontWeight');
   if (subjectFontWeight) subjectFontWeight.value = subject.textFont || 'bold';
+  const subjectFontFamily = document.getElementById('subjectFontFamily');
+  if (subjectFontFamily) subjectFontFamily.value = subject.textFontFamily || SUBJECT_FONT_FAMILY_OPTIONS[0].value;
+  const subjectLetterSpacing = document.getElementById('subjectLetterSpacing');
+  if (subjectLetterSpacing) subjectLetterSpacing.value = String(subject.textLetterSpacing ?? 0);
   const subjectBgIntensity = document.getElementById('subjectBgIntensity');
   if (subjectBgIntensity) subjectBgIntensity.value = subject.bgIntensity ?? 0.08;
   const subjectPadding = document.getElementById('subjectPadding');
