@@ -48,7 +48,7 @@ async function npmPackInstall() {
   const { stdout: tarballStdout } = await execFileAsync('npm', ['pack', '--silent'], { cwd: libDir });
   const tarballName = tarballStdout.trim().split('\n').pop();
   const tarballPath = path.join(libDir, tarballName);
-  const tempDir = await mkdtemp(path.join(os.tmpdir(), 'ascii-bg-pack-'));
+  const tempDir = await mkdtemp(path.join(os.tmpdir(), 'ascii-arter-pack-'));
   await execFileAsync('npm', ['init', '-y'], { cwd: tempDir });
   await execFileAsync('npm', ['install', tarballPath], { cwd: tempDir });
   return { tempDir, tarballPath };
@@ -63,11 +63,11 @@ test('packed npm package exposes helpers for import/export in both CJS and ESM',
   const { tempDir, tarballPath } = await npmPackInstall();
   try {
     const cjsOut = await runNode(
-      "const m=require('ascii-bg'); console.log(JSON.stringify(Object.keys(m).sort()));",
+      "const m=require('ascii-arter'); console.log(JSON.stringify(Object.keys(m).sort()));",
       tempDir,
     );
     const esmOut = await runNode(
-      "import('ascii-bg').then(m=>console.log(JSON.stringify(Object.keys(m).sort())))",
+      "import('ascii-arter').then(m=>console.log(JSON.stringify(Object.keys(m).sort())))",
       tempDir,
       ['--input-type=module'],
     );
@@ -132,7 +132,7 @@ test('npm package can render exported text-only JSON as a real animated backgrou
 <body style="margin:0;background:#111;">
   <section id="hero" style="position:relative;width:720px;height:420px;overflow:hidden"></section>
   <script type="module">
-    import AsciiBackground from './node_modules/ascii-bg/dist/ascii-bg.esm.js';
+    import AsciiBackground from './node_modules/ascii-arter/dist/ascii-arter.esm.js';
     const project = ${JSON.stringify(project)};
     const bg = AsciiBackground.mount('#hero', project);
     window.__asciiBg = bg;

@@ -304,7 +304,7 @@
         <div class="embed-modal-body">
           <div class="embed-step">
             <div class="embed-step-label">Install the library</div>
-            <pre class="embed-code-block">npm install ascii-bg
+            <pre class="embed-code-block">npm install ascii-arter
 
 // Önce JSON'u burada test et:
 // https://lowgame.github.io/Ascii-Arter/  (JSON Test)
@@ -312,18 +312,25 @@
           </div>
           <div class="embed-step">
             <div class="embed-step-label">Bundler usage</div>
-            <pre class="embed-code-block" id="embedSnippetBlock">import AsciiBackground from 'ascii-bg';
-import project from './my-project.json';
+            <pre class="embed-code-block" id="embedSnippetBlock">import AsciiBackground, { parseProjectData } from 'ascii-arter';
 
-AsciiBackground.mount('#my-element', project);</pre>
+fetch('/my-project.json')
+  .then((res) =&gt; res.text())
+  .then((json) =&gt; {
+    AsciiBackground.mount('#my-element', parseProjectData(json));
+  });</pre>
             <button class="btn btn-ghost embed-copy-btn" id="embedCopySnippetBtn" type="button">Copy snippet</button>
           </div>
           <div class="embed-step">
             <div class="embed-step-label">CDN usage</div>
             <pre class="embed-code-block" id="embedCdnBlock">&lt;script type="module"&gt;
-  import AsciiBackground from 'https://unpkg.com/ascii-bg/dist/ascii-bg.esm.js';
-  const project = { /* exported JSON */ };
-  AsciiBackground.mount('#my-element', project);
+  import AsciiBackground, { parseProjectData } from 'https://unpkg.com/ascii-arter/dist/ascii-arter.esm.js';
+
+  fetch('/my-project.json')
+    .then((res) =&gt; res.text())
+    .then((json) =&gt; {
+      AsciiBackground.mount('#my-element', parseProjectData(json));
+    });
 &lt;/script&gt;</pre>
           </div>
           <div class="embed-step">

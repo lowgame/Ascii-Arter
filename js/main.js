@@ -641,7 +641,7 @@ function bindButtons() {
     });
   });
   dom.embedCopySnippetBtn.addEventListener('click', () => {
-    const snippet = `import AsciiBackground from 'ascii-bg';\nimport project from './my-project.json'; // your exported JSON\n\nAsciiBackground.mount('#my-element', project);`;
+    const snippet = `import AsciiBackground, { parseProjectData } from 'ascii-arter';\n\nfetch('/my-project.json')\n  .then((res) => res.text())\n  .then((json) => {\n    AsciiBackground.mount('#my-element', parseProjectData(json));\n  });`;
     navigator.clipboard.writeText(snippet).then(() => {
       dom.embedCopySnippetBtn.textContent = '✅ Copied!';
       setTimeout(() => { dom.embedCopySnippetBtn.textContent = '📋 Copy Snippet'; }, 1500);

@@ -1,42 +1,48 @@
-# ascii-bg
+# ascii-arter
 
-Drop animated ASCII art backgrounds onto any HTML element — design your scene on [ASCII Arter](https://lowgame.github.io/Ascii-Arter/), export JSON, embed anywhere.
+Drop animated ASCII art backgrounds onto any HTML element — design your scene on https://lowgame.github.io/Ascii-Arter/, export JSON, embed anywhere.
 
 ## Install
 
 ```bash
-npm install ascii-bg
+npm install ascii-arter
 ```
 
-Tip: You can test JSONs directly in ASCII Arter first, then export and use in your own project:
-https://lowgame.github.io/Ascii-Arter/  (use the JSON Test button)
+Tip: Önce JSON'u doğrudan ASCII Arter içinde test et, sonra export edip kendi projende kullan:
+https://lowgame.github.io/Ascii-Arter/  (JSON Test button)
 
 ## Quick Start
 
-1. Design your animation at **https://lowgame.github.io/Ascii-Arter/**
-2. Click **Export ▾ → JSON Project** to download your project file
-3. Use the library to embed it:
+1. Sahneyi https://lowgame.github.io/Ascii-Arter/ içinde hazırla
+2. JSON export al
+3. JSON'u sitene yükle ve mount et
 
 ```js
-import AsciiBackground from 'ascii-bg';
-import project from './my-project.json' assert { type: 'json' };
+import AsciiBackground, { parseProjectData } from 'ascii-arter';
 
-AsciiBackground.mount('#hero', project);
+fetch('/my-project.json')
+  .then((res) => res.text())
+  .then((json) => {
+    AsciiBackground.mount('#hero', parseProjectData(json));
+  });
 ```
 
-The animation will render as a canvas background inside `#hero`. The container gets `position: relative` automatically if needed.
+`parseProjectData()` hem JSON string hem plain object kabul eder. Böylece export edilen veriyi dosyadan, API'den veya inline string olarak güvenli şekilde yükleyebilirsin.
 
-## CDN (no build step)
+Animasyon `#hero` içinde canvas background olarak render edilir. Gerekirse container'a `position: relative` otomatik eklenir.
+
+## CDN
 
 ```html
 <div id="hero" style="height:400px"></div>
 <script type="module">
-  import AsciiBackground from 'https://unpkg.com/ascii-bg/dist/ascii-bg.esm.js';
+  import AsciiBackground, { parseProjectData } from 'https://unpkg.com/ascii-arter/dist/ascii-arter.esm.js';
 
-  // Paste your exported project JSON here:
-  const project = { /* ... */ };
-
-  AsciiBackground.mount('#hero', project);
+  fetch('/my-project.json')
+    .then((res) => res.text())
+    .then((json) => {
+      AsciiBackground.mount('#hero', parseProjectData(json));
+    });
 </script>
 ```
 
@@ -44,31 +50,31 @@ The animation will render as a canvas background inside `#hero`. The container g
 
 ### `AsciiBackground.mount(selector, projectData, options?)`
 
-Static factory. Creates and starts the animation immediately.
+Static factory. Animation'ı hemen başlatır.
 
-- `selector` — CSS selector string or DOM element
-- `projectData` — JSON object exported from ASCII Arter (or `null` for default)
-- `options` — reserved for future use
+- `selector` — CSS selector string veya DOM element
+- `projectData` — ASCII Arter'dan export edilen JSON object/string
+- `options` — future use
 
-Returns an `AsciiBackground` instance.
+Bir `AsciiBackground` instance döner.
 
 ### Instance methods
 
 | Method | Description |
 |--------|-------------|
-| `.play()` | Resume animation (chainable) |
-| `.pause()` | Pause animation (chainable) |
-| `.load(projectData)` | Replace the whole scene with exported JSON data |
-| `.update(partial)` | Merge partial project props and re-render |
-| `.toJSON(space?)` | Export the currently running scene back to JSON |
-| `.destroy()` | Stop animation, remove canvas, disconnect observer |
+| `.play()` | Animasyonu devam ettirir |
+| `.pause()` | Animasyonu durdurur |
+| `.load(projectData)` | Tüm sahneyi yeni export JSON ile değiştirir |
+| `.update(partial)` | Partial project props merge eder ve yeniden render eder |
+| `.toJSON(space?)` | O an çalışan sahneyi tekrar JSON olarak export eder |
+| `.destroy()` | Animasyonu durdurur, canvas'ı kaldırır, observer'ı kapatır |
 
 ### Utility exports
 
 | Export | Description |
 |--------|-------------|
-| `parseProjectData(input)` | Accepts an exported JSON string or plain object and returns normalized project data |
-| `serializeProjectData(project)` | Strips runtime-only fields so exported JSON stays publishable/embed-safe |
+| `parseProjectData(input)` | Export edilen JSON string/object input'unu normalize eder |
+| `serializeProjectData(project)` | Runtime-only alanları temizler; publish/embed-safe JSON üretir |
 
 ## Example
 
@@ -76,16 +82,15 @@ Returns an `AsciiBackground` instance.
 <!DOCTYPE html>
 <html>
 <body>
-  <section id="hero" style="height:100vh; display:flex; align-items:center; justify-content:center;">
+  <section id="hero" style="height:100vh; display:flex; align-items:center; justify-content:center; overflow:hidden;">
     <h1 style="position:relative; z-index:1; color:#fff">Hello, world!</h1>
   </section>
 
   <script type="module">
-    import AsciiBackground from 'https://unpkg.com/ascii-bg/dist/ascii-bg.esm.js';
+    import AsciiBackground from 'https://unpkg.com/ascii-arter/dist/ascii-arter.esm.js';
 
-    const bg = AsciiBackground.mount('#hero', null); // uses default matrix animation
+    const bg = AsciiBackground.mount('#hero', null);
 
-    // Pause on hover
     document.getElementById('hero').addEventListener('mouseenter', () => bg.pause());
     document.getElementById('hero').addEventListener('mouseleave', () => bg.play());
   </script>
