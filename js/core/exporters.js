@@ -1,3 +1,20 @@
+function stripRuntimeFields(value) {
+  if (Array.isArray(value)) {
+    return value.map(stripRuntimeFields);
+  }
+
+  if (!value || typeof value !== 'object') {
+    return value;
+  }
+
+  const clone = {};
+  Object.entries(value).forEach(([key, nextValue]) => {
+    if (key.startsWith('_')) return;
+    clone[key] = stripRuntimeFields(nextValue);
+  });
+  return clone;
+}
+
 export function downloadBlob(filename, blob) {
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement('a');
@@ -13,23 +30,36 @@ export function downloadText(filename, text) {
   downloadBlob(filename, new Blob([text], { type: 'text/plain;charset=utf-8' }));
 }
 
-export function exportProjectJSON(project) {
-  return JSON.stringify(project, null, 2);
+export function serializeProjectData(project) {
+  return stripRuntimeFields(project || {});
 }
 
-export function importProjectJSON(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      try {
-        resolve(JSON.parse(String(reader.result)));
-      } catch (error) {
-        reject(error);
-      }
-    };
-    reader.onerror = () => reject(reader.error || new Error('Could not read file'));
-    reader.readAsText(file);
-  });
+export function exportProjectJSON(project) {
+  return JSON.stringify(serializeProjectData(project), null, 2);
+}
+
+export async function parseProjectJSONInput(input) {
+  if (input == null) {
+    throw new Error('No JSON input provided');
+  }
+
+  if (typeof input === 'string') {
+    return JSON.parse(input);
+  }
+
+  if (typeof Blob !== 'undefined' && input instanceof Blob) {
+    return JSON.parse(await input.text());
+  }
+
+  if (typeof input === 'object') {
+    return JSON.parse(JSON.stringify(serializeProjectData(input)));
+  }
+
+  throw new Error('Unsupported JSON input type');
+}
+
+export async function importProjectJSON(input) {
+  return parseProjectJSONInput(input);
 }
 
 export function exportCanvasPNG(canvas, filename) {

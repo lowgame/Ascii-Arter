@@ -20,6 +20,7 @@
       <div class="header-actions">
         <button id="playPauseBtn" class="btn btn-ghost" type="button">Pause</button>
         <button id="randomizeBtn" class="btn btn-primary" type="button">Randomize</button>
+        <button id="jsonTestBtn" class="btn" type="button">JSON Test</button>
 
         <div class="export-group">
           <button class="btn" id="exportMenuBtn" type="button" aria-haspopup="true" aria-expanded="false">Export</button>
@@ -297,13 +298,17 @@
     <div id="embedModal" class="presets-modal-overlay" hidden>
       <div class="presets-modal embed-modal">
         <div class="presets-modal-header">
-          <span class="presets-modal-title">Embed</span>
+          <span class="presets-modal-title">Embed / JSON Test</span>
           <button id="embedModalClose" class="panel-close" type="button" title="Close">✕</button>
         </div>
         <div class="embed-modal-body">
           <div class="embed-step">
             <div class="embed-step-label">Install the library</div>
-            <pre class="embed-code-block">npm install ascii-bg</pre>
+            <pre class="embed-code-block">npm install ascii-bg
+
+// Önce JSON'u burada test et:
+// https://lowgame.github.io/Ascii-Arter/  (JSON Test)
+// sonra kendi sitende kullan.</pre>
           </div>
           <div class="embed-step">
             <div class="embed-step-label">Bundler usage</div>
@@ -314,9 +319,32 @@ AsciiBackground.mount('#my-element', project);</pre>
             <button class="btn btn-ghost embed-copy-btn" id="embedCopySnippetBtn" type="button">Copy snippet</button>
           </div>
           <div class="embed-step">
+            <div class="embed-step-label">CDN usage</div>
+            <pre class="embed-code-block" id="embedCdnBlock">&lt;script type="module"&gt;
+  import AsciiBackground from 'https://unpkg.com/ascii-bg/dist/ascii-bg.esm.js';
+  const project = { /* exported JSON */ };
+  AsciiBackground.mount('#my-element', project);
+&lt;/script&gt;</pre>
+          </div>
+          <div class="embed-step">
             <div class="embed-step-label">Current project JSON</div>
             <textarea id="embedJsonTextarea" class="embed-json-textarea" readonly></textarea>
             <button class="btn btn-ghost embed-copy-btn" id="embedCopyJsonBtn" type="button">Copy JSON</button>
+          </div>
+          <div class="embed-step">
+            <div class="embed-step-label">Test with existing JSONs</div>
+            <div class="embed-inline-row">
+              <select id="embedPresetJsonSelect" class="select-compact embed-select"></select>
+              <button class="btn btn-ghost" id="embedLoadPresetJsonBtn" type="button">Load to Paste Area</button>
+              <button class="btn btn-primary" id="embedApplyPresetJsonBtn" type="button">Apply Selected</button>
+              <button class="btn" id="embedExportTesterJsonBtn" type="button">Export Tested JSON</button>
+            </div>
+            <textarea id="embedPresetJsonPreview" class="embed-json-textarea" readonly></textarea>
+          </div>
+          <div class="embed-step">
+            <div class="embed-step-label">Paste JSON here (test/import)</div>
+            <textarea id="embedPasteJsonTextarea" class="embed-json-textarea" placeholder="Paste project JSON and click Apply"></textarea>
+            <button class="btn btn-primary embed-copy-btn" id="embedApplyJsonBtn" type="button">Apply Pasted JSON</button>
           </div>
         </div>
       </div>

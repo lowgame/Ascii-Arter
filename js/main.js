@@ -17,7 +17,7 @@ import {
 import { ANIMATION_MODES, MODE_BY_ID, sampleMode } from './data/animations.js';
 import { BUILTIN_PRESETS, getPresetById } from './data/presets.js';
 import { AsciiRenderer, FrameBuffer } from './core/engine.js';
-import { downloadText, exportCanvasPNG, exportHTMLSnapshot, exportProjectJSON, importProjectJSON } from './core/exporters.js';
+import { downloadText, exportCanvasPNG, exportHTMLSnapshot, exportProjectJSON, importProjectJSON, parseProjectJSONInput } from './core/exporters.js';
 import {
   SUBJECT_FONT_FAMILY_OPTIONS,
   buildSubjectCanvasFont,
@@ -114,6 +114,7 @@ let subjectMask = null; // Float32Array | null
 let subjectDirty = true;
 const controlRefs = new Map();
 const paletteCache = new Map(Object.entries(PALETTES).map(([name, stops]) => [name, stops.map(hexToRgb)]));
+const embedJsonCatalog = new Map();
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 const clamp01 = (value) => clamp(value, 0, 1);
@@ -157,7 +158,7 @@ function init() {
 function bindDom() {
   const ids = [
     'presetSelect', 'controlsContent', 'projectTitleLabel', 'stageCanvas', 'frameOutput', 'previewCard',
-    'fpsStat', 'renderStat', 'cellsStat', 'layersStat', 'statusStat', 'playPauseBtn',
+    'fpsStat', 'renderStat', 'cellsStat', 'layersStat', 'statusStat', 'playPauseBtn', 'jsonTestBtn',
     'randomizeBtn', 'fullscreenRandomizeBtn', 'shuffleCharsetBtn', 'savePresetBtn', 'importBtn', 'exportProjectBtn', 'fullscreenBtn',
     'importProjectInput', 'copyFrameBtn', 'exportTxtBtn', 'exportPngBtn', 'exportHtmlBtn',
     'refreshFrameBtn', 'layersList', 'textsList', 'layerInspector', 'textInspector',
@@ -166,6 +167,8 @@ function bindDom() {
     'svgLayersList', 'svgLayerInspector', 'addSvgLayerBtn', 'removeSvgLayerBtn',
     'svgUploadInput', 'presetsGalleryBtn', 'presetsModal', 'presetsModalClose', 'presetsGrid',
     'embedCodeBtn', 'embedModal', 'embedModalClose', 'embedJsonTextarea', 'embedCopyJsonBtn', 'embedCopySnippetBtn',
+    'embedPasteJsonTextarea', 'embedApplyJsonBtn',
+    'embedPresetJsonSelect', 'embedLoadPresetJsonBtn', 'embedApplyPresetJsonBtn', 'embedPresetJsonPreview', 'embedExportTesterJsonBtn',
     'subjectPresetLabel', 'subjectFontWeight', 'subjectFontFamily', 'subjectLetterSpacing'
   ];
 
@@ -268,11 +271,11 @@ function bindPresetControls() {
       const presetId = value.replace('builtin:', '');
       const preset = getPresetById(presetId);
       if (preset) {
-        applyPresetVisuals(presetId, preset);
-        project = normalizeProject(preset);
+        applyPresetVisuals(presetId, preset.project);
+        project = normalizeProject(preset.project);
         selectedLayerId = project.layers[0]?.id || selectedLayerId;
         selectedTextId = project.texts[0]?.id || selectedTextId;
-        applyProject(project, { keepPresetSelection: true, status: `Loaded ${preset.projectName || 'preset'}` });
+        applyProject(project, { keepPresetSelection: true, status: `Loaded ${preset.name || preset.project?.projectName || 'preset'}` });
       }
       return;
     }
@@ -624,6 +627,9 @@ function bindButtons() {
   dom.presetsModalClose.addEventListener('click', () => closePresetsModal());
   dom.presetsModal.addEventListener('click', (e) => { if (e.target === dom.presetsModal) closePresetsModal(); });
 
+  // Main menu shortcut to JSON testing area
+  dom.jsonTestBtn.addEventListener('click', () => openEmbedModal());
+
   // Embed modal
   dom.embedCodeBtn.addEventListener('click', () => openEmbedModal());
   dom.embedModalClose.addEventListener('click', () => closeEmbedModal());
@@ -640,6 +646,65 @@ function bindButtons() {
       dom.embedCopySnippetBtn.textContent = '✅ Copied!';
       setTimeout(() => { dom.embedCopySnippetBtn.textContent = '📋 Copy Snippet'; }, 1500);
     });
+  });
+  dom.embedPresetJsonSelect.addEventListener('change', () => {
+    const key = dom.embedPresetJsonSelect.value;
+    if (!key) return;
+    const selected = embedJsonCatalog.get(key);
+    if (!selected) return;
+    dom.embedPresetJsonPreview.value = selected.json;
+  });
+  dom.embedLoadPresetJsonBtn.addEventListener('click', () => {
+    const key = dom.embedPresetJsonSelect.value;
+    if (!key) {
+      setStatus('Select an existing JSON first');
+      return;
+    }
+    const selected = embedJsonCatalog.get(key);
+    if (!selected) return;
+    dom.embedPasteJsonTextarea.value = selected.json;
+    setStatus(`Loaded ${selected.label} into paste area`);
+  });
+  dom.embedApplyPresetJsonBtn.addEventListener('click', () => {
+    const key = dom.embedPresetJsonSelect.value;
+    if (!key) {
+      setStatus('Select an existing JSON first');
+      return;
+    }
+    const selected = embedJsonCatalog.get(key);
+    if (!selected) return;
+    applyProject(cloneProject(selected.project), { keepPresetSelection: false, status: `${selected.label} applied` });
+    dom.embedJsonTextarea.value = exportProjectJSON(project);
+    dom.embedPasteJsonTextarea.value = dom.embedJsonTextarea.value;
+    dom.embedPresetJsonPreview.value = dom.embedJsonTextarea.value;
+    const currentKey = `current:${slugify(project.projectName || 'project')}`;
+    embedJsonCatalog.set(currentKey, { label: 'Current Project', project: cloneProject(project), json: dom.embedJsonTextarea.value });
+    setStatus(`${selected.label} applied`);
+  });
+  dom.embedExportTesterJsonBtn.addEventListener('click', () => {
+    const json = dom.embedPresetJsonPreview.value || dom.embedJsonTextarea.value || exportProjectJSON(project);
+    const file = `${slugify(project.projectName || 'ascii-arter-tested')}-tested.json`;
+    downloadText(file, json);
+    setStatus(`Exported tested JSON: ${file}`);
+  });
+  dom.embedApplyJsonBtn.addEventListener('click', async () => {
+    const raw = dom.embedPasteJsonTextarea.value.trim();
+    if (!raw) {
+      setStatus('Paste area is empty');
+      return;
+    }
+    try {
+      const parsed = await parseProjectJSONInput(raw);
+      applyProject(parsed, { keepPresetSelection: false, status: 'Pasted JSON applied' });
+      dom.embedJsonTextarea.value = exportProjectJSON(project);
+      dom.embedApplyJsonBtn.textContent = '✅ Applied!';
+      setTimeout(() => { dom.embedApplyJsonBtn.textContent = 'Apply Pasted JSON'; }, 1200);
+    } catch (error) {
+      console.error(error);
+      setStatus('Paste failed: invalid JSON');
+      dom.embedApplyJsonBtn.textContent = '❌ Invalid JSON';
+      setTimeout(() => { dom.embedApplyJsonBtn.textContent = 'Apply Pasted JSON'; }, 1500);
+    }
   });
 
   // SVG Layers
@@ -1248,7 +1313,44 @@ function closePresetsModal() {
 }
 
 function openEmbedModal() {
-  dom.embedJsonTextarea.value = exportProjectJSON(project);
+  const currentJson = exportProjectJSON(project);
+  dom.embedJsonTextarea.value = currentJson;
+  dom.embedPasteJsonTextarea.value = currentJson;
+  dom.embedApplyJsonBtn.textContent = 'Apply Pasted JSON';
+  dom.embedApplyPresetJsonBtn.textContent = 'Apply Selected';
+
+  embedJsonCatalog.clear();
+  dom.embedPresetJsonSelect.innerHTML = '';
+
+  const addOption = (key, label) => {
+    const option = document.createElement('option');
+    option.value = key;
+    option.textContent = label;
+    dom.embedPresetJsonSelect.appendChild(option);
+  };
+
+  const currentKey = `current:${slugify(project.projectName || 'project')}`;
+  embedJsonCatalog.set(currentKey, { label: 'Current Project', project: cloneProject(project), json: currentJson });
+  addOption(currentKey, 'Current Project');
+
+  BUILTIN_PRESETS.forEach((preset) => {
+    const key = `builtin:${preset.id}`;
+    const proj = cloneProject(preset.project);
+    const json = exportProjectJSON(proj);
+    embedJsonCatalog.set(key, { label: `Built-in: ${preset.name}`, project: proj, json });
+    addOption(key, `Built-in: ${preset.name}`);
+  });
+
+  getSavedPresets().forEach((preset) => {
+    const key = `saved:${preset.id}`;
+    const proj = cloneProject(preset.project);
+    const json = exportProjectJSON(proj);
+    embedJsonCatalog.set(key, { label: `Saved: ${preset.name}`, project: proj, json });
+    addOption(key, `Saved: ${preset.name}`);
+  });
+
+  dom.embedPresetJsonSelect.value = currentKey;
+  dom.embedPresetJsonPreview.value = currentJson;
   dom.embedModal.hidden = false;
 }
 

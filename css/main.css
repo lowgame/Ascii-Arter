@@ -980,6 +980,29 @@ summary > span:first-child {
   justify-self: start;
 }
 
+.embed-inline-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.embed-select {
+  min-width: 220px;
+  max-width: 100%;
+}
+
+#jsonTestBtn {
+  border-color: rgba(115, 240, 199, 0.4);
+  color: var(--accent);
+}
+
+#jsonTestBtn:hover {
+  color: #fff;
+  border-color: rgba(115, 240, 199, 0.68);
+  background: rgba(115, 240, 199, 0.12);
+}
+
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;

@@ -58,8 +58,17 @@ Returns an `AsciiBackground` instance.
 |--------|-------------|
 | `.play()` | Resume animation (chainable) |
 | `.pause()` | Pause animation (chainable) |
+| `.load(projectData)` | Replace the whole scene with exported JSON data |
 | `.update(partial)` | Merge partial project props and re-render |
+| `.toJSON(space?)` | Export the currently running scene back to JSON |
 | `.destroy()` | Stop animation, remove canvas, disconnect observer |
+
+### Utility exports
+
+| Export | Description |
+|--------|-------------|
+| `parseProjectData(input)` | Accepts an exported JSON string or plain object and returns normalized project data |
+| `serializeProjectData(project)` | Strips runtime-only fields so exported JSON stays publishable/embed-safe |
 
 ## Example
 
