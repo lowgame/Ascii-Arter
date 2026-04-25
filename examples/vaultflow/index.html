@@ -1,255 +1,304 @@
 <!doctype html>
 <html lang="en">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Vaultflow — Treasury automation for lean finance teams</title>
   <meta name="description" content="Static Vaultflow demo powered by ascii-arter animated backgrounds.">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;500;600;700&family=Source+Code+Pro:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #08070f;
-      --bg-soft: #110d1c;
-      --surface: rgba(255,255,255,.04);
-      --border: rgba(255,255,255,.08);
-      --text: #faf7ff;
-      --muted: #c1b7d6;
-      --subtle: #8e82a7;
-      --accent: #b06cff;
-      --accent-2: #ff8b6b;
-      --ok: #ffd36d;
-      --shadow: 0 24px 80px rgba(0,0,0,.34);
-      --radius: 24px;
-      --max: 1180px;
+      --page: #f7fbff;
+      --surface: #ffffff;
+      --surface-soft: #eef5fb;
+      --border: #dce6f4;
+      --text: #061b31;
+      --muted: #5e6b7f;
+      --subtle: #7d8aa0;
+      --accent: #533afd;
+      --accent-2: #ea2261;
+      --brand-dark: #1c1e54;
+      --shadow: rgba(50,50,93,0.16) 0 28px 48px -28px, rgba(0,0,0,0.08) 0 18px 34px -18px;
+      --max: 1160px;
     }
     * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
     body {
       margin: 0;
-      font-family: 'Inter', system-ui, sans-serif;
+      background: linear-gradient(180deg, #f7fbff 0%, #eef5fb 42%, #ffffff 100%);
       color: var(--text);
-      background:
-        radial-gradient(circle at top, rgba(176, 108, 255, 0.2), transparent 34%),
-        radial-gradient(circle at 85% 10%, rgba(255, 139, 107, 0.14), transparent 28%),
-        linear-gradient(180deg, var(--bg) 0%, #05070b 100%);
+      font-family: 'Source Sans 3', system-ui, sans-serif;
+      font-feature-settings: 'ss01';
     }
     a { color: inherit; text-decoration: none; }
     .shell { width: min(var(--max), calc(100vw - 32px)); margin: 0 auto; }
-    .hero, .cta-band { position: relative; overflow: hidden; isolation: isolate; }
-    .hero::before, .cta-band::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(180deg, rgba(4,6,10,.15), rgba(4,6,10,.74));
-      pointer-events: none;
-      z-index: 1;
+    .site-nav {
+      display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 22px 0;
     }
-    .hero-inner, .cta-inner { position: relative; z-index: 2; }
-    .nav { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:24px 0; }
-    .brand { display:inline-flex; align-items:center; gap:12px; font-weight:700; letter-spacing:-.02em; }
+    .brand { display: inline-flex; align-items: center; gap: 12px; font-weight: 600; color: var(--text); }
     .brand-mark {
-      width:34px; height:34px; border-radius:12px; display:grid; place-items:center; color:#fff;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      box-shadow: 0 14px 34px color-mix(in srgb, var(--accent) 42%, transparent);
+      width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; color: white;
+      background: linear-gradient(135deg, var(--accent), #7d72ff);
+      box-shadow: rgba(83,58,253,0.22) 0 12px 30px;
     }
-    .nav-links { display:flex; gap:12px; flex-wrap:wrap; color: var(--muted); font-size:14px; }
-    .chip {
-      display:inline-flex; align-items:center; gap:8px; border-radius:999px; padding:9px 12px;
-      border: 1px solid var(--border); background: rgba(255,255,255,.04); backdrop-filter: blur(12px);
-      font-size:12px; color: var(--muted);
+    .nav-links { display: flex; flex-wrap: wrap; gap: 10px; }
+    .nav-pill {
+      padding: 9px 12px; border-radius: 999px; border: 1px solid var(--border); background: rgba(255,255,255,0.9); color: var(--muted); font-size: 13px;
     }
-    .chip::before { content:''; width:8px; height:8px; border-radius:999px; background: var(--accent-2); box-shadow:0 0 18px var(--accent-2); }
-    .hero-grid { display:grid; grid-template-columns:minmax(0,1.08fr) minmax(320px,.92fr); gap:24px; padding:40px 0 56px; align-items:stretch; }
+    .fintech-hero {
+      position: relative; padding: 34px 0 40px;
+    }
+    .hero-grid {
+      display: grid; grid-template-columns: minmax(0, 0.95fr) minmax(340px, 1.05fr); gap: 28px; align-items: center;
+    }
     .eyebrow {
-      display:inline-flex; align-items:center; gap:10px; margin-bottom:18px; padding:8px 12px; border-radius:999px;
-      font-family:'JetBrains Mono', monospace; font-size:12px; color:#eef4ff;
-      background: color-mix(in srgb, var(--accent) 16%, transparent); border:1px solid color-mix(in srgb, var(--accent) 32%, transparent);
+      display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 999px;
+      font-size: 12px; color: #533afd; background: rgba(83,58,253,0.08); border: 1px solid rgba(83,58,253,0.14);
     }
-    h1 { margin:0; max-width:10ch; font-size: clamp(52px, 8vw, 84px); line-height:.94; letter-spacing:-.06em; font-weight:800; }
-    .lede { margin:22px 0 0; max-width:620px; color:var(--muted); font-size:19px; line-height:1.7; }
-    .cta-row { display:flex; flex-wrap:wrap; gap:14px; margin-top:28px; }
-    .btn { height:48px; display:inline-flex; align-items:center; justify-content:center; gap:10px; padding:0 18px; border-radius:14px; font-weight:700; font-size:14px; letter-spacing:-.02em; }
-    .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color:#fff; box-shadow:0 18px 50px color-mix(in srgb, var(--accent) 28%, transparent); }
-    .btn-secondary { background: rgba(255,255,255,.04); border:1px solid var(--border); color: var(--text); }
-    .proof-row { display:flex; flex-wrap:wrap; gap:18px; margin-top:26px; color:var(--subtle); font-size:13px; }
-    .hero-card, .stat-card, .feature-card, .quote-card, .footer-card {
-      border-radius: var(--radius); border:1px solid var(--border); background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03)); backdrop-filter: blur(16px); box-shadow: var(--shadow);
+    h1 {
+      margin: 18px 0 0; max-width: 10ch; font-size: clamp(58px, 8vw, 88px); line-height: 0.96; letter-spacing: -0.06em; font-weight: 300;
+      color: var(--text);
     }
-    .hero-card { padding:22px; display:grid; gap:18px; }
-    .card-kicker, .section-kicker { font-family:'JetBrains Mono', monospace; text-transform:uppercase; letter-spacing:.08em; font-size:12px; color:#d9e3f1; }
-    .hero-card h2, .feature-card h3, .quote-card h3 { margin:0; font-size:22px; letter-spacing:-.03em; }
-    .muted-copy, .feature-card p, .quote-card p { margin:0; color:var(--muted); line-height:1.7; }
-    .stack-list { display:grid; gap:12px; }
-    .stack-item, .stat-row, .quote-line { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 15px; border-radius:16px; border:1px solid rgba(255,255,255,.07); background: rgba(255,255,255,.03); }
-    .ok-pill { display:inline-flex; align-items:center; gap:8px; padding:8px 10px; border-radius:999px; background: color-mix(in srgb, var(--ok) 13%, transparent); color: var(--ok); font-size:12px; border:1px solid color-mix(in srgb, var(--ok) 32%, transparent); }
-    .ok-pill::before { content:''; width:8px; height:8px; border-radius:999px; background: currentColor; box-shadow:0 0 18px currentColor; }
-    .code-box { border-radius:18px; border:1px solid rgba(255,255,255,.08); background: rgba(5,6,12,.78); padding:16px; font-family:'JetBrains Mono', monospace; font-size:12px; line-height:1.8; color:#dbe7ff; overflow:auto; }
-    section.content-section { padding:78px 0; border-bottom:1px solid rgba(255,255,255,.05); }
-    .section-head { display:flex; align-items:end; justify-content:space-between; gap:24px; margin-bottom:24px; }
-    .section-head h2 { margin:10px 0 0; font-size: clamp(32px, 5vw, 48px); line-height:1; letter-spacing:-.05em; }
-    .stats-grid, .features-grid, .quote-grid, .footer-grid { display:grid; gap:18px; }
-    .stats-grid { grid-template-columns:repeat(3, minmax(0, 1fr)); }
-    .features-grid { grid-template-columns:repeat(3, minmax(0, 1fr)); }
-    .quote-grid { grid-template-columns:repeat(2, minmax(0, 1fr)); }
-    .stat-card, .feature-card, .quote-card, .footer-card { padding:22px; }
-    .stat-value { font-size:clamp(30px, 4vw, 44px); line-height:1; font-weight:800; letter-spacing:-.05em; margin-top:12px; }
-    .feature-card ul { margin:14px 0 0; padding-left:18px; color:var(--muted); line-height:1.8; }
-    .cta-band { margin: 0 0 80px; border-radius: 28px; min-height: 280px; }
-    .cta-inner { min-height:280px; display:grid; align-content:center; gap:18px; padding:36px; }
-    .footer-grid { grid-template-columns:1.3fr .7fr; padding-bottom:72px; }
-    .footer-links { display:grid; gap:10px; color:var(--muted); }
-    @media (max-width: 980px) {
-      .hero-grid, .features-grid, .stats-grid, .quote-grid, .footer-grid { grid-template-columns:1fr; }
-      h1 { max-width:unset; }
-      .section-head { align-items:start; flex-direction:column; }
+    .lede { margin: 20px 0 0; max-width: 580px; font-size: 20px; line-height: 1.65; color: var(--muted); }
+    .cta-row { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 28px; }
+    .btn {
+      height: 48px; padding: 0 18px; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 16px; font-weight: 400; border: 1px solid transparent;
+    }
+    .btn-primary { background: var(--accent); color: white; box-shadow: rgba(83,58,253,0.22) 0 16px 36px; }
+    .btn-secondary { background: white; color: var(--accent); border-color: #cfd6ff; }
+    .proof-row { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 22px; font-size: 14px; color: var(--subtle); }
+
+    .floating-stack {
+      position: relative; min-height: 560px; display: grid; align-items: center;
+    }
+    .floating-orbit {
+      position: absolute; inset: 22px 14px 18px 24px; border-radius: 34px;
+      background: radial-gradient(circle at top left, rgba(83,58,253,0.18), transparent 34%), radial-gradient(circle at bottom right, rgba(234,34,97,0.12), transparent 30%), linear-gradient(180deg, rgba(255,255,255,0.96), rgba(247,251,255,0.98));
+      border: 1px solid rgba(83,58,253,0.08);
+      transform: rotate(-4deg);
+    }
+    .hero-orbit-card {
+      position: relative; z-index: 2; margin-left: 48px; overflow: hidden; border-radius: 28px; min-height: 500px;
+      background: linear-gradient(180deg, rgba(28,30,84,0.94), rgba(16,24,48,0.98)); border: 1px solid rgba(83,58,253,0.18); box-shadow: var(--shadow);
+    }
+    .hero-orbit-card::before {
+      content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+      background: linear-gradient(180deg, rgba(6,27,49,0.08), rgba(6,27,49,0.76));
+    }
+    .hero-card-inner { position: relative; z-index: 2; padding: 20px; }
+    .card-header {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border-radius: 14px;
+      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.84); font-size: 13px;
+    }
+    .ledger-strip {
+      display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-top: 18px;
+    }
+    .ledger-stat {
+      padding: 16px; border-radius: 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.09); color: white;
+    }
+    .ledger-stat strong { display: block; margin-top: 12px; font-size: 28px; letter-spacing: -0.05em; }
+    .transfer-list { display: grid; gap: 12px; margin-top: 16px; }
+    .transfer-card {
+      display: grid; gap: 8px; padding: 14px 16px; border-radius: 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.09); color: white;
+    }
+    .transfer-meta { display: flex; justify-content: space-between; gap: 12px; color: rgba(255,255,255,0.66); font-size: 12px; }
+
+    .page-section { padding: 84px 0 0; }
+    .section-head { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 24px; }
+    .section-kicker { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: #4e5d73; font-family: 'Source Code Pro', monospace; }
+    .section-head h2 { margin: 10px 0 0; font-size: clamp(36px, 5vw, 54px); line-height: 0.98; letter-spacing: -0.05em; font-weight: 300; }
+    .section-copy { max-width: 540px; color: var(--muted); font-size: 18px; line-height: 1.7; }
+    .compliance-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+    .compliance-card, .pricing-card, .footer-card {
+      background: white; border: 1px solid var(--border); border-radius: 18px; box-shadow: var(--shadow); padding: 22px;
+    }
+    .compliance-card h3, .pricing-card h3 { margin: 12px 0 10px; font-size: 24px; line-height: 1.15; letter-spacing: -0.03em; font-weight: 400; }
+    .compliance-card p, .pricing-card p, .footer-card p { margin: 0; color: var(--muted); line-height: 1.7; }
+    .compliance-card ul, .pricing-card ul { margin: 14px 0 0; padding-left: 18px; color: var(--muted); line-height: 1.8; }
+    .pricing-stack { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; }
+    .pricing-badge {
+      display: inline-flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: 999px; font-size: 12px; color: #108c3d; background: rgba(21,190,83,0.14); border: 1px solid rgba(21,190,83,0.22);
+    }
+    .price { margin: 18px 0 0; font-size: 38px; line-height: 1; letter-spacing: -0.05em; color: var(--text); font-weight: 300; }
+    .price span { font-size: 16px; color: var(--subtle); }
+
+    .cta-band {
+      position: relative; overflow: hidden; margin: 84px 0 80px; min-height: 300px; border-radius: 28px;
+      background: linear-gradient(135deg, rgba(28,30,84,1), rgba(83,58,253,0.95)); box-shadow: var(--shadow);
+    }
+    .cta-band::before {
+      content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+      background: radial-gradient(circle at top right, rgba(249,107,238,0.22), transparent 22%), linear-gradient(180deg, rgba(6,27,49,0.06), rgba(6,27,49,0.36));
+    }
+    .cta-inner {
+      position: relative; z-index: 2; min-height: 300px; display: grid; grid-template-columns: 1fr 0.7fr; gap: 24px; align-items: center; padding: 34px;
+    }
+    .cta-copy { color: white; }
+    .cta-copy h2 { margin: 14px 0 0; max-width: 12ch; font-size: clamp(36px, 5vw, 58px); line-height: 0.98; letter-spacing: -0.05em; font-weight: 300; }
+    .cta-copy p { max-width: 560px; color: rgba(255,255,255,0.76); line-height: 1.7; font-size: 18px; }
+    .footer-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 18px; padding-bottom: 72px; }
+    .footer-card h3 { margin: 10px 0 8px; font-size: 28px; line-height: 1.08; letter-spacing: -0.04em; font-weight: 400; }
+    .footer-links { display: grid; gap: 10px; margin-top: 14px; color: var(--muted); }
+    @media (max-width: 1024px) {
+      .hero-grid, .compliance-grid, .pricing-stack, .cta-inner, .footer-grid, .ledger-strip { grid-template-columns: 1fr; }
+      .hero-orbit-card { margin-left: 0; }
+      h1, .cta-copy h2 { max-width: unset; }
+      .section-head { flex-direction: column; align-items: start; }
     }
   </style>
 </head>
-<body>
-  <header class="hero" id="heroBg">
-    <div class="shell hero-inner">
-      <nav class="nav">
+<body data-demo-variant="stripe-light-fintech">
+  <header class="fintech-hero">
+    <div class="shell">
+      <nav class="site-nav">
         <a class="brand" href="../../examples/">
-          <span class="brand-mark">#</span>
+          <span class="brand-mark">◌</span>
           <span>Vaultflow</span>
         </a>
         <div class="nav-links">
-          <a class="chip" href="../../examples/">Examples</a>
-          <a class="chip" href="../../">Editor</a>
-          <a class="chip" href="../../lib/README.md">Package docs</a>
+          <a class="nav-pill" href="../../examples/">Examples</a>
+          <a class="nav-pill" href="../../">Editor</a>
+          <a class="nav-pill" href="../../lib/README.md">Package docs</a>
         </div>
       </nav>
 
       <div class="hero-grid">
-        <div>
-          <div class="eyebrow">ascii-arter demo / finance ops landing</div>
+        <section>
+          <div class="eyebrow">@lowgame/ascii-arter / stripe-style finance demo</div>
           <h1>Move cash with less dashboard debt.</h1>
-          <p class="lede">Vaultflow gives lean finance teams one place to track approvals, exposures, transfers and runway signals without turning every morning into a tab safari.</p>
+          <p class="lede">Vaultflow is now intentionally bright, financial and editorial. Instead of another dark SaaS page, it behaves like a premium fintech site with a dark motion card floating inside a light product story.</p>
           <div class="cta-row">
             <a class="btn btn-primary" href="#pricing">View treasury flow</a>
-            <a class="btn btn-secondary" href="../../examples/">Browse examples</a>
+            <a class="btn btn-secondary" href="../../examples/">Browse all demos</a>
           </div>
           <div class="proof-row">
             <span>Approval latency down 43%</span>
             <span>•</span>
             <span>Weekly cash review cut from 90 to 28 minutes</span>
             <span>•</span>
-            <span>Built with ascii-arter</span>
+            <span>Built with @lowgame/ascii-arter</span>
           </div>
-        </div>
+        </section>
 
-        <aside class="hero-card">
-          <div class="card-kicker">Why this page works</div>
-          <h2>Design-led motion for a finance brand.</h2>
-          <p class="muted-copy">The background is still just exported JSON from the ASCII Arter editor, but the resulting page feels like a polished fintech launch site.</p>
-          <div class="stack-list">
-            <div class="stack-item"><span>Accounts monitored</span><strong>38</strong></div>
-            <div class="stack-item"><span>Approvals automated</span><strong>91%</strong></div>
-            <div class="stack-item"><span>Runway confidence</span><strong>+19 pts</strong></div>
+        <section class="floating-stack">
+          <div class="floating-orbit"></div>
+          <div class="hero-orbit-card" id="heroBg">
+            <div class="hero-card-inner">
+              <div class="card-header">
+                <span>Cross-entity cash orchestration</span>
+                <span>12:34 UTC</span>
+              </div>
+              <div class="ledger-strip">
+                <div class="ledger-stat"><div class="section-kicker" style="color: rgba(255,255,255,0.76);">Runway</div><strong>18.4 mo</strong></div>
+                <div class="ledger-stat"><div class="section-kicker" style="color: rgba(255,255,255,0.76);">Exposure</div><strong>2.1%</strong></div>
+                <div class="ledger-stat"><div class="section-kicker" style="color: rgba(255,255,255,0.76);">Approvals</div><strong>91%</strong></div>
+                <div class="ledger-stat"><div class="section-kicker" style="color: rgba(255,255,255,0.76);">Move time</div><strong>8m</strong></div>
+              </div>
+              <div class="transfer-list">
+                <div class="transfer-card">
+                  <strong>Payroll transfer queued after FX review</strong>
+                  <div class="transfer-meta"><span>USD → EUR</span><span>Ready for second approver</span></div>
+                </div>
+                <div class="transfer-card">
+                  <strong>Runway model updated after vendor schedule shift</strong>
+                  <div class="transfer-meta"><span>Scenario delta +0.8 months</span><span>Board pack synced</span></div>
+                </div>
+                <div class="transfer-card">
+                  <strong>Entity cash threshold tripped in APAC wallet</strong>
+                  <div class="transfer-meta"><span>Auto-top-up suggested</span><span>24 min saved</span></div>
+                </div>
+              </div>
+            </div>
           </div>
-          <span class="ok-pill">Static HTML, dual scene mount, finance-friendly tone</span>
-          <div class="code-box">import AsciiBackground, { parseProjectData } from '@lowgame/ascii-arter';
-
-fetch('./hero.json')
-  .then((res) => res.text())
-  .then((json) => AsciiBackground.mount('#heroBg', parseProjectData(json)));</div>
-        </aside>
+        </section>
       </div>
     </div>
   </header>
 
   <main>
-    <section class="content-section">
+    <section class="page-section">
       <div class="shell">
         <div class="section-head">
           <div>
-            <div class="section-kicker">What you get</div>
-            <h2>Clear cash visibility without enterprise UI bloat.</h2>
+            <div class="section-kicker">Why this one feels different</div>
+            <h2>Light fintech surface. Dark motion object. Stripe-ish rhythm.</h2>
           </div>
-          <p class="muted-copy" style="max-width:540px;">This example leans more fintech: warmer contrast, tighter copy, and a stronger CTA block while still using the same package API.</p>
+          <p class="section-copy">Vaultflow is now the opposite of PulseBoard. Airy layout, white cards, navy headings, fintech language and a floating dark motion panel instead of a dashboard-wall hero.</p>
         </div>
-        <div class="stats-grid">
-          <article class="stat-card">
-            <div class="card-kicker">Signal velocity</div>
-            <div class="stat-value">$14.8M</div>
-            <p class="muted-copy">managed across entities with a single morning workflow.</p>
-          </article>
-          <article class="stat-card">
-            <div class="card-kicker">Operator focus</div>
-            <div class="stat-value">5x</div>
-            <p class="muted-copy">faster payment exception handling once approvals stop living in inboxes.</p>
-          </article>
-          <article class="stat-card">
-            <div class="card-kicker">Time to action</div>
-            <div class="stat-value">99.2%</div>
-            <p class="muted-copy">same-day certainty on treasury position after imports and overrides.</p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section class="content-section">
-      <div class="shell">
-        <div class="section-head">
-          <div>
-            <div class="section-kicker">Three reasons</div>
-            <h2>Why this structure works for fintech pages</h2>
-          </div>
-          <p class="muted-copy" style="max-width:520px;">You get atmosphere and differentiation without sacrificing legibility or trust.</p>
-        </div>
-        <div class="features-grid">
-          <article class="feature-card">
-            <div class="card-kicker">01</div>
-            <h3>Credible visual system</h3>
-            <p>The moving ASCII layer reads like a deliberate brand texture, not a novelty effect.</p>
+        <div class="compliance-grid">
+          <article class="compliance-card">
+            <div class="section-kicker">01</div>
+            <h3>Editorial hero rhythm</h3>
+            <p>The page breathes more. Headline weight is lighter, spacing is wider and the story reads like a premium fintech launch page.</p>
             <ul>
-              <li>Warm palette keeps it premium, not gamer</li>
-              <li>Foreground cards stay extremely readable</li>
+              <li>White-first layout</li>
+              <li>Dark motion contained in one orbit card</li>
             </ul>
           </article>
-          <article class="feature-card">
-            <div class="card-kicker">02</div>
-            <h3>Simple developer flow</h3>
-            <p>Nothing custom is hidden here. It is still just HTML, JSON and one mount call.</p>
+          <article class="compliance-card">
+            <div class="section-kicker">02</div>
+            <h3>Transfer and ledger language</h3>
+            <p>Instead of product-ops copy, everything here talks in treasury concepts: approvals, entities, runway and exposure.</p>
             <ul>
-              <li>Swap scenes per section</li>
-              <li>Host on GitHub Pages or any static CDN</li>
+              <li>Board-pack tone instead of dashboard-product tone</li>
+              <li>Cards feel financial, not general SaaS</li>
             </ul>
           </article>
-          <article class="feature-card">
-            <div class="card-kicker">03</div>
-            <h3>Works beyond hero blocks</h3>
-            <p>The second mount proves you can repeat the pattern for pricing, CTA or announcement bands.</p>
+          <article class="compliance-card">
+            <div class="section-kicker">03</div>
+            <h3>Premium CTA block</h3>
+            <p>The second mount lives in a strong branded band, not another generic footer-style section.</p>
             <ul>
-              <li>Independent motion per section</li>
-              <li>No global state gymnastics required</li>
+              <li>Distinct second motion zone</li>
+              <li>Clear contrast against the light page body</li>
             </ul>
           </article>
         </div>
       </div>
     </section>
 
-    <section class="content-section" id="pricing">
+    <section class="page-section" id="pricing">
       <div class="shell">
         <div class="section-head">
           <div>
-            <div class="section-kicker">Social proof</div>
-            <h2>A package showcase that still looks client-ready</h2>
+            <div class="section-kicker">Packaging and plans</div>
+            <h2>A static demo that still looks investor-deck ready.</h2>
           </div>
-          <p class="muted-copy" style="max-width:520px;">This page exists to help people imagine real usage, not just stare at an API signature.</p>
+          <p class="section-copy">This layout is intentionally more commercial and pricing-led. It shows the same package can support a much cleaner fintech front-end identity.</p>
         </div>
-        <div class="quote-grid">
-          <article class="quote-card">
-            <div class="card-kicker">Ops lead</div>
-            <h3>“I could hand this to a founder and they would get it immediately.”</h3>
-            <p>The package becomes easier to understand once the examples look like real sites.</p>
-            <div class="quote-line"><span>Message clarity</span><strong>+31%</strong></div>
+        <div class="pricing-stack">
+          <article class="pricing-card">
+            <div class="pricing-badge">Starter</div>
+            <h3>For lean finance teams cleaning up approval chaos.</h3>
+            <div class="price">$49 <span>/ seat</span></div>
+            <p>Daily cash position, transfer queue and approval routing without spreadsheet sprawl.</p>
+            <ul>
+              <li>Multi-entity cash view</li>
+              <li>Approval audit trail</li>
+              <li>Weekly board export</li>
+            </ul>
           </article>
-          <article class="quote-card">
-            <div class="card-kicker">Builder fit</div>
-            <h3>“The background feels branded, not distracting.”</h3>
-            <p>That balance is the whole point of exporting scenes from a visual editor.</p>
-            <div class="quote-line"><span>Scroll depth</span><strong>+18%</strong></div>
+          <article class="pricing-card">
+            <div class="pricing-badge">Growth</div>
+            <h3>For operators balancing runway and more complex rails.</h3>
+            <div class="price">$129 <span>/ seat</span></div>
+            <p>Scenario planning, exposure guardrails and treasury collaboration for scaling teams.</p>
+            <ul>
+              <li>Runway scenarios</li>
+              <li>FX and threshold rules</li>
+              <li>Slack + ERP routing</li>
+            </ul>
+          </article>
+          <article class="pricing-card">
+            <div class="pricing-badge">Custom</div>
+            <h3>For finance orgs that want a branded treasury control layer.</h3>
+            <div class="price">Custom</div>
+            <p>Private rollout, entity-specific policies and a more tailored implementation path.</p>
+            <ul>
+              <li>Custom controls</li>
+              <li>Dedicated onboarding</li>
+              <li>Private review loops</li>
+            </ul>
           </article>
         </div>
       </div>
@@ -258,14 +307,16 @@ fetch('./hero.json')
     <div class="shell">
       <section class="cta-band" id="ctaBg">
         <div class="cta-inner">
-          <div>
-            <div class="section-kicker">Final CTA</div>
-            <h2 style="margin:12px 0 0; font-size:clamp(34px, 5vw, 54px); line-height:1; letter-spacing:-.05em;">Use ascii-arter when you want static pages to feel like products.</h2>
-            <p class="muted-copy" style="margin-top:16px; max-width:720px;">Vaultflow is another proof that the same package can serve a very different category with only new JSON and copy choices.</p>
+          <div class="cta-copy">
+            <div class="section-kicker" style="color: rgba(255,255,255,0.72);">Final CTA</div>
+            <h2>Use ASCII motion where premium product marketing normally goes flat.</h2>
+            <p>Vaultflow proves the examples can diverge hard: one dashboard-like, one fintech-editorial — same package, same export flow.</p>
           </div>
-          <div class="cta-row">
-            <a class="btn btn-primary" href="../../?t=vaultflow-demo">Open editor</a>
-            <a class="btn btn-secondary" href="https://github.com/lowgame/Ascii-Arter/tree/main/examples/vaultflow">See demo files</a>
+          <div>
+            <div class="cta-row">
+              <a class="btn btn-primary" href="../../?t=vaultflow-fintech">Open editor</a>
+              <a class="btn btn-secondary" href="https://github.com/lowgame/Ascii-Arter/tree/main/examples/vaultflow">See demo files</a>
+            </div>
           </div>
         </div>
       </section>
@@ -274,29 +325,29 @@ fetch('./hero.json')
 
   <footer>
     <div class="shell footer-grid">
-      <div class="footer-card">
-        <div class="card-kicker">What this proves</div>
-        <h3 style="margin:10px 0 8px; font-size:28px; letter-spacing:-.04em;">Vaultflow proves the package can support premium fintech aesthetics without extra runtime complexity.</h3>
-        <p class="muted-copy">No framework lock-in, no API calls, just a static site with better motion and stronger first impression.</p>
-      </div>
-      <div class="footer-card">
-        <div class="card-kicker">Links</div>
-        <div class="footer-links" style="margin-top:14px;">
+      <article class="footer-card">
+        <div class="section-kicker">What this proves</div>
+        <h3>Vaultflow now feels like a finance brand page, not another dark SaaS clone.</h3>
+        <p>It borrows a lighter, more premium landing rhythm while still mounting the same exported JSON backgrounds with the same API.</p>
+      </article>
+      <article class="footer-card">
+        <div class="section-kicker">Links</div>
+        <div class="footer-links">
           <a href="../../examples/">All demos</a>
           <a href="../../">ASCII Arter editor</a>
           <a href="../../lib/README.md">Package README</a>
           <a href="https://github.com/lowgame/Ascii-Arter">GitHub repo</a>
         </div>
-      </div>
+      </article>
     </div>
   </footer>
 
   <script type="module">
     import AsciiBackground, { parseProjectData } from '../../lib/dist/ascii-arter.esm.js';
 
-    async function mountAscii(selector, path) {
-      const response = await fetch(path);
-      if (!response.ok) throw new Error(`Failed to load ${path}: ${response.status}`);
+    async function mountAscii(selector, file) {
+      const response = await fetch(file);
+      if (!response.ok) throw new Error(`Failed to load ${file}: ${response.status}`);
       const json = await response.text();
       const instance = AsciiBackground.mount(selector, parseProjectData(json));
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) instance.pause();

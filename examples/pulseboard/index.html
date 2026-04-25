@@ -5,112 +5,182 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PulseBoard — Product signals without dashboard chaos</title>
   <meta name="description" content="Static PulseBoard demo powered by ascii-arter animated backgrounds.">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #050812;
-      --bg-soft: #0b1020;
-      --surface: rgba(255,255,255,.04);
-      --border: rgba(255,255,255,.08);
-      --text: #f5f8ff;
-      --muted: #b4bfd4;
-      --subtle: #7f8aa3;
-      --accent: #5b8cff;
-      --accent-2: #66f0ff;
-      --ok: #7cf0bf;
-      --shadow: 0 24px 80px rgba(0,0,0,.34);
-      --radius: 24px;
-      --max: 1180px;
+      --bg: #08090a;
+      --panel: #0f1011;
+      --surface: #17181b;
+      --surface-2: #1e2024;
+      --border: rgba(255,255,255,0.08);
+      --border-soft: rgba(255,255,255,0.05);
+      --text: #f7f8f8;
+      --muted: #a4a9b6;
+      --subtle: #6a717d;
+      --accent: #5e6ad2;
+      --accent-2: #7f8cff;
+      --ok: #27a644;
+      --max: 1220px;
+      --shadow: rgba(0,0,0,0.45) 0 20px 80px;
     }
     * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
     body {
       margin: 0;
-      font-family: 'Inter', system-ui, sans-serif;
+      background: radial-gradient(circle at top, rgba(94,106,210,0.16), transparent 28%), linear-gradient(180deg, #08090a 0%, #050607 100%);
       color: var(--text);
-      background:
-        radial-gradient(circle at top, rgba(91, 140, 255, 0.18), transparent 34%),
-        radial-gradient(circle at 85% 10%, rgba(102, 240, 255, 0.14), transparent 28%),
-        linear-gradient(180deg, var(--bg) 0%, #05070b 100%);
+      font-family: 'Inter', system-ui, sans-serif;
+      font-feature-settings: 'cv01', 'ss03';
     }
     a { color: inherit; text-decoration: none; }
     .shell { width: min(var(--max), calc(100vw - 32px)); margin: 0 auto; }
-    .hero, .cta-band { position: relative; overflow: hidden; isolation: isolate; }
-    .hero::before, .cta-band::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(180deg, rgba(4,6,10,.15), rgba(4,6,10,.74));
-      pointer-events: none;
-      z-index: 1;
+    .hero-shell { min-height: 100vh; padding-bottom: 56px; }
+    .nav {
+      display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 24px 0;
     }
-    .hero-inner, .cta-inner { position: relative; z-index: 2; }
-    .nav { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:24px 0; }
-    .brand { display:inline-flex; align-items:center; gap:12px; font-weight:700; letter-spacing:-.02em; }
+    .brand { display: inline-flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 600; }
     .brand-mark {
-      width:34px; height:34px; border-radius:12px; display:grid; place-items:center; color:#fff;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      box-shadow: 0 14px 34px color-mix(in srgb, var(--accent) 42%, transparent);
+      width: 34px; height: 34px; border-radius: 12px; display: grid; place-items: center; color: white;
+      background: linear-gradient(135deg, var(--accent), #7b86ef);
+      box-shadow: rgba(94,106,210,0.35) 0 12px 32px;
     }
-    .nav-links { display:flex; gap:12px; flex-wrap:wrap; color: var(--muted); font-size:14px; }
+    .nav-links { display: flex; flex-wrap: wrap; gap: 12px; color: var(--muted); }
     .chip {
-      display:inline-flex; align-items:center; gap:8px; border-radius:999px; padding:9px 12px;
-      border: 1px solid var(--border); background: rgba(255,255,255,.04); backdrop-filter: blur(12px);
-      font-size:12px; color: var(--muted);
+      border: 1px solid var(--border-soft); background: rgba(255,255,255,0.02); padding: 10px 12px; border-radius: 999px; font-size: 12px;
     }
-    .chip::before { content:''; width:8px; height:8px; border-radius:999px; background: var(--accent-2); box-shadow:0 0 18px var(--accent-2); }
-    .hero-grid { display:grid; grid-template-columns:minmax(0,1.08fr) minmax(320px,.92fr); gap:24px; padding:40px 0 56px; align-items:stretch; }
+    .hero-grid {
+      display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(380px, 1.1fr); gap: 28px; align-items: center; padding-top: 38px;
+    }
     .eyebrow {
-      display:inline-flex; align-items:center; gap:10px; margin-bottom:18px; padding:8px 12px; border-radius:999px;
-      font-family:'JetBrains Mono', monospace; font-size:12px; color:#eef4ff;
-      background: color-mix(in srgb, var(--accent) 16%, transparent); border:1px solid color-mix(in srgb, var(--accent) 32%, transparent);
+      display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 999px;
+      font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #d7dcff;
+      background: rgba(94,106,210,0.12); border: 1px solid rgba(127,140,255,0.22);
     }
-    h1 { margin:0; max-width:10ch; font-size: clamp(52px, 8vw, 84px); line-height:.94; letter-spacing:-.06em; font-weight:800; }
-    .lede { margin:22px 0 0; max-width:620px; color:var(--muted); font-size:19px; line-height:1.7; }
-    .cta-row { display:flex; flex-wrap:wrap; gap:14px; margin-top:28px; }
-    .btn { height:48px; display:inline-flex; align-items:center; justify-content:center; gap:10px; padding:0 18px; border-radius:14px; font-weight:700; font-size:14px; letter-spacing:-.02em; }
-    .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color:#fff; box-shadow:0 18px 50px color-mix(in srgb, var(--accent) 28%, transparent); }
-    .btn-secondary { background: rgba(255,255,255,.04); border:1px solid var(--border); color: var(--text); }
-    .proof-row { display:flex; flex-wrap:wrap; gap:18px; margin-top:26px; color:var(--subtle); font-size:13px; }
-    .hero-card, .stat-card, .feature-card, .quote-card, .footer-card {
-      border-radius: var(--radius); border:1px solid var(--border); background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03)); backdrop-filter: blur(16px); box-shadow: var(--shadow);
+    h1 {
+      margin: 18px 0 0; max-width: 10ch; font-size: clamp(54px, 8vw, 82px); line-height: 0.94; letter-spacing: -0.06em; font-weight: 510;
     }
-    .hero-card { padding:22px; display:grid; gap:18px; }
-    .card-kicker, .section-kicker { font-family:'JetBrains Mono', monospace; text-transform:uppercase; letter-spacing:.08em; font-size:12px; color:#d9e3f1; }
-    .hero-card h2, .feature-card h3, .quote-card h3 { margin:0; font-size:22px; letter-spacing:-.03em; }
-    .muted-copy, .feature-card p, .quote-card p { margin:0; color:var(--muted); line-height:1.7; }
-    .stack-list { display:grid; gap:12px; }
-    .stack-item, .stat-row, .quote-line { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 15px; border-radius:16px; border:1px solid rgba(255,255,255,.07); background: rgba(255,255,255,.03); }
-    .ok-pill { display:inline-flex; align-items:center; gap:8px; padding:8px 10px; border-radius:999px; background: color-mix(in srgb, var(--ok) 13%, transparent); color: var(--ok); font-size:12px; border:1px solid color-mix(in srgb, var(--ok) 32%, transparent); }
-    .ok-pill::before { content:''; width:8px; height:8px; border-radius:999px; background: currentColor; box-shadow:0 0 18px currentColor; }
-    .code-box { border-radius:18px; border:1px solid rgba(255,255,255,.08); background: rgba(5,6,12,.78); padding:16px; font-family:'JetBrains Mono', monospace; font-size:12px; line-height:1.8; color:#dbe7ff; overflow:auto; }
-    section.content-section { padding:78px 0; border-bottom:1px solid rgba(255,255,255,.05); }
-    .section-head { display:flex; align-items:end; justify-content:space-between; gap:24px; margin-bottom:24px; }
-    .section-head h2 { margin:10px 0 0; font-size: clamp(32px, 5vw, 48px); line-height:1; letter-spacing:-.05em; }
-    .stats-grid, .features-grid, .quote-grid, .footer-grid { display:grid; gap:18px; }
-    .stats-grid { grid-template-columns:repeat(3, minmax(0, 1fr)); }
-    .features-grid { grid-template-columns:repeat(3, minmax(0, 1fr)); }
-    .quote-grid { grid-template-columns:repeat(2, minmax(0, 1fr)); }
-    .stat-card, .feature-card, .quote-card, .footer-card { padding:22px; }
-    .stat-value { font-size:clamp(30px, 4vw, 44px); line-height:1; font-weight:800; letter-spacing:-.05em; margin-top:12px; }
-    .feature-card ul { margin:14px 0 0; padding-left:18px; color:var(--muted); line-height:1.8; }
-    .cta-band { margin: 0 0 80px; border-radius: 28px; min-height: 280px; }
-    .cta-inner { min-height:280px; display:grid; align-content:center; gap:18px; padding:36px; }
-    .footer-grid { grid-template-columns:1.3fr .7fr; padding-bottom:72px; }
-    .footer-links { display:grid; gap:10px; color:var(--muted); }
-    @media (max-width: 980px) {
-      .hero-grid, .features-grid, .stats-grid, .quote-grid, .footer-grid { grid-template-columns:1fr; }
-      h1 { max-width:unset; }
-      .section-head { align-items:start; flex-direction:column; }
+    .lede { margin: 22px 0 0; color: var(--muted); font-size: 18px; line-height: 1.75; max-width: 560px; }
+    .cta-row { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 28px; }
+    .btn {
+      height: 48px; padding: 0 18px; display: inline-flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 14px; font-weight: 600;
+      border: 1px solid transparent;
+    }
+    .btn-primary { background: var(--accent); color: white; box-shadow: rgba(94,106,210,0.24) 0 16px 44px; }
+    .btn-secondary { background: rgba(255,255,255,0.03); border-color: var(--border); color: var(--text); }
+    .proof-row { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 24px; color: var(--subtle); font-size: 13px; }
+
+    .dashboard-shell {
+      position: relative; overflow: hidden; border-radius: 28px; border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(18,19,22,0.92), rgba(10,11,12,0.96));
+      box-shadow: var(--shadow); min-height: 680px;
+    }
+    .dashboard-shell::before {
+      content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 1;
+      background: linear-gradient(180deg, rgba(8,9,10,0.12), rgba(8,9,10,0.84));
+    }
+    .dashboard-inner { position: relative; z-index: 2; padding: 20px; }
+    .command-bar {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px;
+      border-radius: 14px; border: 1px solid var(--border-soft); background: rgba(255,255,255,0.03);
+      color: var(--muted); font-size: 13px;
+    }
+    .command-left { display: inline-flex; align-items: center; gap: 10px; }
+    .command-kbd { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #dfe3ff; padding: 4px 6px; border-radius: 6px; background: rgba(255,255,255,0.06); }
+    .dashboard-grid { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 16px; margin-top: 16px; }
+    .bento-grid {
+      display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px;
+    }
+    .bento-card, .feed-card, .workflow-card, .footer-card {
+      border-radius: 18px; border: 1px solid var(--border-soft); background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+    }
+    .bento-card { padding: 16px; min-height: 168px; }
+    .kicker {
+      font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #cfd5e6; text-transform: uppercase; letter-spacing: 0.08em;
+    }
+    .metric-value { margin-top: 18px; font-size: clamp(28px, 4vw, 42px); line-height: 1; letter-spacing: -0.05em; font-weight: 590; }
+    .metric-copy { margin-top: 10px; color: var(--muted); line-height: 1.7; font-size: 14px; }
+    .trend-pill {
+      display: inline-flex; align-items: center; gap: 8px; margin-top: 14px; padding: 8px 10px; border-radius: 999px;
+      background: rgba(39,166,68,0.12); color: #8fe7a3; border: 1px solid rgba(39,166,68,0.24); font-size: 12px;
+    }
+    .signal-feed { display: grid; gap: 14px; }
+    .feed-card { padding: 16px; }
+    .feed-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .feed-list { display: grid; gap: 10px; margin-top: 14px; }
+    .feed-item {
+      display: grid; gap: 6px; padding: 12px; border-radius: 14px; border: 1px solid var(--border-soft); background: rgba(255,255,255,0.02);
+    }
+    .feed-item strong { font-size: 14px; }
+    .feed-meta { color: var(--subtle); font-size: 12px; }
+    .mini-chart {
+      margin-top: 14px; height: 120px; border-radius: 14px; border: 1px solid var(--border-soft);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01)),
+        repeating-linear-gradient(90deg, rgba(255,255,255,0.05), rgba(255,255,255,0.05) 1px, transparent 1px, transparent 52px),
+        repeating-linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.04) 1px, transparent 1px, transparent 30px);
+      position: relative;
+    }
+    .mini-chart::after {
+      content: ''; position: absolute; left: 14px; right: 14px; bottom: 18px; height: 48px;
+      background: linear-gradient(180deg, rgba(94,106,210,0.18), transparent), linear-gradient(90deg, transparent 0%, rgba(127,140,255,0.7) 18%, rgba(127,140,255,0.24) 46%, rgba(94,106,210,0.95) 62%, rgba(39,166,68,0.8) 100%);
+      clip-path: polygon(0% 72%, 10% 68%, 22% 74%, 34% 48%, 46% 58%, 60% 30%, 72% 42%, 84% 18%, 100% 0, 100% 100%, 0 100%);
+      border-bottom-left-radius: 10px; border-bottom-right-radius: 10px;
+    }
+
+    .operators-section, .workflow-section { padding: 88px 0 0; }
+    .section-head { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 24px; }
+    .section-head h2 { margin: 10px 0 0; font-size: clamp(34px, 5vw, 50px); line-height: 0.98; letter-spacing: -0.05em; font-weight: 510; }
+    .section-copy { max-width: 540px; color: var(--muted); font-size: 16px; line-height: 1.7; }
+    .operator-strip {
+      display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 18px;
+    }
+    .operator-panel, .command-panel {
+      border-radius: 24px; border: 1px solid var(--border); background: rgba(255,255,255,0.03); box-shadow: var(--shadow);
+      padding: 22px;
+    }
+    .operator-panel { display: grid; gap: 16px; }
+    .operator-lane { display: grid; gap: 12px; }
+    .lane-row {
+      display: grid; grid-template-columns: 110px 1fr auto; align-items: center; gap: 12px;
+      padding: 12px 14px; border-radius: 14px; background: rgba(255,255,255,0.025); border: 1px solid var(--border-soft);
+    }
+    .lane-label { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--subtle); }
+    .lane-bar { height: 8px; border-radius: 999px; background: rgba(255,255,255,0.08); overflow: hidden; }
+    .lane-bar span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--accent), #8a95ff); }
+    .lane-value { font-size: 12px; color: var(--muted); }
+
+    .workflow-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+    .workflow-card { padding: 22px; }
+    .workflow-card h3 { margin: 12px 0 8px; font-size: 22px; letter-spacing: -0.03em; }
+    .workflow-card p { margin: 0; color: var(--muted); line-height: 1.7; }
+
+    .cta-band {
+      margin: 88px 0 80px; position: relative; overflow: hidden; border-radius: 28px; min-height: 280px;
+      border: 1px solid var(--border); background: linear-gradient(180deg, rgba(15,16,17,0.94), rgba(8,9,10,0.98)); box-shadow: var(--shadow);
+    }
+    .cta-band::before {
+      content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+      background: linear-gradient(180deg, rgba(8,9,10,0.1), rgba(8,9,10,0.78));
+    }
+    .cta-inner { position: relative; z-index: 2; min-height: 280px; display: grid; align-content: center; gap: 18px; padding: 36px; }
+    .cta-inner h2 { margin: 0; font-size: clamp(36px, 5vw, 56px); line-height: 0.98; letter-spacing: -0.05em; font-weight: 510; max-width: 12ch; }
+    .footer-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 18px; padding-bottom: 72px; }
+    .footer-card { padding: 22px; }
+    .footer-card h3 { margin: 10px 0 8px; font-size: 28px; line-height: 1.1; letter-spacing: -0.04em; }
+    .footer-card p, .footer-links { color: var(--muted); line-height: 1.7; }
+    .footer-links { display: grid; gap: 10px; margin-top: 14px; }
+    @media (max-width: 1024px) {
+      .hero-grid, .dashboard-grid, .operator-strip, .workflow-grid, .footer-grid { grid-template-columns: 1fr; }
+      h1, .cta-inner h2 { max-width: unset; }
+      .section-head { flex-direction: column; align-items: start; }
     }
   </style>
 </head>
-<body>
-  <header class="hero" id="heroBg">
-    <div class="shell hero-inner">
+<body data-demo-variant="linear-dark-dashboard">
+  <header class="hero-shell">
+    <div class="shell">
       <nav class="nav">
         <a class="brand" href="../../examples/">
-          <span class="brand-mark">#</span>
+          <span class="brand-mark">↗</span>
           <span>PulseBoard</span>
         </a>
         <div class="nav-links">
@@ -121,135 +191,145 @@
       </nav>
 
       <div class="hero-grid">
-        <div>
-          <div class="eyebrow">ascii-arter demo / product analytics landing</div>
+        <section>
+          <div class="eyebrow">@lowgame/ascii-arter / linear-style dashboard demo</div>
           <h1>See product signals before churn shows up.</h1>
-          <p class="lede">PulseBoard turns onboarding friction, sticky features, expansion moments and silent churn risk into one calm timeline your team can actually act on.</p>
+          <p class="lede">PulseBoard now reads like a product dashboard promo instead of a generic landing page. The motion sits inside a living operator surface, with signal cards, feed activity and dashboard blocks doing the heavy lifting.</p>
           <div class="cta-row">
-            <a class="btn btn-primary" href="#pricing">See live metrics</a>
-            <a class="btn btn-secondary" href="../../examples/">Browse examples</a>
+            <a class="btn btn-primary" href="#operators">Open signal wall</a>
+            <a class="btn btn-secondary" href="../../examples/">Browse all demos</a>
           </div>
           <div class="proof-row">
             <span>Onboarding drop-offs spotted 31% earlier</span>
             <span>•</span>
             <span>Weekly product review time cut in half</span>
             <span>•</span>
-            <span>Built with ascii-arter</span>
+            <span>Built with @lowgame/ascii-arter</span>
           </div>
-        </div>
+        </section>
 
-        <aside class="hero-card">
-          <div class="card-kicker">Why this page works</div>
-          <h2>A static site that still feels alive.</h2>
-          <p class="muted-copy">The UI is plain HTML + CSS. The motion layer comes from exported ascii-arter JSON files mounted behind the hero and CTA blocks.</p>
-          <div class="stack-list">
-            <div class="stack-item"><span>Signals unified</span><strong>12 feeds</strong></div>
-            <div class="stack-item"><span>Weekly report time</span><strong>-48%</strong></div>
-            <div class="stack-item"><span>First insight</span><strong>9 min</strong></div>
+        <section class="dashboard-shell" id="heroBg">
+          <div class="dashboard-inner">
+            <div class="command-bar">
+              <div class="command-left">
+                <span class="command-kbd">⌘ K</span>
+                <span>Jump to expansion, silent churn, onboarding friction…</span>
+              </div>
+              <span class="command-kbd">LIVE</span>
+            </div>
+
+            <div class="dashboard-grid">
+              <div class="bento-grid">
+                <article class="bento-card">
+                  <div class="kicker">Signal density</div>
+                  <div class="metric-value">84%</div>
+                  <p class="metric-copy">of new accounts hit their first sticky workflow after PM + CS share one decision surface.</p>
+                  <span class="trend-pill">↑ 22% more signal confidence</span>
+                </article>
+                <article class="bento-card">
+                  <div class="kicker">Review time</div>
+                  <div class="metric-value">-48%</div>
+                  <p class="metric-copy">Weekly product review time drops when usage, CRM and support drift stop living in separate tabs.</p>
+                </article>
+                <article class="bento-card">
+                  <div class="kicker">Moment to action</div>
+                  <div class="metric-value">14m</div>
+                  <p class="metric-copy">Median lag from “something is off” to routed follow-up on a high-value expansion account.</p>
+                </article>
+                <article class="bento-card">
+                  <div class="kicker">Timeline clarity</div>
+                  <div class="metric-value">12 feeds</div>
+                  <p class="metric-copy">Usage, invites, blockers, support friction and ownership signals translated into one readable queue.</p>
+                </article>
+              </div>
+
+              <aside class="signal-feed">
+                <article class="feed-card">
+                  <div class="feed-head">
+                    <div>
+                      <div class="kicker">Signal feed</div>
+                      <strong>Product + CS handoff lane</strong>
+                    </div>
+                    <span class="command-kbd">3 urgent</span>
+                  </div>
+                  <div class="feed-list">
+                    <div class="feed-item">
+                      <strong>Enterprise account stalled at step 2</strong>
+                      <span class="feed-meta">5 new invite attempts • no workflow publish • owner pinged</span>
+                    </div>
+                    <div class="feed-item">
+                      <strong>Champion invited 7 teammates in 48h</strong>
+                      <span class="feed-meta">Expansion score rising • send PMM playbook</span>
+                    </div>
+                    <div class="feed-item">
+                      <strong>Silent churn risk after support spike</strong>
+                      <span class="feed-meta">Usage velocity down • CS review scheduled</span>
+                    </div>
+                  </div>
+                  <div class="mini-chart"></div>
+                </article>
+              </aside>
+            </div>
           </div>
-          <span class="ok-pill">JSON scene mounted twice, no framework required</span>
-          <div class="code-box">import AsciiBackground, { parseProjectData } from '@lowgame/ascii-arter';
-
-fetch('./hero.json')
-  .then((res) => res.text())
-  .then((json) => AsciiBackground.mount('#heroBg', parseProjectData(json)));</div>
-        </aside>
+        </section>
       </div>
     </div>
   </header>
 
   <main>
-    <section class="content-section">
+    <section class="operators-section" id="operators">
       <div class="shell">
         <div class="section-head">
           <div>
-            <div class="section-kicker">What you get</div>
-            <h2>Quiet UI in front. Loud signal density behind it.</h2>
+            <div class="kicker">Operator view</div>
+            <h2>Less marketing-site polish. More living product surface.</h2>
           </div>
-          <p class="muted-copy" style="max-width:540px;">This demo is meant to show a believable SaaS landing page, not a toy. Content stays readable while the ASCII layer adds motion and personality.</p>
+          <p class="section-copy">PulseBoard is now deliberately different from the other demos: denser, darker, more product-shaped. It reads like a live workspace with motion under glass.</p>
         </div>
-        <div class="stats-grid">
-          <article class="stat-card">
-            <div class="card-kicker">Signal velocity</div>
-            <div class="stat-value">84%</div>
-            <p class="muted-copy">of new accounts hit aha moments after teams reorder first-run checklists.</p>
+
+        <div class="operator-strip">
+          <article class="operator-panel">
+            <div class="kicker">Team lanes</div>
+            <div class="operator-lane">
+              <div class="lane-row"><span class="lane-label">Onboarding</span><div class="lane-bar"><span style="width:72%"></span></div><span class="lane-value">72%</span></div>
+              <div class="lane-row"><span class="lane-label">Expansion</span><div class="lane-bar"><span style="width:58%"></span></div><span class="lane-value">58%</span></div>
+              <div class="lane-row"><span class="lane-label">Risk watch</span><div class="lane-bar"><span style="width:34%"></span></div><span class="lane-value">34%</span></div>
+              <div class="lane-row"><span class="lane-label">Support drag</span><div class="lane-bar"><span style="width:46%"></span></div><span class="lane-value">46%</span></div>
+            </div>
           </article>
-          <article class="stat-card">
-            <div class="card-kicker">Operator focus</div>
-            <div class="stat-value">2.3x</div>
-            <p class="muted-copy">faster triage once usage, CRM and support pings land in one feed.</p>
-          </article>
-          <article class="stat-card">
-            <div class="card-kicker">Time to action</div>
-            <div class="stat-value">14m</div>
-            <p class="muted-copy">from alert to routed follow-up for high-value expansion signals.</p>
+
+          <article class="command-panel operator-panel">
+            <div class="kicker">Why it feels different</div>
+            <p class="section-copy">Instead of repeating the same glossy SaaS blocks, this example leans into a dashboard promo layout: operator lanes, live queue cards and a dashboard shell as the main visual object.</p>
           </article>
         </div>
       </div>
     </section>
 
-    <section class="content-section">
+    <section class="workflow-section">
       <div class="shell">
         <div class="section-head">
           <div>
-            <div class="section-kicker">Three reasons</div>
-            <h2>Built for teams that hate dashboard sprawl</h2>
+            <div class="kicker">Three moves</div>
+            <h2>The showcase is now a different shape, not just a recolor.</h2>
           </div>
-          <p class="muted-copy" style="max-width:520px;">Three product stories, one pattern: clearer signal routing, less tab fatigue, better timing.</p>
+          <p class="section-copy">These cards explain the real difference: dashboard-first composition, denser interface rhythm and a less traditional landing-page silhouette.</p>
         </div>
-        <div class="features-grid">
-          <article class="feature-card">
-            <div class="card-kicker">01</div>
-            <h3>One timeline, not six tabs</h3>
-            <p>PM, CS and growth can read the same motion without jumping across tools.</p>
-            <ul>
-              <li>Feature adoption + CRM state in one pass</li>
-              <li>Fast enough for weekly operating reviews</li>
-            </ul>
+        <div class="workflow-grid">
+          <article class="workflow-card">
+            <div class="kicker">01</div>
+            <h3>Dashboard hero</h3>
+            <p>The hero is a live-looking signal board instead of another generic screenshot-on-the-right marketing card.</p>
           </article>
-          <article class="feature-card">
-            <div class="card-kicker">02</div>
-            <h3>Churn risk gets context</h3>
-            <p>Badges, silent accounts and support friction line up before the account is already gone.</p>
-            <ul>
-              <li>Drop-offs grouped by account segment</li>
-              <li>Playbooks trigger off real product behavior</li>
-            </ul>
+          <article class="workflow-card">
+            <div class="kicker">02</div>
+            <h3>Bento metrics</h3>
+            <p>The first visual rhythm comes from small operating cards, not feature-marketing paragraphs.</p>
           </article>
-          <article class="feature-card">
-            <div class="card-kicker">03</div>
-            <h3>Expansion feels less random</h3>
-            <p>Usage spikes and team invites become concrete moments to route, not vague hope.</p>
-            <ul>
-              <li>Surface champions before the contract review</li>
-              <li>Keep growth work visible without making UI noisy</li>
-            </ul>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section class="content-section" id="pricing">
-      <div class="shell">
-        <div class="section-head">
-          <div>
-            <div class="section-kicker">Social proof</div>
-            <h2>A believable package demo, not just a code snippet</h2>
-          </div>
-          <p class="muted-copy" style="max-width:520px;">Everything here is static, but it demonstrates how a brand site can still feel custom with exported ASCII motion.</p>
-        </div>
-        <div class="quote-grid">
-          <article class="quote-card">
-            <div class="card-kicker">Ops lead</div>
-            <h3>“This feels like a product brand, not a hacky canvas effect.”</h3>
-            <p>The motion stays behind the copy, so the page still reads like a normal SaaS site.</p>
-            <div class="quote-line"><span>Attention held</span><strong>+22%</strong></div>
-          </article>
-          <article class="quote-card">
-            <div class="card-kicker">Builder fit</div>
-            <h3>“I can copy this structure into a real marketing page.”</h3>
-            <p>Same package, same API, just different JSON scenes for each section.</p>
-            <div class="quote-line"><span>Time to first fork</span><strong>under 1h</strong></div>
+          <article class="workflow-card">
+            <div class="kicker">03</div>
+            <h3>Operator language</h3>
+            <p>Everything is written like a team workspace: lanes, queues, moments, follow-up and signal confidence.</p>
           </article>
         </div>
       </div>
@@ -258,13 +338,11 @@ fetch('./hero.json')
     <div class="shell">
       <section class="cta-band" id="ctaBg">
         <div class="cta-inner">
-          <div>
-            <div class="section-kicker">Final CTA</div>
-            <h2 style="margin:12px 0 0; font-size:clamp(34px, 5vw, 54px); line-height:1; letter-spacing:-.05em;">Ship a landing page with motion, without shipping a mess.</h2>
-            <p class="muted-copy" style="margin-top:16px; max-width:720px;">Use the editor to make the scene, export the JSON, then mount it anywhere. That is the entire trick.</p>
-          </div>
+          <div class="kicker">Final CTA</div>
+          <h2>Ship a dashboard-shaped landing page without shipping an actual app.</h2>
+          <p class="section-copy">PulseBoard is still static HTML. The feeling changes because the layout changes, not because the stack gets heavier.</p>
           <div class="cta-row">
-            <a class="btn btn-primary" href="../../?t=pulseboard-demo">Open editor</a>
+            <a class="btn btn-primary" href="../../?t=pulseboard-dashboard">Open editor</a>
             <a class="btn btn-secondary" href="https://github.com/lowgame/Ascii-Arter/tree/main/examples/pulseboard">See demo files</a>
           </div>
         </div>
@@ -274,29 +352,29 @@ fetch('./hero.json')
 
   <footer>
     <div class="shell footer-grid">
-      <div class="footer-card">
-        <div class="card-kicker">What this proves</div>
-        <h3 style="margin:10px 0 8px; font-size:28px; letter-spacing:-.04em;">PulseBoard shows how ascii-arter can sell a product, not just decorate a hero.</h3>
-        <p class="muted-copy">Two independent mounts, clean content hierarchy, static hosting, and no backend needed.</p>
-      </div>
-      <div class="footer-card">
-        <div class="card-kicker">Links</div>
-        <div class="footer-links" style="margin-top:14px;">
+      <article class="footer-card">
+        <div class="kicker">What this proves</div>
+        <h3>PulseBoard no longer feels like RelayStack’s sibling in a different shirt.</h3>
+        <p>It now has its own shape, rhythm and product language — while still using exported JSON scenes and the same package API.</p>
+      </article>
+      <article class="footer-card">
+        <div class="kicker">Links</div>
+        <div class="footer-links">
           <a href="../../examples/">All demos</a>
           <a href="../../">ASCII Arter editor</a>
           <a href="../../lib/README.md">Package README</a>
           <a href="https://github.com/lowgame/Ascii-Arter">GitHub repo</a>
         </div>
-      </div>
+      </article>
     </div>
   </footer>
 
   <script type="module">
     import AsciiBackground, { parseProjectData } from '../../lib/dist/ascii-arter.esm.js';
 
-    async function mountAscii(selector, path) {
-      const response = await fetch(path);
-      if (!response.ok) throw new Error(`Failed to load ${path}: ${response.status}`);
+    async function mountAscii(selector, file) {
+      const response = await fetch(file);
+      if (!response.ok) throw new Error(`Failed to load ${file}: ${response.status}`);
       const json = await response.text();
       const instance = AsciiBackground.mount(selector, parseProjectData(json));
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) instance.pause();
