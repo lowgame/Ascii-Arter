@@ -95,13 +95,19 @@ test('examples gallery lists all showcase demos and screenshot assets exist', as
   assert.match(galleryHtml, /RelayStack/);
   assert.match(galleryHtml, /PulseBoard/);
   assert.match(galleryHtml, /Vaultflow/);
+  assert.match(galleryHtml, /Chromawave/);
+  assert.match(galleryHtml, /OrbitDeck/);
   assert.match(galleryHtml, /Apple-style ASCII wave hero/i);
   assert.match(galleryHtml, /Your Company/i);
+  assert.match(galleryHtml, /colorful wave/i);
+  assert.match(galleryHtml, /floating product cards/i);
 
   for (const asset of [
     'assets/screenshots/relaystack-demo.png',
     'assets/screenshots/pulseboard-demo.png',
     'assets/screenshots/vaultflow-demo.png',
+    'assets/screenshots/chromawave-demo.png',
+    'assets/screenshots/orbitdeck-demo.png',
   ]) {
     assert.equal(existsSync(path.join(rootDir, asset)), true, `${asset} should exist`);
   }
@@ -127,6 +133,16 @@ for (const demo of [
     slug: 'vaultflow',
     title: 'Vaultflow — Treasury automation for lean finance teams',
     heroText: 'Move cash with less dashboard debt.',
+  },
+  {
+    slug: 'chromawave',
+    title: 'Chromawave — Colorful wave launch page',
+    heroText: 'Let color do the first sell.',
+  },
+  {
+    slug: 'orbitdeck',
+    title: 'OrbitDeck — Floating product cards on ASCII ribbons',
+    heroText: 'Show the product before the dashboard cliché.',
   },
 ]) {
   test(`${demo.slug} demo mounts ascii-arter backgrounds without console errors`, async () => {

@@ -14,6 +14,8 @@ Design a scene in the [ASCII Arter editor](https://lowgame.github.io/Ascii-Arter
   - RelayStack — Apple-style ASCII wave hero with **Your Company** front copy — https://lowgame.github.io/Ascii-Arter/examples/relaystack/
   - PulseBoard — https://lowgame.github.io/Ascii-Arter/examples/pulseboard/
   - Vaultflow — https://lowgame.github.io/Ascii-Arter/examples/vaultflow/
+  - Chromawave — colorful wave launch page with floating product cards — https://lowgame.github.io/Ascii-Arter/examples/chromawave/
+  - OrbitDeck — orbital ribbon layout with floating product cards — https://lowgame.github.io/Ascii-Arter/examples/orbitdeck/
 - Repository: https://github.com/lowgame/Ascii-Arter
 
 ## Why use it?
@@ -25,6 +27,7 @@ Design a scene in the [ASCII Arter editor](https://lowgame.github.io/Ascii-Arter
 - Includes helpers for loading and re-serializing project data
 - Good fit for hero sections, landing pages, splash screens, and interactive demos
 - Can power artistic Apple-style launch pages like the RelayStack **Your Company** wave demo
+- Also works for colorful wave pages and floating card layouts like Chromawave and OrbitDeck
 
 ## Install
 

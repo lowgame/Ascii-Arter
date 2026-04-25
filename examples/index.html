@@ -30,7 +30,7 @@
     .btn { height: 48px; display:inline-flex; align-items:center; justify-content:center; padding: 0 18px; border-radius: 14px; font-size: 14px; font-weight: 700; }
     .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); color:#fff; }
     .btn-secondary { background: rgba(255,255,255,.04); border:1px solid var(--border); }
-    .grid { display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; padding-bottom: 80px; }
+    .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; padding-bottom: 80px; }
     .card { border-radius: 24px; border:1px solid var(--border); background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03)); box-shadow: var(--shadow); overflow:hidden; }
     .card-image { aspect-ratio: 16/10; background: #0b0f18; }
     .card-image img { width:100%; height:100%; object-fit: cover; display:block; }
@@ -58,8 +58,8 @@
       </div>
       <div class="hero-copy">
         <div class="eyebrow">Static showcase pages built with exported JSON scenes</div>
-        <h1>Examples that range from artistic wave heroes to full product pages.</h1>
-        <p class="lede">Each page here is static HTML using the same <code>ascii-arter</code> package. Design in the editor, export JSON, then mount it behind an Apple-style <strong>Your Company</strong> hero, a dashboard promo, or a fintech landing page.</p>
+        <h1>Examples that range from artistic wave heroes to colorful motion-led product pages.</h1>
+        <p class="lede">Each page here is static HTML using the same <code>ascii-arter</code> package. Design in the editor, export JSON, then mount it behind an Apple-style <strong>Your Company</strong> hero, a colorful wave launch page, floating product cards, a dashboard promo, or a fintech landing page.</p>
         <div class="cta-row">
           <a class="btn btn-primary" href="../lib/README.md">See package docs</a>
           <a class="btn btn-secondary" href="https://www.npmjs.com/package/@lowgame/ascii-arter">npm package</a>
@@ -99,6 +99,30 @@
             <div class="card-links">
               <a class="mini-link" href="./vaultflow/">Open demo</a>
               <a class="mini-link" href="https://github.com/lowgame/Ascii-Arter/tree/main/examples/vaultflow">Source</a>
+            </div>
+          </div>
+        </article>
+        <article class="card">
+          <a class="card-image" href="./chromawave/"><img src="../assets/screenshots/chromawave-demo.png" alt="Chromawave example screenshot"></a>
+          <div class="card-body">
+            <div class="kicker">Colorful wave launch</div>
+            <h2>Chromawave</h2>
+            <p>A saturated colorful wave demo with floating product cards, ambient motion and no subject text mask inside the exported scene.</p>
+            <div class="card-links">
+              <a class="mini-link" href="./chromawave/">Open demo</a>
+              <a class="mini-link" href="https://github.com/lowgame/Ascii-Arter/tree/main/examples/chromawave">Source</a>
+            </div>
+          </div>
+        </article>
+        <article class="card">
+          <a class="card-image" href="./orbitdeck/"><img src="../assets/screenshots/orbitdeck-demo.png" alt="OrbitDeck example screenshot"></a>
+          <div class="card-body">
+            <div class="kicker">Floating product cards</div>
+            <h2>OrbitDeck</h2>
+            <p>An orbital ribbon layout where the ASCII layer lives behind stacked product cards instead of spelling the whole idea with one giant word.</p>
+            <div class="card-links">
+              <a class="mini-link" href="./orbitdeck/">Open demo</a>
+              <a class="mini-link" href="https://github.com/lowgame/Ascii-Arter/tree/main/examples/orbitdeck">Source</a>
             </div>
           </div>
         </article>

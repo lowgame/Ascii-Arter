@@ -172,3 +172,74 @@ test('Vaultflow uses a light fintech/editorial layout distinct from the dashboar
     if (browser) await browser.close();
   }
 });
+
+test('Chromawave uses a colorful wave-driven layout with product cards instead of text-mask theatrics', async () => {
+  let browser;
+  try {
+    await withStaticServer(async (port) => {
+      browser = await chromium.launch({ headless: true });
+      const page = await browser.newPage({ viewport: { width: 1440, height: 1800 } });
+      await page.goto(`http://127.0.0.1:${port}/examples/chromawave/`, { waitUntil: 'networkidle' });
+      await page.waitForFunction(() => document.documentElement.dataset.demoReady === 'true');
+      const info = await page.evaluate(() => ({
+        variant: document.body.dataset.demoVariant,
+        hasSpectrumHero: !!document.querySelector('.spectrum-hero'),
+        hasWaveCardStack: !!document.querySelector('.wave-card-stack'),
+        hasFloatingSwatches: !!document.querySelector('.floating-swatches'),
+        hasAppleHero: !!document.querySelector('.apple-hero'),
+        hasDashboardShell: !!document.querySelector('.dashboard-shell'),
+      }));
+
+      assert.equal(info.variant, 'spectral-colorwaves');
+      assert.equal(info.hasSpectrumHero, true);
+      assert.equal(info.hasWaveCardStack, true);
+      assert.equal(info.hasFloatingSwatches, true);
+      assert.equal(info.hasAppleHero, false);
+      assert.equal(info.hasDashboardShell, false);
+    });
+  } finally {
+    if (browser) await browser.close();
+  }
+});
+
+test('OrbitDeck uses an orbital ribbon layout with floating product cards', async () => {
+  let browser;
+  try {
+    await withStaticServer(async (port) => {
+      browser = await chromium.launch({ headless: true });
+      const page = await browser.newPage({ viewport: { width: 1440, height: 1800 } });
+      await page.goto(`http://127.0.0.1:${port}/examples/orbitdeck/`, { waitUntil: 'networkidle' });
+      await page.waitForFunction(() => document.documentElement.dataset.demoReady === 'true');
+      const info = await page.evaluate(() => ({
+        variant: document.body.dataset.demoVariant,
+        hasOrbitHero: !!document.querySelector('.orbit-hero'),
+        hasOrbitalCluster: !!document.querySelector('.orbital-cluster'),
+        hasOrbitalRibbon: !!document.querySelector('.orbital-ribbon'),
+        hasFintechHero: !!document.querySelector('.fintech-hero'),
+        hasHeroWordmark: !!document.querySelector('.hero-wordmark'),
+      }));
+
+      assert.equal(info.variant, 'orbital-card-ribbons');
+      assert.equal(info.hasOrbitHero, true);
+      assert.equal(info.hasOrbitalCluster, true);
+      assert.equal(info.hasOrbitalRibbon, true);
+      assert.equal(info.hasFintechHero, false);
+      assert.equal(info.hasHeroWordmark, false);
+    });
+  } finally {
+    if (browser) await browser.close();
+  }
+});
+
+test('Chromawave and OrbitDeck exported scenes rely on ambient motion instead of subject text masks', async () => {
+  const chromaHero = JSON.parse(await readFile(path.join(rootDir, 'examples/chromawave/hero.json'), 'utf8'));
+  const chromaCta = JSON.parse(await readFile(path.join(rootDir, 'examples/chromawave/cta.json'), 'utf8'));
+  const orbitHero = JSON.parse(await readFile(path.join(rootDir, 'examples/orbitdeck/hero.json'), 'utf8'));
+  const orbitCta = JSON.parse(await readFile(path.join(rootDir, 'examples/orbitdeck/cta.json'), 'utf8'));
+
+  for (const project of [chromaHero, chromaCta, orbitHero, orbitCta]) {
+    assert.equal(project.subject?.type, 'none');
+    assert.equal(project.subject?.text, '');
+    assert.equal(project.subject?.svgContent, '');
+  }
+});

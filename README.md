@@ -26,6 +26,16 @@ Apple-style ASCII wave hero with **Your Company** front copy, soft glass UI and 
 ### Vaultflow
 [![Vaultflow screenshot](assets/screenshots/vaultflow-demo.png)](https://lowgame.github.io/Ascii-Arter/examples/vaultflow/)
 
+### Chromawave
+[![Chromawave screenshot](assets/screenshots/chromawave-demo.png)](https://lowgame.github.io/Ascii-Arter/examples/chromawave/)
+
+Colorful wave launch page with floating product cards and ambient motion-only scenes.
+
+### OrbitDeck
+[![OrbitDeck screenshot](assets/screenshots/orbitdeck-demo.png)](https://lowgame.github.io/Ascii-Arter/examples/orbitdeck/)
+
+Orbital ribbon layout where the ASCII background supports stacked product cards instead of a text mask.
+
 ## Why this repo is interesting
 
 - **Pure static frontend** — no backend required
@@ -67,6 +77,8 @@ Apple-style ASCII wave hero with **Your Company** front copy, soft glass UI and 
 - `examples/relaystack/` — Apple-style ASCII wave hero starter with **Your Company** front copy
 - `examples/pulseboard/` — product analytics landing page demo
 - `examples/vaultflow/` — treasury automation landing page demo
+- `examples/chromawave/` — colorful wave launch page with floating product cards
+- `examples/orbitdeck/` — orbital ribbon landing page with stacked product cards
 - `assets/screenshots/` — README/demo screenshots
 
 ## Package quick start

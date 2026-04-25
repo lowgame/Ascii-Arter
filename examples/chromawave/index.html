@@ -1,0 +1,631 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chromawave — Colorful wave launch page</title>
+  <meta name="description" content="Chromawave example page powered by @lowgame/ascii-arter with colorful wave backgrounds and floating product cards.">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090515;
+      --bg-soft: #130928;
+      --surface: rgba(255,255,255,0.07);
+      --surface-strong: rgba(255,255,255,0.11);
+      --border: rgba(255,255,255,0.12);
+      --border-soft: rgba(255,255,255,0.08);
+      --text: #f8f8ff;
+      --muted: #cbc7e9;
+      --subtle: #9a96bf;
+      --max: 1200px;
+      --shadow: 0 24px 80px rgba(3, 2, 12, 0.42);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Inter', system-ui, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top, rgba(249, 93, 191, 0.14), transparent 24%),
+        radial-gradient(circle at 85% 18%, rgba(92, 238, 255, 0.14), transparent 18%),
+        linear-gradient(180deg, #090515 0%, #12081f 48%, #0f1324 100%);
+    }
+    a { color: inherit; text-decoration: none; }
+    .shell { width: min(var(--max), calc(100vw - 32px)); margin: 0 auto; }
+
+    .spectrum-hero {
+      position: relative;
+      min-height: 100vh;
+      padding-bottom: 68px;
+      overflow: hidden;
+    }
+    .spectrum-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(circle at 40% 14%, rgba(255,255,255,0.06), transparent 18%);
+      opacity: 0.7;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 26px 0 18px;
+      position: relative;
+      z-index: 3;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .brand-mark {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      color: white;
+      background: linear-gradient(135deg, #ff5ec4, #6ef4ff 62%, #ffd76d);
+      box-shadow: 0 16px 34px rgba(255, 94, 196, 0.28);
+    }
+    .nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .nav-pill,
+    .swatch {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 38px;
+      padding: 0 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border-soft);
+      background: rgba(255,255,255,0.04);
+      color: var(--muted);
+      font-size: 13px;
+      backdrop-filter: blur(14px);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 0.95fr) minmax(360px, 1.05fr);
+      gap: 28px;
+      align-items: center;
+      padding-top: 32px;
+      position: relative;
+      z-index: 2;
+    }
+    .eyebrow,
+    .section-kicker,
+    .metric-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.06);
+      color: #efe8ff;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .eyebrow::before,
+    .section-kicker::before,
+    .metric-tag::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #ff5ec4, #6ef4ff);
+      box-shadow: 0 0 18px rgba(110, 244, 255, 0.5);
+    }
+    h1 {
+      margin: 18px 0 0;
+      max-width: 10ch;
+      font-size: clamp(56px, 8vw, 90px);
+      line-height: 0.94;
+      letter-spacing: -0.07em;
+    }
+    .lede {
+      margin: 22px 0 0;
+      max-width: 580px;
+      color: var(--muted);
+      font-size: 19px;
+      line-height: 1.75;
+    }
+    .cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 28px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 50px;
+      padding: 0 18px;
+      border-radius: 14px;
+      border: 1px solid transparent;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #ff5ec4, #6ef4ff 58%, #ffd76d);
+      color: #14081e;
+      box-shadow: 0 20px 50px rgba(255, 94, 196, 0.2);
+    }
+    .btn-secondary {
+      background: rgba(255,255,255,0.04);
+      border-color: var(--border);
+      color: white;
+    }
+    .proof-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 22px;
+      color: var(--subtle);
+      font-size: 13px;
+    }
+    .floating-swatches {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 24px;
+    }
+    .swatch strong {
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      display: inline-block;
+    }
+
+    .wave-card-stack {
+      display: grid;
+      gap: 16px;
+    }
+    .hero-surface {
+      position: relative;
+      min-height: 640px;
+      border-radius: 32px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(16,10,30,0.88), rgba(10,11,24,0.94));
+      box-shadow: var(--shadow);
+      isolation: isolate;
+    }
+    .wave-stage,
+    .cta-stage {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+    }
+    .wave-stage::after,
+    .cta-stage::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(180deg, rgba(9,5,21,0.12), rgba(9,5,21,0.66));
+      z-index: 2;
+    }
+    .wave-stage canvas,
+    .cta-stage canvas {
+      opacity: 0.96;
+      filter: saturate(1.18) brightness(1.06);
+      mix-blend-mode: screen;
+    }
+    .surface-content {
+      position: relative;
+      z-index: 3;
+      padding: 20px;
+      display: grid;
+      gap: 16px;
+      min-height: 640px;
+      align-content: start;
+    }
+    .surface-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: #faf7ff;
+      backdrop-filter: blur(16px);
+      font-size: 13px;
+    }
+    .surface-mock {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 16px;
+      margin-top: auto;
+    }
+    .stage-panel,
+    .mini-panel,
+    .story-card,
+    .cta-band,
+    .footer-card {
+      border-radius: 24px;
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,0.11), rgba(255,255,255,0.05));
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+    .stage-panel {
+      padding: 20px;
+      min-height: 324px;
+      display: grid;
+      align-content: space-between;
+      gap: 18px;
+    }
+    .stage-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .stage-metric {
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+    .stage-metric strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 28px;
+      letter-spacing: -0.05em;
+    }
+    .chart-lines {
+      position: relative;
+      min-height: 144px;
+      border-radius: 18px;
+      overflow: hidden;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)),
+        repeating-linear-gradient(90deg, rgba(255,255,255,0.08), rgba(255,255,255,0.08) 1px, transparent 1px, transparent 64px),
+        repeating-linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.07) 1px, transparent 1px, transparent 36px);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+    .chart-lines::after {
+      content: '';
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: 14px;
+      height: 88px;
+      background: linear-gradient(90deg, #ff5ec4 0%, #8f67ff 32%, #56ecff 67%, #ffd76d 100%);
+      clip-path: polygon(0% 82%, 10% 70%, 24% 74%, 38% 48%, 56% 58%, 70% 18%, 84% 26%, 100% 0, 100% 100%, 0 100%);
+      opacity: 0.9;
+    }
+    .mini-column {
+      display: grid;
+      gap: 16px;
+    }
+    .mini-panel {
+      padding: 18px;
+    }
+    .mini-panel h3,
+    .story-card h3,
+    .footer-card h3 {
+      margin: 12px 0 8px;
+      font-size: 24px;
+      line-height: 1.08;
+      letter-spacing: -0.04em;
+    }
+    .mini-panel p,
+    .story-card p,
+    .story-card li,
+    .footer-card p,
+    .footer-links {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+    .stack-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .stack-chip {
+      display: grid;
+      gap: 6px;
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+    .stack-chip span { color: var(--subtle); font-size: 12px; }
+
+    .page-section {
+      padding: 86px 0 0;
+    }
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+    .section-head h2 {
+      margin: 12px 0 0;
+      font-size: clamp(36px, 5vw, 58px);
+      line-height: 0.96;
+      letter-spacing: -0.06em;
+    }
+    .section-copy {
+      max-width: 560px;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.75;
+    }
+    .story-grid,
+    .footer-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .story-card,
+    .footer-card {
+      padding: 22px;
+    }
+    .story-card ul {
+      margin: 14px 0 0;
+      padding-left: 18px;
+    }
+
+    .cta-band {
+      position: relative;
+      overflow: hidden;
+      min-height: 320px;
+      margin: 86px 0 78px;
+      background: linear-gradient(180deg, rgba(18,10,34,0.96), rgba(7,11,24,0.96));
+    }
+    .cta-content {
+      position: relative;
+      z-index: 3;
+      min-height: 320px;
+      display: grid;
+      align-content: center;
+      gap: 18px;
+      padding: 32px;
+    }
+    .cta-content h2 {
+      margin: 0;
+      max-width: 12ch;
+      font-size: clamp(38px, 5vw, 60px);
+      line-height: 0.96;
+      letter-spacing: -0.06em;
+    }
+    .cta-content p {
+      margin: 0;
+      max-width: 620px;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.75;
+    }
+
+    footer { padding-bottom: 72px; }
+    .footer-grid { grid-template-columns: 1.2fr 0.8fr; }
+    .footer-links {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    @media (max-width: 1080px) {
+      .hero-grid,
+      .surface-mock,
+      .story-grid,
+      .footer-grid { grid-template-columns: 1fr; }
+      .section-head { flex-direction: column; align-items: start; }
+      .stage-metrics,
+      .stack-row { grid-template-columns: 1fr; }
+      h1,
+      .cta-content h2 { max-width: unset; }
+    }
+
+    @media (max-width: 720px) {
+      .shell { width: min(var(--max), calc(100vw - 22px)); }
+      .nav { flex-direction: column; align-items: start; }
+      .surface-content,
+      .story-card,
+      .footer-card,
+      .cta-content { padding: 20px; }
+      .hero-surface { min-height: 560px; }
+      .surface-content { min-height: 560px; }
+    }
+  </style>
+</head>
+<body data-demo-variant="spectral-colorwaves">
+  <header class="spectrum-hero">
+    <div class="shell">
+      <nav class="nav">
+        <a class="brand" href="../../examples/">
+          <span class="brand-mark">✦</span>
+          <span>Chromawave</span>
+        </a>
+        <div class="nav-links">
+          <a class="nav-pill" href="../../examples/">Examples</a>
+          <a class="nav-pill" href="../../">Editor</a>
+          <a class="nav-pill" href="../../lib/README.md">Package docs</a>
+        </div>
+      </nav>
+
+      <div class="hero-grid">
+        <section>
+          <div class="eyebrow">@lowgame/ascii-arter / colorful wave demo</div>
+          <h1>Let color do the first sell.</h1>
+          <p class="lede">Chromawave is the opposite of the monochrome RelayStack hero. No text-mask gimmick inside the canvas — just ambient liquid motion, saturated wave layers and a foreground stack that feels like a real launch surface.</p>
+          <div class="cta-row">
+            <a class="btn btn-primary" href="#story">See the composition</a>
+            <a class="btn btn-secondary" href="../../examples/">Browse all demos</a>
+          </div>
+          <div class="floating-swatches">
+            <span class="swatch"><strong style="background:#ff5ec4"></strong> Sunset pink</span>
+            <span class="swatch"><strong style="background:#6ef4ff"></strong> Cyan surf</span>
+            <span class="swatch"><strong style="background:#ffd76d"></strong> Soft gold</span>
+          </div>
+          <div class="proof-row">
+            <span>Ambient motion only — no subject text mask</span>
+            <span>•</span>
+            <span>Color-first hero for launch pages</span>
+            <span>•</span>
+            <span>Static HTML + exported JSON</span>
+          </div>
+        </section>
+
+        <section class="wave-card-stack">
+          <div class="hero-surface">
+            <div id="heroBg" class="wave-stage" aria-hidden="true"></div>
+            <div class="surface-content">
+              <div class="surface-bar">
+                <span>Color system preview / live wave backdrop</span>
+                <span class="metric-tag">launch mode</span>
+              </div>
+
+              <div class="surface-mock">
+                <article class="stage-panel">
+                  <div>
+                    <div class="section-kicker">Palette pressure test</div>
+                    <h3>One animated background, three very different product beats.</h3>
+                  </div>
+                  <div class="stage-metrics">
+                    <div class="stage-metric"><span>Hero recall</span><strong>91%</strong></div>
+                    <div class="stage-metric"><span>CTA focus</span><strong>+27%</strong></div>
+                    <div class="stage-metric"><span>Time-to-wow</span><strong>2s</strong></div>
+                  </div>
+                  <div class="chart-lines"></div>
+                </article>
+
+                <div class="mini-column">
+                  <article class="mini-panel">
+                    <div class="section-kicker">Foreground shapes</div>
+                    <h3>Cards over waves, not words inside waves.</h3>
+                    <p>Each panel uses normal HTML so the background remains reusable behind real product blocks, screenshots and pricing cards.</p>
+                  </article>
+                  <article class="mini-panel">
+                    <div class="section-kicker">Stack</div>
+                    <div class="stack-row">
+                      <div class="stack-chip"><strong>Hero scene</strong><span>Wavefield + tidal scan + kaleido</span></div>
+                      <div class="stack-chip"><strong>CTA scene</strong><span>Prism shift + plasma wave</span></div>
+                    </div>
+                  </article>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="page-section" id="story">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <div class="section-kicker">Why this one exists</div>
+            <h2>More randomized motion, less “big masked word in the middle”.</h2>
+          </div>
+          <p class="section-copy">This demo answers the exact need for richer showcase variety: colorful background waves, layered motion, floating product surfaces and no dependency on subject text in the scene itself.</p>
+        </div>
+        <div class="story-grid">
+          <article class="story-card">
+            <div class="section-kicker">01</div>
+            <h3>Color carries the mood</h3>
+            <p>Instead of a monochrome art direction, Chromawave leans into candy, aurora and ocean palettes so the first screen feels lively before a screenshot even shows up.</p>
+          </article>
+          <article class="story-card">
+            <div class="section-kicker">02</div>
+            <h3>No text-only canvas trick</h3>
+            <p>The exported JSON uses ambient motion only. The product story lives in cards, metrics and layout — exactly how a real landing page would use the package.</p>
+            <ul>
+              <li>Hero JSON subject type = none</li>
+              <li>CTA JSON subject type = none</li>
+              <li>Foreground remains pure HTML/CSS</li>
+            </ul>
+          </article>
+          <article class="story-card">
+            <div class="section-kicker">03</div>
+            <h3>Easy to remix</h3>
+            <p>Open the editor, swap palettes and layer modes, export again, then keep the same page shell. It’s a useful starter for consumer brands and colorful SaaS launches alike.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <div class="shell">
+      <section class="cta-band">
+        <div id="ctaBg" class="cta-stage" aria-hidden="true"></div>
+        <div class="cta-content">
+          <div class="section-kicker">Final CTA</div>
+          <h2>Build the page first. Let the ASCII motion carry the atmosphere.</h2>
+          <p>Chromawave is a good pattern when you want something more visual than a dashboard hero but still usable in a real product landing. The scene stays alive while the layout stays simple.</p>
+          <div class="cta-row">
+            <a class="btn btn-primary" href="../../">Open editor</a>
+            <a class="btn btn-secondary" href="https://github.com/lowgame/Ascii-Arter/tree/main/examples/chromawave">View source</a>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <div class="shell footer-grid">
+      <article class="footer-card">
+        <div class="section-kicker">What this proves</div>
+        <h3>@lowgame/ascii-arter can do saturated, playful launch pages too.</h3>
+        <p>You are not limited to monochrome Apple-ish heroes or dark dashboards. The same package can drive colorful wave-led brand pages with mock cards layered on top.</p>
+      </article>
+      <article class="footer-card">
+        <div class="section-kicker">Links</div>
+        <div class="footer-links">
+          <a href="../../examples/">All demos</a>
+          <a href="../../">ASCII Arter editor</a>
+          <a href="../../lib/README.md">Package README</a>
+          <a href="https://github.com/lowgame/Ascii-Arter">GitHub repo</a>
+        </div>
+      </article>
+    </div>
+  </footer>
+
+  <script type="module">
+    import AsciiBackground, { parseProjectData } from '../../lib/dist/ascii-arter.esm.js';
+
+    async function mountAscii(selector, file) {
+      const response = await fetch(file);
+      if (!response.ok) throw new Error(`Failed to load ${file}: ${response.status}`);
+      const json = await response.text();
+      const instance = AsciiBackground.mount(selector, parseProjectData(json));
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) instance.pause();
+      return instance;
+    }
+
+    Promise.all([
+      mountAscii('#heroBg', './hero.json'),
+      mountAscii('#ctaBg', './cta.json')
+    ]).then(([hero, cta]) => {
+      window.__demoInstances = { hero, cta };
+      document.documentElement.dataset.demoReady = 'true';
+    }).catch((error) => {
+      console.error('Chromawave demo failed', error);
+      document.documentElement.dataset.demoReady = 'error';
+    });
+  </script>
+</body>
+</html>

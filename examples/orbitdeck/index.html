@@ -1,0 +1,663 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OrbitDeck — Floating product cards on ASCII ribbons</title>
+  <meta name="description" content="OrbitDeck example page powered by @lowgame/ascii-arter with orbital ribbons and floating product cards.">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #050813;
+      --bg-soft: #0d1330;
+      --surface: rgba(255,255,255,0.06);
+      --surface-strong: rgba(255,255,255,0.1);
+      --border: rgba(255,255,255,0.12);
+      --border-soft: rgba(255,255,255,0.08);
+      --text: #f5f8ff;
+      --muted: #c0c8de;
+      --subtle: #93a0bf;
+      --max: 1220px;
+      --shadow: 0 28px 84px rgba(2, 3, 12, 0.46);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Inter', system-ui, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top, rgba(109, 236, 255, 0.1), transparent 24%),
+        radial-gradient(circle at 82% 18%, rgba(137, 102, 255, 0.12), transparent 20%),
+        linear-gradient(180deg, #050813 0%, #090d1b 44%, #111a2d 100%);
+    }
+    a { color: inherit; text-decoration: none; }
+    .shell { width: min(var(--max), calc(100vw - 32px)); margin: 0 auto; }
+
+    .orbit-hero {
+      position: relative;
+      min-height: 100vh;
+      padding-bottom: 74px;
+      overflow: hidden;
+    }
+    .orbit-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(circle at 35% 14%, rgba(255,255,255,0.05), transparent 16%);
+      opacity: 0.8;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 26px 0 18px;
+      position: relative;
+      z-index: 3;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .brand-mark {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #80e8ff, #8f66ff 68%, #ff84d3);
+      color: white;
+      box-shadow: 0 14px 34px rgba(128, 232, 255, 0.18);
+    }
+    .nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .nav-pill,
+    .stat-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 38px;
+      padding: 0 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border-soft);
+      background: rgba(255,255,255,0.04);
+      color: var(--muted);
+      font-size: 13px;
+      backdrop-filter: blur(14px);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(380px, 1.1fr);
+      gap: 28px;
+      align-items: center;
+      padding-top: 36px;
+      position: relative;
+      z-index: 2;
+    }
+    .eyebrow,
+    .section-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.06);
+      color: #e9f3ff;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .eyebrow::before,
+    .section-kicker::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #80e8ff, #8f66ff);
+      box-shadow: 0 0 18px rgba(128, 232, 255, 0.46);
+    }
+    h1 {
+      margin: 18px 0 0;
+      max-width: 11ch;
+      font-size: clamp(54px, 8vw, 88px);
+      line-height: 0.95;
+      letter-spacing: -0.07em;
+    }
+    .lede {
+      margin: 22px 0 0;
+      max-width: 600px;
+      color: var(--muted);
+      font-size: 19px;
+      line-height: 1.75;
+    }
+    .cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 28px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 50px;
+      padding: 0 18px;
+      border-radius: 14px;
+      border: 1px solid transparent;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #80e8ff, #8f66ff 64%, #ff84d3);
+      color: #0b1020;
+      box-shadow: 0 18px 44px rgba(128, 232, 255, 0.16);
+    }
+    .btn-secondary {
+      background: rgba(255,255,255,0.04);
+      border-color: var(--border);
+      color: white;
+    }
+    .proof-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 24px;
+      color: var(--subtle);
+      font-size: 13px;
+    }
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    .orbital-stage {
+      position: relative;
+      min-height: 690px;
+      border-radius: 34px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(11,14,28,0.94), rgba(8,11,22,0.98));
+      box-shadow: var(--shadow);
+      isolation: isolate;
+    }
+    #heroBg,
+    #ctaBg {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+    }
+    #heroBg::after,
+    #ctaBg::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(180deg, rgba(5,8,19,0.16), rgba(5,8,19,0.72));
+      z-index: 2;
+    }
+    #heroBg canvas,
+    #ctaBg canvas {
+      opacity: 0.94;
+      filter: saturate(1.08) brightness(1.04);
+      mix-blend-mode: screen;
+    }
+    .orbital-ribbon {
+      position: absolute;
+      border-radius: 999px;
+      filter: blur(0.3px);
+      z-index: 2;
+      opacity: 0.9;
+      pointer-events: none;
+    }
+    .ribbon-a {
+      width: 340px;
+      height: 340px;
+      right: -70px;
+      top: -46px;
+      border: 1px solid rgba(128,232,255,0.22);
+      background: radial-gradient(circle at 30% 30%, rgba(128,232,255,0.14), transparent 58%);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.03);
+    }
+    .ribbon-b {
+      width: 520px;
+      height: 220px;
+      left: -90px;
+      bottom: 40px;
+      transform: rotate(-18deg);
+      border: 1px solid rgba(143,102,255,0.16);
+      background: linear-gradient(90deg, rgba(128,232,255,0.08), rgba(143,102,255,0.16), rgba(255,132,211,0.12));
+    }
+    .stage-content {
+      position: relative;
+      z-index: 3;
+      min-height: 690px;
+      padding: 20px;
+      display: grid;
+      align-content: space-between;
+      gap: 18px;
+    }
+    .stage-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.07);
+      color: #edf4ff;
+      backdrop-filter: blur(16px);
+      font-size: 13px;
+    }
+
+    .orbital-cluster {
+      position: relative;
+      min-height: 500px;
+    }
+    .card,
+    .story-card,
+    .cta-band,
+    .footer-card {
+      border-radius: 24px;
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+    .hero-card {
+      position: absolute;
+      inset: 68px 32px 40px 32px;
+      padding: 22px;
+      display: grid;
+      gap: 18px;
+    }
+    .hero-card h3,
+    .float-card h3,
+    .story-card h3,
+    .footer-card h3 {
+      margin: 12px 0 8px;
+      font-size: 24px;
+      line-height: 1.08;
+      letter-spacing: -0.04em;
+    }
+    .hero-card p,
+    .float-card p,
+    .story-card p,
+    .story-card li,
+    .footer-card p,
+    .footer-links {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+    .float-card {
+      position: absolute;
+      width: 220px;
+      padding: 18px;
+    }
+    .float-top {
+      right: 0;
+      top: 26px;
+    }
+    .float-bottom {
+      left: 6px;
+      bottom: 0;
+    }
+    .mini-ledger {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .mini-ledger div {
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+    .mini-ledger strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 28px;
+      letter-spacing: -0.05em;
+    }
+    .path-lines {
+      display: grid;
+      gap: 12px;
+    }
+    .path-row {
+      display: grid;
+      grid-template-columns: 110px 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+    .path-row span:last-child { color: var(--subtle); font-size: 12px; }
+    .path-bar {
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      overflow: hidden;
+    }
+    .path-bar b {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #80e8ff, #8f66ff 70%, #ff84d3);
+    }
+    .orbit-grid {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .orbit-chip {
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+    .orbit-chip strong { display: block; margin-bottom: 6px; }
+
+    .page-section {
+      padding: 88px 0 0;
+    }
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+    .section-head h2 {
+      margin: 12px 0 0;
+      font-size: clamp(36px, 5vw, 56px);
+      line-height: 0.96;
+      letter-spacing: -0.06em;
+    }
+    .section-copy {
+      max-width: 560px;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.75;
+    }
+    .story-grid,
+    .footer-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .story-card,
+    .footer-card {
+      padding: 22px;
+    }
+    .story-card ul {
+      margin: 14px 0 0;
+      padding-left: 18px;
+    }
+
+    .cta-band {
+      position: relative;
+      overflow: hidden;
+      min-height: 320px;
+      margin: 88px 0 78px;
+      background: linear-gradient(180deg, rgba(11,14,28,0.96), rgba(7,10,22,0.98));
+    }
+    .cta-content {
+      position: relative;
+      z-index: 3;
+      min-height: 320px;
+      display: grid;
+      align-content: center;
+      gap: 18px;
+      padding: 32px;
+    }
+    .cta-content h2 {
+      margin: 0;
+      max-width: 12ch;
+      font-size: clamp(38px, 5vw, 60px);
+      line-height: 0.96;
+      letter-spacing: -0.06em;
+    }
+    .cta-content p {
+      margin: 0;
+      max-width: 620px;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.75;
+    }
+
+    footer { padding-bottom: 72px; }
+    .footer-grid { grid-template-columns: 1.2fr 0.8fr; }
+    .footer-links {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    @media (max-width: 1120px) {
+      .hero-grid,
+      .story-grid,
+      .footer-grid { grid-template-columns: 1fr; }
+      .section-head { flex-direction: column; align-items: start; }
+      .mini-ledger { grid-template-columns: 1fr; }
+      h1,
+      .cta-content h2 { max-width: unset; }
+      .hero-card { position: relative; inset: auto; }
+      .float-card { position: relative; width: auto; inset: auto !important; }
+      .orbital-cluster { display: grid; gap: 16px; min-height: auto; }
+      .orbital-stage { min-height: auto; }
+      .stage-content { min-height: auto; }
+    }
+
+    @media (max-width: 720px) {
+      .shell { width: min(var(--max), calc(100vw - 22px)); }
+      .nav { flex-direction: column; align-items: start; }
+      .stage-content,
+      .hero-card,
+      .float-card,
+      .story-card,
+      .footer-card,
+      .cta-content { padding: 20px; }
+      .path-row { grid-template-columns: 1fr; }
+      .ribbon-a,
+      .ribbon-b { opacity: 0.5; }
+    }
+  </style>
+</head>
+<body data-demo-variant="orbital-card-ribbons">
+  <header class="orbit-hero">
+    <div class="shell">
+      <nav class="nav">
+        <a class="brand" href="../../examples/">
+          <span class="brand-mark">◎</span>
+          <span>OrbitDeck</span>
+        </a>
+        <div class="nav-links">
+          <a class="nav-pill" href="../../examples/">Examples</a>
+          <a class="nav-pill" href="../../">Editor</a>
+          <a class="nav-pill" href="../../lib/README.md">Package docs</a>
+        </div>
+      </nav>
+
+      <div class="hero-grid">
+        <section>
+          <div class="eyebrow">@lowgame/ascii-arter / orbital product-card demo</div>
+          <h1>Show the product before the dashboard cliché.</h1>
+          <p class="lede">OrbitDeck treats the ASCII layer like moving ribbons behind a product stack. No giant word stamped inside the canvas — just orbital motion, floating cards and enough structure to feel like a real launch page.</p>
+          <div class="cta-row">
+            <a class="btn btn-primary" href="#story">See the layout</a>
+            <a class="btn btn-secondary" href="../../examples/">Browse all demos</a>
+          </div>
+          <div class="pill-row">
+            <span class="stat-pill">Orbital ribbons</span>
+            <span class="stat-pill">Ambient JSON scenes</span>
+            <span class="stat-pill">Foreground card cluster</span>
+          </div>
+          <div class="proof-row">
+            <span>Built for product stories, not just hero slogans</span>
+            <span>•</span>
+            <span>Scene subject type stays none</span>
+            <span>•</span>
+            <span>Static HTML + exported JSON</span>
+          </div>
+        </section>
+
+        <section class="orbital-stage">
+          <div id="heroBg" aria-hidden="true"></div>
+          <div class="orbital-ribbon ribbon-a" aria-hidden="true"></div>
+          <div class="orbital-ribbon ribbon-b" aria-hidden="true"></div>
+          <div class="stage-content">
+            <div class="stage-topbar">
+              <span>OrbitDeck / floating preview cluster</span>
+              <span class="section-kicker">preview live</span>
+            </div>
+
+            <div class="orbital-cluster">
+              <article class="card hero-card">
+                <div>
+                  <div class="section-kicker">Primary surface</div>
+                  <h3>A product panel with motion behind it, not inside it.</h3>
+                </div>
+                <div class="mini-ledger">
+                  <div><span>Activation</span><strong>78%</strong></div>
+                  <div><span>Recall</span><strong>+31%</strong></div>
+                  <div><span>Noise</span><strong>Low</strong></div>
+                </div>
+                <div class="path-lines">
+                  <div class="path-row"><span>Hero focus</span><div class="path-bar"><b style="width:88%"></b></div><span>clear</span></div>
+                  <div class="path-row"><span>Card contrast</span><div class="path-bar"><b style="width:74%"></b></div><span>balanced</span></div>
+                  <div class="path-row"><span>Motion depth</span><div class="path-bar"><b style="width:82%"></b></div><span>alive</span></div>
+                </div>
+              </article>
+
+              <article class="card float-card float-top">
+                <div class="section-kicker">Secondary card</div>
+                <h3>Three small cards can say more than one huge word.</h3>
+                <p>Use the package behind product artifacts, launch checklists and pricing blocks — not only behind headlines.</p>
+              </article>
+
+              <article class="card float-card float-bottom">
+                <div class="section-kicker">Orbit chips</div>
+                <div class="orbit-grid">
+                  <div class="orbit-chip"><strong>Ribbon scene</strong><span>orbital weave + ripple pond</span></div>
+                  <div class="orbit-chip"><strong>CTA scene</strong><span>byte orbit + aurora noise</span></div>
+                </div>
+              </article>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="page-section" id="story">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <div class="section-kicker">Why this one exists</div>
+            <h2>Another answer to “give me more examples, not just text.”</h2>
+          </div>
+          <p class="section-copy">OrbitDeck uses ambient orbital motion and floating interface blocks so the page feels more like a product launch composition than a background with a masked label dropped on it.</p>
+        </div>
+        <div class="story-grid">
+          <article class="story-card">
+            <div class="section-kicker">01</div>
+            <h3>Motion behaves like ribbon lighting</h3>
+            <p>The ASCII scene is tuned to read like curved ribbons and orbit traces, giving the page depth without taking over the layout.</p>
+          </article>
+          <article class="story-card">
+            <div class="section-kicker">02</div>
+            <h3>Cards tell the product story</h3>
+            <p>Instead of relying on a text-mask subject, the foreground uses real UI blocks, stats and chips. That makes the demo closer to a realistic launch page.</p>
+            <ul>
+              <li>Hero JSON subject type = none</li>
+              <li>CTA JSON subject type = none</li>
+              <li>Foreground still fully static-hosting friendly</li>
+            </ul>
+          </article>
+          <article class="story-card">
+            <div class="section-kicker">03</div>
+            <h3>Easy pattern to remix</h3>
+            <p>Swap the copy, change the card content, keep the mount zones and export fresh JSON scenes whenever you want different motion language.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <div class="shell">
+      <section class="cta-band">
+        <div id="ctaBg" aria-hidden="true"></div>
+        <div class="cta-content">
+          <div class="section-kicker">Final CTA</div>
+          <h2>Use the ASCII layer like a material behind real product blocks.</h2>
+          <p>OrbitDeck is for the moments when you want motion-rich pages without turning the canvas itself into the headline. Build cards, panels and pricing first — then let the orbital scene make them feel more alive.</p>
+          <div class="cta-row">
+            <a class="btn btn-primary" href="../../">Open editor</a>
+            <a class="btn btn-secondary" href="https://github.com/lowgame/Ascii-Arter/tree/main/examples/orbitdeck">View source</a>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <div class="shell footer-grid">
+      <article class="footer-card">
+        <div class="section-kicker">What this proves</div>
+        <h3>The package can support richer product-card choreography too.</h3>
+        <p>Not every example needs a giant wordmark or a dashboard shell. OrbitDeck shows a middle ground: moving depth in the back, floating launch artifacts in the front.</p>
+      </article>
+      <article class="footer-card">
+        <div class="section-kicker">Links</div>
+        <div class="footer-links">
+          <a href="../../examples/">All demos</a>
+          <a href="../../">ASCII Arter editor</a>
+          <a href="../../lib/README.md">Package README</a>
+          <a href="https://github.com/lowgame/Ascii-Arter">GitHub repo</a>
+        </div>
+      </article>
+    </div>
+  </footer>
+
+  <script type="module">
+    import AsciiBackground, { parseProjectData } from '../../lib/dist/ascii-arter.esm.js';
+
+    async function mountAscii(selector, file) {
+      const response = await fetch(file);
+      if (!response.ok) throw new Error(`Failed to load ${file}: ${response.status}`);
+      const json = await response.text();
+      const instance = AsciiBackground.mount(selector, parseProjectData(json));
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) instance.pause();
+      return instance;
+    }
+
+    Promise.all([
+      mountAscii('#heroBg', './hero.json'),
+      mountAscii('#ctaBg', './cta.json')
+    ]).then(([hero, cta]) => {
+      window.__demoInstances = { hero, cta };
+      document.documentElement.dataset.demoReady = 'true';
+    }).catch((error) => {
+      console.error('OrbitDeck demo failed', error);
+      document.documentElement.dataset.demoReady = 'error';
+    });
+  </script>
+</body>
+</html>
