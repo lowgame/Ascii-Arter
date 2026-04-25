@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vaultflow — Treasury automation for lean finance teams</title>
+  <meta name="description" content="Static Vaultflow demo powered by ascii-arter animated backgrounds.">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #08070f;
+      --bg-soft: #110d1c;
+      --surface: rgba(255,255,255,.04);
+      --border: rgba(255,255,255,.08);
+      --text: #faf7ff;
+      --muted: #c1b7d6;
+      --subtle: #8e82a7;
+      --accent: #b06cff;
+      --accent-2: #ff8b6b;
+      --ok: #ffd36d;
+      --shadow: 0 24px 80px rgba(0,0,0,.34);
+      --radius: 24px;
+      --max: 1180px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: 'Inter', system-ui, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top, rgba(176, 108, 255, 0.2), transparent 34%),
+        radial-gradient(circle at 85% 10%, rgba(255, 139, 107, 0.14), transparent 28%),
+        linear-gradient(180deg, var(--bg) 0%, #05070b 100%);
+    }
+    a { color: inherit; text-decoration: none; }
+    .shell { width: min(var(--max), calc(100vw - 32px)); margin: 0 auto; }
+    .hero, .cta-band { position: relative; overflow: hidden; isolation: isolate; }
+    .hero::before, .cta-band::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(4,6,10,.15), rgba(4,6,10,.74));
+      pointer-events: none;
+      z-index: 1;
+    }
+    .hero-inner, .cta-inner { position: relative; z-index: 2; }
+    .nav { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:24px 0; }
+    .brand { display:inline-flex; align-items:center; gap:12px; font-weight:700; letter-spacing:-.02em; }
+    .brand-mark {
+      width:34px; height:34px; border-radius:12px; display:grid; place-items:center; color:#fff;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 14px 34px color-mix(in srgb, var(--accent) 42%, transparent);
+    }
+    .nav-links { display:flex; gap:12px; flex-wrap:wrap; color: var(--muted); font-size:14px; }
+    .chip {
+      display:inline-flex; align-items:center; gap:8px; border-radius:999px; padding:9px 12px;
+      border: 1px solid var(--border); background: rgba(255,255,255,.04); backdrop-filter: blur(12px);
+      font-size:12px; color: var(--muted);
+    }
+    .chip::before { content:''; width:8px; height:8px; border-radius:999px; background: var(--accent-2); box-shadow:0 0 18px var(--accent-2); }
+    .hero-grid { display:grid; grid-template-columns:minmax(0,1.08fr) minmax(320px,.92fr); gap:24px; padding:40px 0 56px; align-items:stretch; }
+    .eyebrow {
+      display:inline-flex; align-items:center; gap:10px; margin-bottom:18px; padding:8px 12px; border-radius:999px;
+      font-family:'JetBrains Mono', monospace; font-size:12px; color:#eef4ff;
+      background: color-mix(in srgb, var(--accent) 16%, transparent); border:1px solid color-mix(in srgb, var(--accent) 32%, transparent);
+    }
+    h1 { margin:0; max-width:10ch; font-size: clamp(52px, 8vw, 84px); line-height:.94; letter-spacing:-.06em; font-weight:800; }
+    .lede { margin:22px 0 0; max-width:620px; color:var(--muted); font-size:19px; line-height:1.7; }
+    .cta-row { display:flex; flex-wrap:wrap; gap:14px; margin-top:28px; }
+    .btn { height:48px; display:inline-flex; align-items:center; justify-content:center; gap:10px; padding:0 18px; border-radius:14px; font-weight:700; font-size:14px; letter-spacing:-.02em; }
+    .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color:#fff; box-shadow:0 18px 50px color-mix(in srgb, var(--accent) 28%, transparent); }
+    .btn-secondary { background: rgba(255,255,255,.04); border:1px solid var(--border); color: var(--text); }
+    .proof-row { display:flex; flex-wrap:wrap; gap:18px; margin-top:26px; color:var(--subtle); font-size:13px; }
+    .hero-card, .stat-card, .feature-card, .quote-card, .footer-card {
+      border-radius: var(--radius); border:1px solid var(--border); background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03)); backdrop-filter: blur(16px); box-shadow: var(--shadow);
+    }
+    .hero-card { padding:22px; display:grid; gap:18px; }
+    .card-kicker, .section-kicker { font-family:'JetBrains Mono', monospace; text-transform:uppercase; letter-spacing:.08em; font-size:12px; color:#d9e3f1; }
+    .hero-card h2, .feature-card h3, .quote-card h3 { margin:0; font-size:22px; letter-spacing:-.03em; }
+    .muted-copy, .feature-card p, .quote-card p { margin:0; color:var(--muted); line-height:1.7; }
+    .stack-list { display:grid; gap:12px; }
+    .stack-item, .stat-row, .quote-line { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 15px; border-radius:16px; border:1px solid rgba(255,255,255,.07); background: rgba(255,255,255,.03); }
+    .ok-pill { display:inline-flex; align-items:center; gap:8px; padding:8px 10px; border-radius:999px; background: color-mix(in srgb, var(--ok) 13%, transparent); color: var(--ok); font-size:12px; border:1px solid color-mix(in srgb, var(--ok) 32%, transparent); }
+    .ok-pill::before { content:''; width:8px; height:8px; border-radius:999px; background: currentColor; box-shadow:0 0 18px currentColor; }
+    .code-box { border-radius:18px; border:1px solid rgba(255,255,255,.08); background: rgba(5,6,12,.78); padding:16px; font-family:'JetBrains Mono', monospace; font-size:12px; line-height:1.8; color:#dbe7ff; overflow:auto; }
+    section.content-section { padding:78px 0; border-bottom:1px solid rgba(255,255,255,.05); }
+    .section-head { display:flex; align-items:end; justify-content:space-between; gap:24px; margin-bottom:24px; }
+    .section-head h2 { margin:10px 0 0; font-size: clamp(32px, 5vw, 48px); line-height:1; letter-spacing:-.05em; }
+    .stats-grid, .features-grid, .quote-grid, .footer-grid { display:grid; gap:18px; }
+    .stats-grid { grid-template-columns:repeat(3, minmax(0, 1fr)); }
+    .features-grid { grid-template-columns:repeat(3, minmax(0, 1fr)); }
+    .quote-grid { grid-template-columns:repeat(2, minmax(0, 1fr)); }
+    .stat-card, .feature-card, .quote-card, .footer-card { padding:22px; }
+    .stat-value { font-size:clamp(30px, 4vw, 44px); line-height:1; font-weight:800; letter-spacing:-.05em; margin-top:12px; }
+    .feature-card ul { margin:14px 0 0; padding-left:18px; color:var(--muted); line-height:1.8; }
+    .cta-band { margin: 0 0 80px; border-radius: 28px; min-height: 280px; }
+    .cta-inner { min-height:280px; display:grid; align-content:center; gap:18px; padding:36px; }
+    .footer-grid { grid-template-columns:1.3fr .7fr; padding-bottom:72px; }
+    .footer-links { display:grid; gap:10px; color:var(--muted); }
+    @media (max-width: 980px) {
+      .hero-grid, .features-grid, .stats-grid, .quote-grid, .footer-grid { grid-template-columns:1fr; }
+      h1 { max-width:unset; }
+      .section-head { align-items:start; flex-direction:column; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero" id="heroBg">
+    <div class="shell hero-inner">
+      <nav class="nav">
+        <a class="brand" href="../../examples/">
+          <span class="brand-mark">#</span>
+          <span>Vaultflow</span>
+        </a>
+        <div class="nav-links">
+          <a class="chip" href="../../examples/">Examples</a>
+          <a class="chip" href="../../">Editor</a>
+          <a class="chip" href="../../lib/README.md">Package docs</a>
+        </div>
+      </nav>
+
+      <div class="hero-grid">
+        <div>
+          <div class="eyebrow">ascii-arter demo / finance ops landing</div>
+          <h1>Move cash with less dashboard debt.</h1>
+          <p class="lede">Vaultflow gives lean finance teams one place to track approvals, exposures, transfers and runway signals without turning every morning into a tab safari.</p>
+          <div class="cta-row">
+            <a class="btn btn-primary" href="#pricing">View treasury flow</a>
+            <a class="btn btn-secondary" href="../../examples/">Browse examples</a>
+          </div>
+          <div class="proof-row">
+            <span>Approval latency down 43%</span>
+            <span>•</span>
+            <span>Weekly cash review cut from 90 to 28 minutes</span>
+            <span>•</span>
+            <span>Built with ascii-arter</span>
+          </div>
+        </div>
+
+        <aside class="hero-card">
+          <div class="card-kicker">Why this page works</div>
+          <h2>Design-led motion for a finance brand.</h2>
+          <p class="muted-copy">The background is still just exported JSON from the ASCII Arter editor, but the resulting page feels like a polished fintech launch site.</p>
+          <div class="stack-list">
+            <div class="stack-item"><span>Accounts monitored</span><strong>38</strong></div>
+            <div class="stack-item"><span>Approvals automated</span><strong>91%</strong></div>
+            <div class="stack-item"><span>Runway confidence</span><strong>+19 pts</strong></div>
+          </div>
+          <span class="ok-pill">Static HTML, dual scene mount, finance-friendly tone</span>
+          <div class="code-box">import AsciiBackground, { parseProjectData } from 'ascii-arter';
+
+fetch('./hero.json')
+  .then((res) => res.text())
+  .then((json) => AsciiBackground.mount('#heroBg', parseProjectData(json)));</div>
+        </aside>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="content-section">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <div class="section-kicker">What you get</div>
+            <h2>Clear cash visibility without enterprise UI bloat.</h2>
+          </div>
+          <p class="muted-copy" style="max-width:540px;">This example leans more fintech: warmer contrast, tighter copy, and a stronger CTA block while still using the same package API.</p>
+        </div>
+        <div class="stats-grid">
+          <article class="stat-card">
+            <div class="card-kicker">Signal velocity</div>
+            <div class="stat-value">$14.8M</div>
+            <p class="muted-copy">managed across entities with a single morning workflow.</p>
+          </article>
+          <article class="stat-card">
+            <div class="card-kicker">Operator focus</div>
+            <div class="stat-value">5x</div>
+            <p class="muted-copy">faster payment exception handling once approvals stop living in inboxes.</p>
+          </article>
+          <article class="stat-card">
+            <div class="card-kicker">Time to action</div>
+            <div class="stat-value">99.2%</div>
+            <p class="muted-copy">same-day certainty on treasury position after imports and overrides.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="content-section">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <div class="section-kicker">Three reasons</div>
+            <h2>Why this structure works for fintech pages</h2>
+          </div>
+          <p class="muted-copy" style="max-width:520px;">You get atmosphere and differentiation without sacrificing legibility or trust.</p>
+        </div>
+        <div class="features-grid">
+          <article class="feature-card">
+            <div class="card-kicker">01</div>
+            <h3>Credible visual system</h3>
+            <p>The moving ASCII layer reads like a deliberate brand texture, not a novelty effect.</p>
+            <ul>
+              <li>Warm palette keeps it premium, not gamer</li>
+              <li>Foreground cards stay extremely readable</li>
+            </ul>
+          </article>
+          <article class="feature-card">
+            <div class="card-kicker">02</div>
+            <h3>Simple developer flow</h3>
+            <p>Nothing custom is hidden here. It is still just HTML, JSON and one mount call.</p>
+            <ul>
+              <li>Swap scenes per section</li>
+              <li>Host on GitHub Pages or any static CDN</li>
+            </ul>
+          </article>
+          <article class="feature-card">
+            <div class="card-kicker">03</div>
+            <h3>Works beyond hero blocks</h3>
+            <p>The second mount proves you can repeat the pattern for pricing, CTA or announcement bands.</p>
+            <ul>
+              <li>Independent motion per section</li>
+              <li>No global state gymnastics required</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="content-section" id="pricing">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <div class="section-kicker">Social proof</div>
+            <h2>A package showcase that still looks client-ready</h2>
+          </div>
+          <p class="muted-copy" style="max-width:520px;">This page exists to help people imagine real usage, not just stare at an API signature.</p>
+        </div>
+        <div class="quote-grid">
+          <article class="quote-card">
+            <div class="card-kicker">Ops lead</div>
+            <h3>“I could hand this to a founder and they would get it immediately.”</h3>
+            <p>The package becomes easier to understand once the examples look like real sites.</p>
+            <div class="quote-line"><span>Message clarity</span><strong>+31%</strong></div>
+          </article>
+          <article class="quote-card">
+            <div class="card-kicker">Builder fit</div>
+            <h3>“The background feels branded, not distracting.”</h3>
+            <p>That balance is the whole point of exporting scenes from a visual editor.</p>
+            <div class="quote-line"><span>Scroll depth</span><strong>+18%</strong></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <div class="shell">
+      <section class="cta-band" id="ctaBg">
+        <div class="cta-inner">
+          <div>
+            <div class="section-kicker">Final CTA</div>
+            <h2 style="margin:12px 0 0; font-size:clamp(34px, 5vw, 54px); line-height:1; letter-spacing:-.05em;">Use ascii-arter when you want static pages to feel like products.</h2>
+            <p class="muted-copy" style="margin-top:16px; max-width:720px;">Vaultflow is another proof that the same package can serve a very different category with only new JSON and copy choices.</p>
+          </div>
+          <div class="cta-row">
+            <a class="btn btn-primary" href="../../?t=vaultflow-demo">Open editor</a>
+            <a class="btn btn-secondary" href="https://github.com/lowgame/Ascii-Arter/tree/main/examples/vaultflow">See demo files</a>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <div class="shell footer-grid">
+      <div class="footer-card">
+        <div class="card-kicker">What this proves</div>
+        <h3 style="margin:10px 0 8px; font-size:28px; letter-spacing:-.04em;">Vaultflow proves the package can support premium fintech aesthetics without extra runtime complexity.</h3>
+        <p class="muted-copy">No framework lock-in, no API calls, just a static site with better motion and stronger first impression.</p>
+      </div>
+      <div class="footer-card">
+        <div class="card-kicker">Links</div>
+        <div class="footer-links" style="margin-top:14px;">
+          <a href="../../examples/">All demos</a>
+          <a href="../../">ASCII Arter editor</a>
+          <a href="../../lib/README.md">Package README</a>
+          <a href="https://github.com/lowgame/Ascii-Arter">GitHub repo</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module">
+    import AsciiBackground, { parseProjectData } from '../../lib/dist/ascii-arter.esm.js';
+
+    async function mountAscii(selector, path) {
+      const response = await fetch(path);
+      if (!response.ok) throw new Error(`Failed to load ${path}: ${response.status}`);
+      const json = await response.text();
+      const instance = AsciiBackground.mount(selector, parseProjectData(json));
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) instance.pause();
+      return instance;
+    }
+
+    Promise.all([
+      mountAscii('#heroBg', './hero.json'),
+      mountAscii('#ctaBg', './cta.json')
+    ]).then(([hero, cta]) => {
+      window.__demoInstances = { hero, cta };
+      document.documentElement.dataset.demoReady = 'true';
+    }).catch((error) => {
+      console.error('Vaultflow demo failed', error);
+      document.documentElement.dataset.demoReady = 'error';
+    });
+  </script>
+</body>
+</html>

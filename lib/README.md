@@ -1,6 +1,29 @@
 # ascii-arter
 
-Drop animated ASCII art backgrounds onto any HTML element — design your scene on https://lowgame.github.io/Ascii-Arter/, export JSON, embed anywhere.
+Animated ASCII art backgrounds for the web.
+
+Design a scene in the [ASCII Arter editor](https://lowgame.github.io/Ascii-Arter/), export the JSON, then mount it on any DOM element with a single call.
+
+![RelayStack demo](https://raw.githubusercontent.com/lowgame/Ascii-Arter/main/assets/screenshots/relaystack-demo.png)
+
+## Links
+
+- Editor: https://lowgame.github.io/Ascii-Arter/
+- Examples gallery: https://lowgame.github.io/Ascii-Arter/examples/
+- Demo landing pages:
+  - RelayStack — https://lowgame.github.io/Ascii-Arter/examples/relaystack/
+  - PulseBoard — https://lowgame.github.io/Ascii-Arter/examples/pulseboard/
+  - Vaultflow — https://lowgame.github.io/Ascii-Arter/examples/vaultflow/
+- Repository: https://github.com/lowgame/Ascii-Arter
+
+## Why use it?
+
+- Mount animated ASCII backgrounds on any element
+- Works with exported JSON from the ASCII Arter editor
+- Supports both **ESM** and **CommonJS**
+- Ships with **zero runtime dependencies**
+- Includes helpers for loading and re-serializing project data
+- Good fit for hero sections, landing pages, splash screens, and interactive demos
 
 ## Install
 
@@ -8,95 +31,194 @@ Drop animated ASCII art backgrounds onto any HTML element — design your scene 
 npm install ascii-arter
 ```
 
-Tip: Önce JSON'u doğrudan ASCII Arter içinde test et, sonra export edip kendi projende kullan:
-https://lowgame.github.io/Ascii-Arter/  (JSON Test button)
+## Basic usage
 
-## Quick Start
+### 1) Create a container
 
-1. Sahneyi https://lowgame.github.io/Ascii-Arter/ içinde hazırla
-2. JSON export al
-3. JSON'u sitene yükle ve mount et
+Your target element needs a real size.
+
+```html
+<section id="hero" style="position:relative;height:100vh;overflow:hidden;">
+  <div style="position:relative;z-index:1;color:white;">
+    <h1>Hello</h1>
+    <p>ASCII background behind this content.</p>
+  </div>
+</section>
+```
+
+### 2) Mount a project
 
 ```js
 import AsciiBackground, { parseProjectData } from 'ascii-arter';
 
-fetch('/my-project.json')
-  .then((res) => res.text())
-  .then((json) => {
-    AsciiBackground.mount('#hero', parseProjectData(json));
-  });
+const response = await fetch('/ascii-project.json');
+const json = await response.text();
+const project = parseProjectData(json);
+
+const bg = AsciiBackground.mount('#hero', project);
 ```
 
-`parseProjectData()` hem JSON string hem plain object kabul eder. Böylece export edilen veriyi dosyadan, API'den veya inline string olarak güvenli şekilde yükleyebilirsin.
+That’s it — the package injects a canvas into the container and starts animating immediately.
 
-Animasyon `#hero` içinde canvas background olarak render edilir. Gerekirse container'a `position: relative` otomatik eklenir.
+## Recommended workflow
 
-## CDN
+1. Open the editor: https://lowgame.github.io/Ascii-Arter/
+2. Build your scene visually
+3. Export the project JSON
+4. Save it in your app (for example `public/ascii-project.json`)
+5. Load it and mount it with `AsciiBackground.mount(...)`
+
+## ESM example
+
+```js
+import AsciiBackground, { parseProjectData } from 'ascii-arter';
+
+async function boot() {
+  const response = await fetch('/hero.json');
+  if (!response.ok) throw new Error(`Failed to load hero.json: ${response.status}`);
+
+  const json = await response.text();
+  const project = parseProjectData(json);
+
+  const bg = AsciiBackground.mount('#hero', project);
+
+  // optional controls
+  document.getElementById('pause')?.addEventListener('click', () => bg.pause());
+  document.getElementById('play')?.addEventListener('click', () => bg.play());
+}
+
+boot();
+```
+
+## CommonJS example
+
+Use this if your app/bundler still consumes CommonJS in the browser.
+
+```js
+const { AsciiBackground, parseProjectData } = require('ascii-arter');
+
+const project = parseProjectData(window.__ASCII_PROJECT__);
+AsciiBackground.mount(document.getElementById('hero'), project);
+```
+
+## CDN example
 
 ```html
-<div id="hero" style="height:400px"></div>
+<section id="hero" style="position:relative;height:80vh;overflow:hidden">
+  <div style="position:relative;z-index:1;color:white">Launch faster</div>
+</section>
+
 <script type="module">
   import AsciiBackground, { parseProjectData } from 'https://unpkg.com/ascii-arter/dist/ascii-arter.esm.js';
 
-  fetch('/my-project.json')
-    .then((res) => res.text())
-    .then((json) => {
-      AsciiBackground.mount('#hero', parseProjectData(json));
-    });
+  const response = await fetch('/hero.json');
+  const json = await response.text();
+  const project = parseProjectData(json);
+
+  AsciiBackground.mount('#hero', project);
 </script>
 ```
 
 ## API
 
-### `AsciiBackground.mount(selector, projectData, options?)`
+### `AsciiBackground.mount(selectorOrElement, projectData, options?)`
 
-Static factory. Animation'ı hemen başlatır.
+Creates and starts a new background instance.
 
-- `selector` — CSS selector string veya DOM element
-- `projectData` — ASCII Arter'dan export edilen JSON object/string
-- `options` — future use
+- `selectorOrElement`: a CSS selector string or a real DOM element
+- `projectData`: project JSON as a string or plain object
+- `options`: reserved for future use
 
-Bir `AsciiBackground` instance döner.
+Returns an `AsciiBackground` instance.
 
 ### Instance methods
 
-| Method | Description |
-|--------|-------------|
-| `.play()` | Animasyonu devam ettirir |
-| `.pause()` | Animasyonu durdurur |
-| `.load(projectData)` | Tüm sahneyi yeni export JSON ile değiştirir |
-| `.update(partial)` | Partial project props merge eder ve yeniden render eder |
-| `.toJSON(space?)` | O an çalışan sahneyi tekrar JSON olarak export eder |
-| `.destroy()` | Animasyonu durdurur, canvas'ı kaldırır, observer'ı kapatır |
+#### `play()`
+Resume animation.
 
-### Utility exports
+#### `pause()`
+Pause animation.
 
-| Export | Description |
-|--------|-------------|
-| `parseProjectData(input)` | Export edilen JSON string/object input'unu normalize eder |
-| `serializeProjectData(project)` | Runtime-only alanları temizler; publish/embed-safe JSON üretir |
+#### `load(projectData)`
+Replace the current scene with a new exported project.
 
-## Example
-
-```html
-<!DOCTYPE html>
-<html>
-<body>
-  <section id="hero" style="height:100vh; display:flex; align-items:center; justify-content:center; overflow:hidden;">
-    <h1 style="position:relative; z-index:1; color:#fff">Hello, world!</h1>
-  </section>
-
-  <script type="module">
-    import AsciiBackground from 'https://unpkg.com/ascii-arter/dist/ascii-arter.esm.js';
-
-    const bg = AsciiBackground.mount('#hero', null);
-
-    document.getElementById('hero').addEventListener('mouseenter', () => bg.pause());
-    document.getElementById('hero').addEventListener('mouseleave', () => bg.play());
-  </script>
-</body>
-</html>
+```js
+const nextProject = await fetch('/pricing.json').then((r) => r.text());
+bg.load(nextProject);
 ```
+
+#### `update(partial)`
+Apply a top-level partial update, then normalize and re-render the scene.
+
+> Note: this is not a deep merge for nested structures like `texts`, `svgLayers`, or `subject`.
+
+```js
+bg.update({
+  palette: 'aurora',
+  speed: 0.8,
+});
+```
+
+#### `toJSON(space = 2)`
+Serialize the currently running scene back to JSON.
+
+```js
+const snapshot = bg.toJSON();
+```
+
+#### `destroy()`
+Stop animation, disconnect observers, and remove the injected canvas.
+
+```js
+bg.destroy();
+```
+
+## Utility exports
+
+### `parseProjectData(input)`
+Accepts:
+- exported JSON string
+- plain object
+- `null` / `undefined` (falls back to a default project)
+
+```js
+const projectA = parseProjectData('{"palette":"matrix"}');
+const projectB = parseProjectData({ palette: 'aurora' });
+```
+
+### `serializeProjectData(project)`
+Strips runtime-only fields and returns embed-safe project data.
+
+```js
+import { serializeProjectData } from 'ascii-arter';
+
+const cleanProject = serializeProjectData(project);
+```
+
+## Layout notes
+
+- The target element must have a real width/height
+- The package prepends an absolutely positioned canvas into the container
+- If the container has `position: static`, the package sets it to `position: relative`
+- Your foreground content should usually have `position: relative; z-index: 1`
+- For hero sections, `overflow: hidden` is usually the right default
+
+## Security note
+
+If your project data contains user-provided SVG, sanitize it before passing it into the package. The library is designed for trusted project JSON exported from the editor.
+
+## Tested package contents
+
+The published package contains only:
+- `LICENSE`
+- `dist/ascii-arter.cjs`
+- `dist/ascii-arter.esm.js`
+- `README.md`
+- `package.json`
+
+## Maintainer note
+
+Building this package locally uses `esbuild` and currently expects a modern Node runtime (Node 18+ recommended for contributors/CI).
 
 ## License
 

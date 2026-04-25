@@ -1,39 +1,116 @@
 # ASCII Arter
 
-ASCII Arter is a pure JavaScript ASCII animation creator designed to run directly on GitHub Pages.
+Design animated ASCII scenes in the browser, export them as JSON, and reuse them anywhere.
 
-Features:
+ASCII Arter has two sides:
+- a **visual editor** that runs as a static site
+- an **npm package** (`ascii-arter`) that mounts exported scenes onto real websites
+
+## Live links
+
+- **Editor:** https://lowgame.github.io/Ascii-Arter/
+- **Examples gallery:** https://lowgame.github.io/Ascii-Arter/examples/
+- **npm package:** https://www.npmjs.com/package/ascii-arter
+- **Package docs:** [`lib/README.md`](./lib/README.md)
+
+## What it looks like
+
+### RelayStack
+[![RelayStack screenshot](assets/screenshots/relaystack-demo.png)](https://lowgame.github.io/Ascii-Arter/examples/relaystack/)
+
+### PulseBoard
+[![PulseBoard screenshot](assets/screenshots/pulseboard-demo.png)](https://lowgame.github.io/Ascii-Arter/examples/pulseboard/)
+
+### Vaultflow
+[![Vaultflow screenshot](assets/screenshots/vaultflow-demo.png)](https://lowgame.github.io/Ascii-Arter/examples/vaultflow/)
+
+## Why this repo is interesting
+
+- **Pure static frontend** — no backend required
+- **Visual scene editor** — tune animation, palettes, chars, layers, text, SVG and export JSON
+- **Reusable package** — mount exported scenes on any DOM element with `ascii-arter`
+- **GitHub Pages friendly** — editor + demos work as plain static files
+- **Real showcase pages** — not just toy snippets; there are full landing page examples in `examples/`
+
+## Main features
+
 - 60 built-in animation modes
-- 28+ live controls
-- Layered animation system
-- Layered text overlays
-- Custom palettes and character sets
-- Built-in presets + local preset saving
-- TXT, PNG, HTML snapshot, and JSON export
-- No framework, no build step, no backend
+- layered animation system
+- text and SVG-driven subject masks
+- custom palettes and character sets
+- JSON export/import flow
+- PNG export
+- embeddable npm package with ESM + CommonJS support
+- zero runtime dependencies in the published package
 
-Project structure:
-- `index.html` — app shell
+## Repo map
+
+### Editor app
+- `index.html` — editor shell
 - `css/main.css` — layout and styling
-- `js/data/config.js` — control schemas and defaults
-- `js/data/animations.js` — 60 animation definitions and samplers
-- `js/data/presets.js` — built-in presets
+- `js/data/config.js` — defaults and normalization
+- `js/data/animations.js` — animation mode definitions
 - `js/core/engine.js` — framebuffer + canvas renderer
-- `js/core/exporters.js` — export/import helpers
-- `js/main.js` — UI, state, runtime loop
+- `js/core/exporters.js` — import/export helpers
+- `js/main.js` — editor runtime and UI bindings
 
-Run locally:
-1. Open the repo root
-2. Start a static server
-   - `python3 -m http.server 8123`
-3. Visit `http://127.0.0.1:8123`
+### Package
+- `lib/src/` — package source
+- `lib/dist/` — built package files
+- `lib/README.md` — package documentation used for npm
+- `lib/build.mjs` — package build script
 
-Deploy on GitHub Pages:
-- Push everything to the root of the repository
-- Enable GitHub Pages from the `main` branch using the `/ (root)` folder
+### Showcase demos
+- `examples/index.html` — examples gallery
+- `examples/relaystack/` — revenue ops landing page demo
+- `examples/pulseboard/` — product analytics landing page demo
+- `examples/vaultflow/` — treasury automation landing page demo
+- `assets/screenshots/` — README/demo screenshots
+
+## Package quick start
+
+```bash
+npm install ascii-arter
+```
+
+```js
+import AsciiBackground, { parseProjectData } from 'ascii-arter';
+
+const response = await fetch('/hero.json');
+const json = await response.text();
+const project = parseProjectData(json);
+
+AsciiBackground.mount('#hero', project);
+```
+
+For full package docs, examples, API and usage notes:
+**see [`lib/README.md`](./lib/README.md)**
+
+## Recommended workflow
+
+1. Open the editor: https://lowgame.github.io/Ascii-Arter/
+2. Design the scene visually
+3. Export the JSON
+4. Save that JSON in your site/app
+5. Mount it with `ascii-arter`
+
+## Run locally
+
+```bash
+python3 -m http.server 8123
+```
+
+Then visit:
+- `http://127.0.0.1:8123/` for the editor
+- `http://127.0.0.1:8123/examples/` for the demo gallery
+
+## Notes
+
+- Saved presets live in browser `localStorage`
+- Exported JSON is portable across browsers and machines
+- The examples in this repo are intentionally static so people can copy the pattern into real marketing/product sites
 - `.nojekyll` is included so GitHub Pages serves the app as a plain static site
 
-Notes:
-- Presets saved from the UI are stored in browser `localStorage`
-- JSON export/import moves full projects between browsers or machines
-- The app is optimized around a canvas-based ASCII renderer for fast redraws
+## License
+
+MIT

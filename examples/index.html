@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ascii-arter examples</title>
+  <meta name="description" content="Static example sites built with ascii-arter.">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #06070b; --text: #f7f8fb; --muted: #a9b0bf; --border: rgba(255,255,255,.08); --surface: rgba(255,255,255,.04);
+      --accent: #7b8cff; --accent2: #67e8f9; --shadow: 0 24px 80px rgba(0,0,0,.34); --max: 1200px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; font-family: 'Inter', system-ui, sans-serif; color: var(--text);
+      background: radial-gradient(circle at top, rgba(123,140,255,.16), transparent 28%), linear-gradient(180deg, #06070b 0%, #0a0d14 100%);
+    }
+    a { color: inherit; text-decoration: none; }
+    .shell { width: min(var(--max), calc(100vw - 32px)); margin: 0 auto; }
+    .hero { padding: 28px 0 34px; }
+    .nav { display:flex; align-items:center; justify-content:space-between; gap:16px; }
+    .brand { display:inline-flex; align-items:center; gap:12px; font-weight:800; }
+    .brand-mark { width:36px; height:36px; border-radius:12px; display:grid; place-items:center; color:#fff; background: linear-gradient(135deg, var(--accent), var(--accent2)); }
+    .hero-copy { padding: 64px 0 28px; max-width: 760px; }
+    .eyebrow { display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px; font-size:12px; color:#dbe5f9; border:1px solid rgba(123,140,255,.25); background: rgba(123,140,255,.1); }
+    h1 { margin: 18px 0 0; font-size: clamp(44px, 7vw, 76px); line-height: .96; letter-spacing: -.06em; }
+    p.lede { margin: 20px 0 0; max-width: 680px; color: var(--muted); font-size: 18px; line-height: 1.75; }
+    .cta-row { display:flex; gap:14px; flex-wrap:wrap; margin-top: 28px; }
+    .btn { height: 48px; display:inline-flex; align-items:center; justify-content:center; padding: 0 18px; border-radius: 14px; font-size: 14px; font-weight: 700; }
+    .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); color:#fff; }
+    .btn-secondary { background: rgba(255,255,255,.04); border:1px solid var(--border); }
+    .grid { display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; padding-bottom: 80px; }
+    .card { border-radius: 24px; border:1px solid var(--border); background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03)); box-shadow: var(--shadow); overflow:hidden; }
+    .card-image { aspect-ratio: 16/10; background: #0b0f18; }
+    .card-image img { width:100%; height:100%; object-fit: cover; display:block; }
+    .card-body { padding: 20px; }
+    .kicker { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: #d5def3; }
+    .card h2 { margin: 10px 0 8px; font-size: 24px; letter-spacing: -.04em; }
+    .card p { margin: 0; color: var(--muted); line-height: 1.7; min-height: 82px; }
+    .card-links { display:flex; gap:10px; flex-wrap:wrap; margin-top: 18px; }
+    .mini-link { padding: 10px 12px; border-radius: 12px; border:1px solid var(--border); background: rgba(255,255,255,.03); font-size: 13px; }
+    @media (max-width: 980px) { .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <section class="hero">
+    <div class="shell">
+      <div class="nav">
+        <a class="brand" href="../">
+          <span class="brand-mark">#</span>
+          <span>ascii-arter examples</span>
+        </a>
+        <div class="cta-row" style="margin-top:0;">
+          <a class="btn btn-secondary" href="../">Open editor</a>
+          <a class="btn btn-secondary" href="../lib/README.md">Package README</a>
+        </div>
+      </div>
+      <div class="hero-copy">
+        <div class="eyebrow">Static showcase pages built with exported JSON scenes</div>
+        <h1>Examples that look like real products, not demo fluff.</h1>
+        <p class="lede">Each page here is static HTML using the same <code>ascii-arter</code> package. Design in the editor, export JSON, mount it behind any section, and ship on plain static hosting.</p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="../lib/README.md">See package docs</a>
+          <a class="btn btn-secondary" href="https://www.npmjs.com/package/ascii-arter">npm package</a>
+        </div>
+      </div>
+      <div class="grid">
+        <article class="card">
+          <a class="card-image" href="./relaystack/"><img src="../assets/screenshots/relaystack-demo.png" alt="RelayStack example screenshot"></a>
+          <div class="card-body">
+            <div class="kicker">Revenue ops</div>
+            <h2>RelayStack</h2>
+            <p>A sharper B2B revenue-ops landing page with layered motion behind the hero and CTA blocks.</p>
+            <div class="card-links">
+              <a class="mini-link" href="./relaystack/">Open demo</a>
+              <a class="mini-link" href="https://github.com/lowgame/Ascii-Arter/tree/main/examples/relaystack">Source</a>
+            </div>
+          </div>
+        </article>
+        <article class="card">
+          <a class="card-image" href="./pulseboard/"><img src="../assets/screenshots/pulseboard-demo.png" alt="PulseBoard example screenshot"></a>
+          <div class="card-body">
+            <div class="kicker">Product analytics</div>
+            <h2>PulseBoard</h2>
+            <p>A product-signals site that keeps the interface calm while the ASCII layer adds depth and motion.</p>
+            <div class="card-links">
+              <a class="mini-link" href="./pulseboard/">Open demo</a>
+              <a class="mini-link" href="https://github.com/lowgame/Ascii-Arter/tree/main/examples/pulseboard">Source</a>
+            </div>
+          </div>
+        </article>
+        <article class="card">
+          <a class="card-image" href="./vaultflow/"><img src="../assets/screenshots/vaultflow-demo.png" alt="Vaultflow example screenshot"></a>
+          <div class="card-body">
+            <div class="kicker">Treasury automation</div>
+            <h2>Vaultflow</h2>
+            <p>A fintech-flavored landing page showing the same package can feel premium, warm and brand-forward.</p>
+            <div class="card-links">
+              <a class="mini-link" href="./vaultflow/">Open demo</a>
+              <a class="mini-link" href="https://github.com/lowgame/Ascii-Arter/tree/main/examples/vaultflow">Source</a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+</body>
+</html>

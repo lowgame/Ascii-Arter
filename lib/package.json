@@ -13,7 +13,7 @@
   },
   "unpkg": "./dist/ascii-arter.esm.js",
   "jsdelivr": "./dist/ascii-arter.esm.js",
-  "files": ["dist", "README.md"],
+  "files": ["dist", "README.md", "LICENSE"],
   "scripts": {
     "build": "node build.mjs"
   },
@@ -29,6 +29,6 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "esbuild": "^0.20.0"
+    "esbuild": "^0.28.0"
   }
 }
