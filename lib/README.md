@@ -11,7 +11,7 @@ Design a scene in the [ASCII Arter editor](https://lowgame.github.io/Ascii-Arter
 - Editor: https://lowgame.github.io/Ascii-Arter/
 - Examples gallery: https://lowgame.github.io/Ascii-Arter/examples/
 - Demo landing pages:
-  - RelayStack — https://lowgame.github.io/Ascii-Arter/examples/relaystack/
+  - RelayStack — Apple-style ASCII wave hero with **Your Company** front copy — https://lowgame.github.io/Ascii-Arter/examples/relaystack/
   - PulseBoard — https://lowgame.github.io/Ascii-Arter/examples/pulseboard/
   - Vaultflow — https://lowgame.github.io/Ascii-Arter/examples/vaultflow/
 - Repository: https://github.com/lowgame/Ascii-Arter
@@ -24,6 +24,7 @@ Design a scene in the [ASCII Arter editor](https://lowgame.github.io/Ascii-Arter
 - Ships with **zero runtime dependencies**
 - Includes helpers for loading and re-serializing project data
 - Good fit for hero sections, landing pages, splash screens, and interactive demos
+- Can power artistic Apple-style launch pages like the RelayStack **Your Company** wave demo
 
 ## Install
 
@@ -40,8 +41,8 @@ Your target element needs a real size.
 ```html
 <section id="hero" style="position:relative;height:100vh;overflow:hidden;">
   <div style="position:relative;z-index:1;color:white;">
-    <h1>Hello</h1>
-    <p>ASCII background behind this content.</p>
+    <h1>Your Company</h1>
+    <p>ASCII wave background behind this content.</p>
   </div>
 </section>
 ```

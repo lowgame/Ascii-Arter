@@ -90,6 +90,35 @@ async function withStaticServer(run) {
   }
 }
 
+test('RelayStack uses an artistic apple-style wave layout distinct from the other demos', async () => {
+  let browser;
+  try {
+    await withStaticServer(async (port) => {
+      browser = await chromium.launch({ headless: true });
+      const page = await browser.newPage({ viewport: { width: 1440, height: 1800 } });
+      await page.goto(`http://127.0.0.1:${port}/examples/relaystack/`, { waitUntil: 'networkidle' });
+      await page.waitForFunction(() => document.documentElement.dataset.demoReady === 'true');
+      const info = await page.evaluate(() => ({
+        variant: document.body.dataset.demoVariant,
+        hasAppleHero: !!document.querySelector('.apple-hero'),
+        hasWaveStage: !!document.querySelector('.wave-stage'),
+        hasHeroWordmark: !!document.querySelector('.hero-wordmark'),
+        hasDashboardShell: !!document.querySelector('.dashboard-shell'),
+        hasFintechHero: !!document.querySelector('.fintech-hero'),
+      }));
+
+      assert.equal(info.variant, 'apple-minimal-wave');
+      assert.equal(info.hasAppleHero, true);
+      assert.equal(info.hasWaveStage, true);
+      assert.equal(info.hasHeroWordmark, true);
+      assert.equal(info.hasDashboardShell, false);
+      assert.equal(info.hasFintechHero, false);
+    });
+  } finally {
+    if (browser) await browser.close();
+  }
+});
+
 test('PulseBoard uses a dark dashboard-style showcase layout distinct from the other demos', async () => {
   let browser;
   try {

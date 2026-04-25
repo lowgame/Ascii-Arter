@@ -104,9 +104,13 @@ test('relaystack landing demo mounts ascii-arter backgrounds without console err
 
     const info = await page.evaluate(() => ({
       title: document.title,
+      variant: document.body.dataset.demoVariant,
       heroCanvas: !!document.querySelector('#heroBg canvas'),
       ctaCanvas: !!document.querySelector('#ctaBg canvas'),
       heroText: document.querySelector('h1')?.textContent?.trim(),
+      hasAppleHero: !!document.querySelector('.apple-hero'),
+      hasWaveStage: !!document.querySelector('.wave-stage'),
+      hasOrb: !!document.querySelector('.hero-orb'),
       hasWindowInstances: !!window.__relayDemo?.hero && !!window.__relayDemo?.cta,
       methods: {
         heroPlay: typeof window.__relayDemo?.hero?.play,
@@ -115,11 +119,15 @@ test('relaystack landing demo mounts ascii-arter backgrounds without console err
       }
     }));
 
-    assert.equal(info.title, 'RelayStack — Revenue ops in one timeline');
+    assert.equal(info.title, 'RelayStack — Apple-style ASCII wave hero');
+    assert.equal(info.variant, 'apple-minimal-wave');
     assert.equal(info.heroCanvas, true);
     assert.equal(info.ctaCanvas, true);
     assert.equal(info.hasWindowInstances, true);
-    assert.equal(info.heroText, 'Revenue ops, finally running in one timeline.');
+    assert.equal(info.heroText, 'Your Company');
+    assert.equal(info.hasAppleHero, true);
+    assert.equal(info.hasWaveStage, true);
+    assert.equal(info.hasOrb, true);
     assert.deepEqual(info.methods, {
       heroPlay: 'function',
       heroPause: 'function',

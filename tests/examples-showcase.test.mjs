@@ -95,6 +95,8 @@ test('examples gallery lists all showcase demos and screenshot assets exist', as
   assert.match(galleryHtml, /RelayStack/);
   assert.match(galleryHtml, /PulseBoard/);
   assert.match(galleryHtml, /Vaultflow/);
+  assert.match(galleryHtml, /Apple-style ASCII wave hero/i);
+  assert.match(galleryHtml, /Your Company/i);
 
   for (const asset of [
     'assets/screenshots/relaystack-demo.png',
@@ -103,6 +105,16 @@ test('examples gallery lists all showcase demos and screenshot assets exist', as
   ]) {
     assert.equal(existsSync(path.join(rootDir, asset)), true, `${asset} should exist`);
   }
+});
+
+test('repo and npm readmes highlight the artistic wave demo and Your Company starter copy', async () => {
+  const repoReadme = await readFile(path.join(rootDir, 'README.md'), 'utf8');
+  const packageReadme = await readFile(path.join(rootDir, 'lib/README.md'), 'utf8');
+
+  assert.match(repoReadme, /Apple-style ASCII wave hero/i);
+  assert.match(repoReadme, /Your Company/i);
+  assert.match(packageReadme, /Apple-style ASCII wave hero/i);
+  assert.match(packageReadme, /Your Company/i);
 });
 
 for (const demo of [

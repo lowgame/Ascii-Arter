@@ -18,6 +18,8 @@ ASCII Arter has two sides:
 ### RelayStack
 [![RelayStack screenshot](assets/screenshots/relaystack-demo.png)](https://lowgame.github.io/Ascii-Arter/examples/relaystack/)
 
+Apple-style ASCII wave hero with **Your Company** front copy, soft glass UI and a cinematic monochrome background.
+
 ### PulseBoard
 [![PulseBoard screenshot](assets/screenshots/pulseboard-demo.png)](https://lowgame.github.io/Ascii-Arter/examples/pulseboard/)
 
@@ -62,7 +64,7 @@ ASCII Arter has two sides:
 
 ### Showcase demos
 - `examples/index.html` — examples gallery
-- `examples/relaystack/` — revenue ops landing page demo
+- `examples/relaystack/` — Apple-style ASCII wave hero starter with **Your Company** front copy
 - `examples/pulseboard/` — product analytics landing page demo
 - `examples/vaultflow/` — treasury automation landing page demo
 - `assets/screenshots/` — README/demo screenshots

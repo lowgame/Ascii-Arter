@@ -1,6 +1,6 @@
 {
   "name": "@lowgame/ascii-arter",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Drop ASCII art animations onto any element. Design on ASCII Arter, export JSON, embed anywhere.",
   "type": "module",
   "main": "./dist/ascii-arter.cjs",
