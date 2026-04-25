@@ -1,0 +1,840 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RelayStack — Revenue ops in one timeline</title>
+  <meta name="description" content="Random SaaS landing page demo powered by ascii-arter animated backgrounds.">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #050608;
+      --bg-soft: #090b10;
+      --surface: rgba(255,255,255,0.04);
+      --surface-strong: rgba(255,255,255,0.06);
+      --border: rgba(255,255,255,0.08);
+      --border-soft: rgba(255,255,255,0.05);
+      --text: #f5f7fb;
+      --muted: #b3bccb;
+      --subtle: #7f8898;
+      --accent: #7b8cff;
+      --accent-2: #6be6ff;
+      --shadow: 0 20px 80px rgba(0, 0, 0, 0.45);
+      --radius: 22px;
+      --radius-sm: 16px;
+      --max: 1180px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      font-feature-settings: 'cv01', 'ss03';
+      background:
+        radial-gradient(circle at top, rgba(123, 140, 255, 0.12), transparent 30%),
+        linear-gradient(180deg, #06070a 0%, #040507 100%);
+      color: var(--text);
+    }
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+
+    .shell {
+      width: min(var(--max), calc(100vw - 32px));
+      margin: 0 auto;
+    }
+
+    .hero,
+    .cta-band {
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .hero {
+      min-height: 88vh;
+      border-bottom: 1px solid var(--border-soft);
+      background: #050608;
+    }
+
+    .hero::before,
+    .cta-band::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(123, 140, 255, 0.22), transparent 28%),
+        radial-gradient(circle at 85% 22%, rgba(107, 230, 255, 0.14), transparent 24%),
+        linear-gradient(180deg, rgba(4, 6, 10, 0.38), rgba(4, 6, 10, 0.82));
+    }
+
+    .hero-inner,
+    .cta-inner {
+      position: relative;
+      z-index: 2;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 24px 0;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: -0.18px;
+    }
+
+    .brand-mark {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      color: white;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 12px 32px rgba(123, 140, 255, 0.35);
+    }
+
+    .nav-links {
+      display: inline-flex;
+      align-items: center;
+      gap: 18px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 9px 12px;
+      background: rgba(255,255,255,0.03);
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1;
+      backdrop-filter: blur(10px);
+    }
+
+    .chip-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 0 18px rgba(107, 230, 255, 0.8);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+      gap: 26px;
+      align-items: stretch;
+      padding: 44px 0 56px;
+    }
+
+    .hero-copy {
+      padding: 38px 0 18px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(123, 140, 255, 0.22);
+      background: rgba(123, 140, 255, 0.09);
+      color: #d9e0ff;
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 12px;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 10ch;
+      font-size: clamp(52px, 8vw, 82px);
+      line-height: 0.95;
+      letter-spacing: -0.06em;
+      font-weight: 800;
+    }
+
+    .hero-copy p {
+      max-width: 640px;
+      margin: 22px 0 0;
+      font-size: 19px;
+      line-height: 1.7;
+      color: var(--muted);
+    }
+
+    .cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 28px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      height: 48px;
+      padding: 0 18px;
+      border-radius: 14px;
+      border: 1px solid transparent;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: -0.16px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #93a0ff);
+      color: white;
+      box-shadow: 0 18px 50px rgba(123, 140, 255, 0.35);
+    }
+
+    .btn-secondary {
+      background: rgba(255,255,255,0.04);
+      border-color: var(--border);
+      color: var(--text);
+      backdrop-filter: blur(10px);
+    }
+
+    .proof-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      margin-top: 28px;
+      color: var(--subtle);
+      font-size: 13px;
+    }
+
+    .hero-card,
+    .feature-card,
+    .metric,
+    .story-card,
+    .price-card,
+    .footer-card {
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.03));
+      backdrop-filter: blur(16px);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-card {
+      border-radius: var(--radius);
+      padding: 22px;
+      display: grid;
+      align-content: start;
+      gap: 18px;
+      min-height: 100%;
+    }
+
+    .card-kicker,
+    .section-kicker,
+    .mini-label {
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 12px;
+      color: #c8d0df;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .hero-card h2,
+    .story-card h3,
+    .price-card h3,
+    .feature-card h3 {
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: -0.03em;
+    }
+
+    .hero-card p,
+    .feature-card p,
+    .story-card p,
+    .price-card p,
+    .section-copy {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .flow-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .flow-item,
+    .metric,
+    .price-feature {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 15px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.07);
+      background: rgba(255,255,255,0.03);
+    }
+
+    .flow-item strong,
+    .metric strong,
+    .price strong {
+      font-size: 16px;
+    }
+
+    .flow-meta,
+    .muted,
+    .small {
+      color: var(--subtle);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(96, 251, 192, 0.1);
+      color: #8ff8cf;
+      font-size: 12px;
+      border: 1px solid rgba(96, 251, 192, 0.2);
+    }
+
+    .status-pill::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #64fbc4;
+      box-shadow: 0 0 18px rgba(100, 251, 196, 0.8);
+    }
+
+    .code-box {
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(3, 5, 10, 0.82);
+      padding: 16px;
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 12px;
+      color: #dbe7ff;
+      overflow: auto;
+      line-height: 1.8;
+    }
+
+    .metrics-grid,
+    .features-grid,
+    .story-grid,
+    .pricing-grid,
+    .footer-grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .metrics-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      margin-top: 10px;
+      padding-bottom: 48px;
+    }
+
+    .metric {
+      padding: 18px;
+      border-radius: 18px;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .metric-value {
+      font-size: clamp(28px, 4vw, 40px);
+      line-height: 1;
+      letter-spacing: -0.05em;
+      font-weight: 800;
+      margin-top: 8px;
+    }
+
+    section.content-section {
+      padding: 82px 0;
+      border-bottom: 1px solid var(--border-soft);
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .section-head h2 {
+      margin: 10px 0 0;
+      font-size: clamp(32px, 5vw, 48px);
+      line-height: 1;
+      letter-spacing: -0.05em;
+    }
+
+    .features-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .feature-card,
+    .story-card,
+    .price-card,
+    .footer-card {
+      border-radius: 20px;
+      padding: 22px;
+    }
+
+    .feature-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 18px;
+      background: rgba(123, 140, 255, 0.14);
+      color: #dce2ff;
+      font-size: 19px;
+      border: 1px solid rgba(123, 140, 255, 0.22);
+    }
+
+    .story-grid {
+      grid-template-columns: 1.15fr 0.85fr;
+      align-items: start;
+    }
+
+    .story-card.large {
+      padding: 26px;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .timeline-step {
+      display: grid;
+      grid-template-columns: 42px minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+    }
+
+    .timeline-num {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.04);
+      color: #dce2ff;
+      font-weight: 700;
+    }
+
+    .pricing-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .price-card.featured {
+      border-color: rgba(123, 140, 255, 0.32);
+      box-shadow: 0 24px 80px rgba(81, 93, 189, 0.24);
+    }
+
+    .price {
+      display: flex;
+      align-items: end;
+      gap: 8px;
+      margin: 18px 0 16px;
+    }
+
+    .price-amount {
+      font-size: 48px;
+      line-height: 1;
+      letter-spacing: -0.06em;
+      font-weight: 800;
+    }
+
+    .price-features {
+      display: grid;
+      gap: 10px;
+      margin: 18px 0 24px;
+    }
+
+    .cta-band {
+      margin: 82px 0;
+      border-radius: 28px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: #07080d;
+      box-shadow: var(--shadow);
+    }
+
+    .cta-inner {
+      padding: 34px;
+      display: grid;
+      grid-template-columns: 1.05fr auto;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .cta-inner h2 {
+      margin: 10px 0 0;
+      font-size: clamp(32px, 5vw, 54px);
+      letter-spacing: -0.05em;
+      line-height: 0.98;
+      max-width: 11ch;
+    }
+
+    footer {
+      padding: 0 0 42px;
+    }
+
+    .footer-grid {
+      grid-template-columns: 1.3fr 0.7fr;
+      align-items: start;
+    }
+
+    .footer-card {
+      border-radius: 22px;
+    }
+
+    .footer-links {
+      display: grid;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .inline-note {
+      margin-top: 10px;
+      color: var(--subtle);
+      font-size: 12px;
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+    }
+
+    @media (max-width: 1080px) {
+      .hero-grid,
+      .story-grid,
+      .cta-inner,
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
+      .features-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .metrics-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .pricing-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 720px) {
+      .shell { width: min(var(--max), calc(100vw - 20px)); }
+      .nav { padding: 18px 0; }
+      .nav-links { display: none; }
+      .hero-grid { padding-top: 24px; }
+      .hero-copy { padding-top: 6px; }
+      .metrics-grid,
+      .features-grid { grid-template-columns: 1fr; }
+      .section-head { align-items: start; flex-direction: column; }
+      .cta-row { flex-direction: column; }
+      .btn { width: 100%; }
+      .cta-inner { padding: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <section class="hero" id="heroBg">
+    <div class="shell hero-inner">
+      <div class="nav">
+        <a href="#" class="brand">
+          <span class="brand-mark">R</span>
+          <span>RelayStack</span>
+        </a>
+        <div class="nav-links">
+          <a href="#features">Features</a>
+          <a href="#proof">Proof</a>
+          <a href="#pricing">Pricing</a>
+          <a class="chip" href="../../?t=relaystack-demo"><span class="chip-dot"></span>Open ASCII Arter</a>
+        </div>
+      </div>
+
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <div class="eyebrow">ascii-arter demo / random SaaS landing page</div>
+          <h1>Revenue ops, finally running in one timeline.</h1>
+          <p>RelayStack pulls pipeline, onboarding, renewals and support events into one command surface so fast-moving SaaS teams can act before churn and bottlenecks appear.</p>
+          <div class="cta-row">
+            <a class="btn btn-primary" href="#pricing">Start free</a>
+            <a class="btn btn-secondary" href="#proof">See the workflow</a>
+          </div>
+          <div class="proof-row">
+            <span>Trusted by 180+ growth-stage teams</span>
+            <span>•</span>
+            <span>Median onboarding time down 42%</span>
+            <span>•</span>
+            <span>Built with ascii-arter animated backgrounds</span>
+          </div>
+        </div>
+
+        <div class="hero-card">
+          <div class="card-kicker">Live board</div>
+          <h2>Everything important moves in one pane.</h2>
+          <p>Marketing qualified leads, CS handoffs and renewal risk all pulse in the same operational layer.</p>
+          <div class="flow-list">
+            <div class="flow-item">
+              <div>
+                <strong>New SQL detected</strong>
+                <div class="flow-meta">Score crossed 83 / SDR notified</div>
+              </div>
+              <span class="status-pill">Live</span>
+            </div>
+            <div class="flow-item">
+              <div>
+                <strong>Onboarding drift</strong>
+                <div class="flow-meta">7 accounts missing champion touchpoint</div>
+              </div>
+              <strong>-31%</strong>
+            </div>
+            <div class="flow-item">
+              <div>
+                <strong>Renewal risk</strong>
+                <div class="flow-meta">3 enterprise accounts flagged this week</div>
+              </div>
+              <strong>$142k</strong>
+            </div>
+          </div>
+          <div class="code-box">import AsciiBackground, { parseProjectData } from 'ascii-arter';
+
+fetch('./hero.json')
+  .then((res) =&gt; res.text())
+  .then((json) =&gt; {
+    AsciiBackground.mount('#heroBg', parseProjectData(json));
+  });</div>
+          <div class="inline-note">Hero arka planı bu sayfada gerçekten ascii-arter paketinden geliyor.</div>
+        </div>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric">
+          <div class="mini-label">Net revenue retention</div>
+          <div class="metric-value">122%</div>
+          <div class="small">Signals before accounts cool down.</div>
+        </div>
+        <div class="metric">
+          <div class="mini-label">Weekly decisions</div>
+          <div class="metric-value">3.4k</div>
+          <div class="small">One shared operational timeline.</div>
+        </div>
+        <div class="metric">
+          <div class="mini-label">Ramp speed</div>
+          <div class="metric-value">9 days</div>
+          <div class="small">New reps hit the same playbook fast.</div>
+        </div>
+        <div class="metric">
+          <div class="mini-label">Manual work removed</div>
+          <div class="metric-value">68%</div>
+          <div class="small">Syncs, alerts and handoffs stay automated.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="content-section" id="features">
+    <div class="shell">
+      <div class="section-head">
+        <div>
+          <div class="section-kicker">Core workflows</div>
+          <h2>Built for operators who hate tab chaos.</h2>
+        </div>
+        <p class="section-copy">Minimal chrome up front. Deep system behavior under the hood. RelayStack keeps the page readable while the background stays alive.</p>
+      </div>
+      <div class="features-grid">
+        <article class="feature-card">
+          <div class="feature-icon">↗</div>
+          <h3>Pipeline drift alerts</h3>
+          <p>Catch silent deal decay with live route changes, handoff misses and response-time regressions.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-icon">◎</div>
+          <h3>Onboarding command center</h3>
+          <p>See every launch milestone, blocker and owner without hunting through six different tools.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-icon">⌁</div>
+          <h3>Renewal risk scoring</h3>
+          <p>Combine product usage, ticket volume and stakeholder silence into one fast risk layer.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-icon">▣</div>
+          <h3>Exec digest</h3>
+          <p>Auto-rollup of wins, bottlenecks and at-risk accounts in a summary people actually read.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="content-section" id="proof">
+    <div class="shell">
+      <div class="section-head">
+        <div>
+          <div class="section-kicker">How it works</div>
+          <h2>One timeline from lead to renewal.</h2>
+        </div>
+        <p class="section-copy">This demo intentionally uses ascii-arter as a subtle site background instead of a toy fullscreen canvas, so you can see the embed use-case in context.</p>
+      </div>
+      <div class="story-grid">
+        <article class="story-card large">
+          <div class="card-kicker">Operational path</div>
+          <h3>From noisy tools to one control loop.</h3>
+          <div class="timeline">
+            <div class="timeline-step">
+              <div class="timeline-num">1</div>
+              <div>
+                <strong>Sync sources</strong>
+                <p>Sales, product, billing and support events land in one normalized stream.</p>
+              </div>
+            </div>
+            <div class="timeline-step">
+              <div class="timeline-num">2</div>
+              <div>
+                <strong>Score intent + risk</strong>
+                <p>RelayStack watches acceleration, friction and silence patterns in real time.</p>
+              </div>
+            </div>
+            <div class="timeline-step">
+              <div class="timeline-num">3</div>
+              <div>
+                <strong>Trigger playbooks</strong>
+                <p>Assign owners, launch sequences and Slack digests before revenue slips.</p>
+              </div>
+            </div>
+          </div>
+        </article>
+        <article class="story-card">
+          <div class="card-kicker">Embed recipe</div>
+          <h3>Drop the same motion into any hero.</h3>
+          <p>Use exported JSON from ASCII Arter, fetch it on page load, and mount it inside a normal marketing section.</p>
+          <div class="code-box" style="margin-top:16px;">import AsciiBackground, { parseProjectData } from '../../lib/dist/ascii-arter.esm.js';
+
+const res = await fetch('./cta.json');
+const json = await res.text();
+AsciiBackground.mount('#ctaBg', parseProjectData(json));</div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="content-section" id="pricing">
+    <div class="shell">
+      <div class="section-head">
+        <div>
+          <div class="section-kicker">Pricing</div>
+          <h2>Simple plans for teams shipping fast.</h2>
+        </div>
+        <p class="section-copy">A fake pricing table, because a random SaaS landing page without pricing feels illegal.</p>
+      </div>
+      <div class="pricing-grid">
+        <article class="price-card">
+          <div class="card-kicker">Starter</div>
+          <h3>For small GTM teams</h3>
+          <div class="price"><div class="price-amount">$39</div><div class="muted">/ seat</div></div>
+          <div class="price-features">
+            <div class="price-feature"><span>5 source integrations</span><strong>✓</strong></div>
+            <div class="price-feature"><span>Weekly exec digest</span><strong>✓</strong></div>
+            <div class="price-feature"><span>Basic risk scoring</span><strong>✓</strong></div>
+          </div>
+          <a class="btn btn-secondary" href="#">Start trial</a>
+        </article>
+        <article class="price-card featured">
+          <div class="card-kicker">Growth</div>
+          <h3>For companies scaling faster than their ops stack.</h3>
+          <div class="price"><div class="price-amount">$89</div><div class="muted">/ seat</div></div>
+          <div class="price-features">
+            <div class="price-feature"><span>Unlimited workspaces</span><strong>✓</strong></div>
+            <div class="price-feature"><span>AI playbook suggestions</span><strong>✓</strong></div>
+            <div class="price-feature"><span>Renewal forecasting</span><strong>✓</strong></div>
+          </div>
+          <a class="btn btn-primary" href="#">Book demo</a>
+        </article>
+        <article class="price-card">
+          <div class="card-kicker">Scale</div>
+          <h3>For larger ops orgs with custom rules.</h3>
+          <div class="price"><div class="price-amount">Custom</div></div>
+          <div class="price-features">
+            <div class="price-feature"><span>Dedicated data routing</span><strong>✓</strong></div>
+            <div class="price-feature"><span>Private Slack agent</span><strong>✓</strong></div>
+            <div class="price-feature"><span>SLA-backed onboarding</span><strong>✓</strong></div>
+          </div>
+          <a class="btn btn-secondary" href="#">Talk to sales</a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <div class="shell">
+    <section class="cta-band" id="ctaBg">
+      <div class="cta-inner">
+        <div>
+          <div class="section-kicker">Final CTA</div>
+          <h2>Ship a live page with animated ASCII in the background.</h2>
+          <p class="section-copy">Bu alt bölüm de aynı paketle çalışıyor. Ayrı JSON, ayrı mount, normal landing-page düzeni.</p>
+        </div>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="../../?t=relaystack-demo">Open editor</a>
+          <a class="btn btn-secondary" href="https://github.com/lowgame/Ascii-Arter/tree/main/examples/relaystack">See demo files</a>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer>
+    <div class="shell footer-grid">
+      <div class="footer-card">
+        <div class="card-kicker">What this proves</div>
+        <h3 style="margin:10px 0 8px; font-size:28px; letter-spacing:-0.04em;">ascii-arter sadece editor değil, embed engine olarak da gayet kullanılabiliyor.</h3>
+        <p class="section-copy">Bu sayfa package bundle + JSON dosyaları ile ayağa kalkıyor. Yani kullanıcılar editor'de sahneyi kurup kendi sitelerinde buna benzer hero arka planları kullanabilir.</p>
+      </div>
+      <div class="footer-card">
+        <div class="card-kicker">Links</div>
+        <div class="footer-links" style="margin-top:14px;">
+          <a href="../../">ASCII Arter editor</a>
+          <a href="../../lib/README.md">Package README</a>
+          <a href="https://github.com/lowgame/Ascii-Arter">GitHub repo</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module">
+    import AsciiBackground, { parseProjectData } from '../../lib/dist/ascii-arter.esm.js';
+
+    async function mountAscii(selector, path) {
+      const response = await fetch(path);
+      const json = await response.text();
+      const instance = AsciiBackground.mount(selector, parseProjectData(json));
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) instance.pause();
+      return instance;
+    }
+
+    Promise.all([
+      mountAscii('#heroBg', './hero.json'),
+      mountAscii('#ctaBg', './cta.json')
+    ]).then(([hero, cta]) => {
+      window.__relayDemo = { hero, cta };
+      document.documentElement.dataset.demoReady = 'true';
+    }).catch((error) => {
+      console.error('RelayStack demo failed', error);
+      document.documentElement.dataset.demoReady = 'error';
+    });
+  </script>
+</body>
+</html>
