@@ -15,6 +15,8 @@ const rootDir = path.resolve(process.cwd());
 const libDir = path.join(rootDir, 'lib');
 const here = path.dirname(fileURLToPath(import.meta.url));
 const require = createRequire(import.meta.url);
+const PACKAGE_NAME = '@lowgame/ascii-arter';
+const PACKAGE_DIR = './node_modules/@lowgame/ascii-arter/dist/ascii-arter.esm.js';
 
 function loadPlaywright() {
   const candidates = [
@@ -63,11 +65,11 @@ test('packed npm package exposes helpers for import/export in both CJS and ESM',
   const { tempDir, tarballPath } = await npmPackInstall();
   try {
     const cjsOut = await runNode(
-      "const m=require('ascii-arter'); console.log(JSON.stringify(Object.keys(m).sort()));",
+      `const m=require(${JSON.stringify(PACKAGE_NAME)}); console.log(JSON.stringify(Object.keys(m).sort()));`,
       tempDir,
     );
     const esmOut = await runNode(
-      "import('ascii-arter').then(m=>console.log(JSON.stringify(Object.keys(m).sort())))",
+      `import(${JSON.stringify(PACKAGE_NAME)}).then(m=>console.log(JSON.stringify(Object.keys(m).sort())))`,
       tempDir,
       ['--input-type=module'],
     );
@@ -132,7 +134,7 @@ test('npm package can render exported text-only JSON as a real animated backgrou
 <body style="margin:0;background:#111;">
   <section id="hero" style="position:relative;width:720px;height:420px;overflow:hidden"></section>
   <script type="module">
-    import AsciiBackground from './node_modules/ascii-arter/dist/ascii-arter.esm.js';
+    import AsciiBackground from '${PACKAGE_DIR}';
     const project = ${JSON.stringify(project)};
     const bg = AsciiBackground.mount('#hero', project);
     window.__asciiBg = bg;

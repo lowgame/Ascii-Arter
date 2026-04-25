@@ -28,7 +28,7 @@ Design a scene in the [ASCII Arter editor](https://lowgame.github.io/Ascii-Arter
 ## Install
 
 ```bash
-npm install ascii-arter
+npm install @lowgame/ascii-arter
 ```
 
 ## Basic usage
@@ -49,7 +49,7 @@ Your target element needs a real size.
 ### 2) Mount a project
 
 ```js
-import AsciiBackground, { parseProjectData } from 'ascii-arter';
+import AsciiBackground, { parseProjectData } from '@lowgame/ascii-arter';
 
 const response = await fetch('/ascii-project.json');
 const json = await response.text();
@@ -71,7 +71,7 @@ That’s it — the package injects a canvas into the container and starts anima
 ## ESM example
 
 ```js
-import AsciiBackground, { parseProjectData } from 'ascii-arter';
+import AsciiBackground, { parseProjectData } from '@lowgame/ascii-arter';
 
 async function boot() {
   const response = await fetch('/hero.json');
@@ -95,7 +95,7 @@ boot();
 Use this if your app/bundler still consumes CommonJS in the browser.
 
 ```js
-const { AsciiBackground, parseProjectData } = require('ascii-arter');
+const { AsciiBackground, parseProjectData } = require('@lowgame/ascii-arter');
 
 const project = parseProjectData(window.__ASCII_PROJECT__);
 AsciiBackground.mount(document.getElementById('hero'), project);
@@ -109,7 +109,7 @@ AsciiBackground.mount(document.getElementById('hero'), project);
 </section>
 
 <script type="module">
-  import AsciiBackground, { parseProjectData } from 'https://unpkg.com/ascii-arter/dist/ascii-arter.esm.js';
+  import AsciiBackground, { parseProjectData } from 'https://unpkg.com/@lowgame/ascii-arter/dist/ascii-arter.esm.js';
 
   const response = await fetch('/hero.json');
   const json = await response.text();
@@ -190,7 +190,7 @@ const projectB = parseProjectData({ palette: 'aurora' });
 Strips runtime-only fields and returns embed-safe project data.
 
 ```js
-import { serializeProjectData } from 'ascii-arter';
+import { serializeProjectData } from '@lowgame/ascii-arter';
 
 const cleanProject = serializeProjectData(project);
 ```

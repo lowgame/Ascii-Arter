@@ -304,7 +304,7 @@
         <div class="embed-modal-body">
           <div class="embed-step">
             <div class="embed-step-label">Install the library</div>
-            <pre class="embed-code-block">npm install ascii-arter
+            <pre class="embed-code-block">npm install @lowgame/ascii-arter
 
 // Önce JSON'u burada test et:
 // https://lowgame.github.io/Ascii-Arter/  (JSON Test)
@@ -312,7 +312,7 @@
           </div>
           <div class="embed-step">
             <div class="embed-step-label">Bundler usage</div>
-            <pre class="embed-code-block" id="embedSnippetBlock">import AsciiBackground, { parseProjectData } from 'ascii-arter';
+            <pre class="embed-code-block" id="embedSnippetBlock">import AsciiBackground, { parseProjectData } from '@lowgame/ascii-arter';
 
 fetch('/my-project.json')
   .then((res) =&gt; res.text())
@@ -324,7 +324,7 @@ fetch('/my-project.json')
           <div class="embed-step">
             <div class="embed-step-label">CDN usage</div>
             <pre class="embed-code-block" id="embedCdnBlock">&lt;script type="module"&gt;
-  import AsciiBackground, { parseProjectData } from 'https://unpkg.com/ascii-arter/dist/ascii-arter.esm.js';
+  import AsciiBackground, { parseProjectData } from 'https://unpkg.com/@lowgame/ascii-arter/dist/ascii-arter.esm.js';
 
   fetch('/my-project.json')
     .then((res) =&gt; res.text())

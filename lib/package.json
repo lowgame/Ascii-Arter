@@ -1,5 +1,5 @@
 {
-  "name": "ascii-arter",
+  "name": "@lowgame/ascii-arter",
   "version": "1.0.0",
   "description": "Drop ASCII art animations onto any element. Design on ASCII Arter, export JSON, embed anywhere.",
   "type": "module",
@@ -13,11 +13,21 @@
   },
   "unpkg": "./dist/ascii-arter.esm.js",
   "jsdelivr": "./dist/ascii-arter.esm.js",
-  "files": ["dist", "README.md", "LICENSE"],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "node build.mjs"
   },
-  "keywords": ["ascii", "art", "animation", "background", "canvas"],
+  "keywords": [
+    "ascii",
+    "art",
+    "animation",
+    "background",
+    "canvas"
+  ],
   "author": "lowgame",
   "homepage": "https://lowgame.github.io/Ascii-Arter/",
   "bugs": {

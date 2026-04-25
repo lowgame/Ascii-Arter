@@ -4,13 +4,13 @@ Design animated ASCII scenes in the browser, export them as JSON, and reuse them
 
 ASCII Arter has two sides:
 - a **visual editor** that runs as a static site
-- an **npm package** (`ascii-arter`) that mounts exported scenes onto real websites
+- an **npm package** (`@lowgame/ascii-arter`) that mounts exported scenes onto real websites
 
 ## Live links
 
 - **Editor:** https://lowgame.github.io/Ascii-Arter/
 - **Examples gallery:** https://lowgame.github.io/Ascii-Arter/examples/
-- **npm package:** https://www.npmjs.com/package/ascii-arter
+- **npm package:** https://www.npmjs.com/package/@lowgame/ascii-arter
 - **Package docs:** [`lib/README.md`](./lib/README.md)
 
 ## What it looks like
@@ -28,7 +28,7 @@ ASCII Arter has two sides:
 
 - **Pure static frontend** — no backend required
 - **Visual scene editor** — tune animation, palettes, chars, layers, text, SVG and export JSON
-- **Reusable package** — mount exported scenes on any DOM element with `ascii-arter`
+- **Reusable package** — mount exported scenes on any DOM element with `@lowgame/ascii-arter`
 - **GitHub Pages friendly** — editor + demos work as plain static files
 - **Real showcase pages** — not just toy snippets; there are full landing page examples in `examples/`
 
@@ -70,11 +70,11 @@ ASCII Arter has two sides:
 ## Package quick start
 
 ```bash
-npm install ascii-arter
+npm install @lowgame/ascii-arter
 ```
 
 ```js
-import AsciiBackground, { parseProjectData } from 'ascii-arter';
+import AsciiBackground, { parseProjectData } from '@lowgame/ascii-arter';
 
 const response = await fetch('/hero.json');
 const json = await response.text();
@@ -92,7 +92,7 @@ For full package docs, examples, API and usage notes:
 2. Design the scene visually
 3. Export the JSON
 4. Save that JSON in your site/app
-5. Mount it with `ascii-arter`
+5. Mount it with `@lowgame/ascii-arter`
 
 ## Run locally
 
