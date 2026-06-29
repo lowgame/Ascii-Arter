@@ -26,7 +26,7 @@ body{font-family:var(--ff);background:var(--bg);color:var(--text);height:100vh;o
 .preview-area canvas{max-width:100%;max-height:100%;image-rendering:auto}
 .preview-area canvas.pixelated{image-rendering:pixelated}
 .drop-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:5}
-.drop-overlay.on{background:rgba(110,200,255,.06);border:2px dashed var(--accent);pointer-events:auto}
+.drop-overlay.on{background:rgba(110,200,255,.06);border:2px dashed var(--accent)}
 .drop-msg{text-align:center;color:var(--dim);font-size:13px;line-height:1.6}
 .drop-msg b{color:var(--accent)}
 /* comparison slider */
@@ -261,14 +261,17 @@ $('demoBtn').onclick=()=>{
   loadImg(c.toDataURL());
 };
 
-// Drag-drop
-$('pvArea').ondragover=e=>{e.preventDefault();$('dropZone').classList.add('on')};
-$('pvArea').ondragleave=()=>$('dropZone').classList.remove('on');
-$('pvArea').ondrop=e=>{
-  e.preventDefault();$('dropZone').classList.remove('on');
+// Drag-drop — use document-level handlers to avoid child-element dragleave issues
+let dragCounter=0;
+document.addEventListener('dragover',e=>{e.preventDefault()});
+document.addEventListener('dragenter',e=>{e.preventDefault();dragCounter++;if(e.target.closest('#pvArea'))$('dropZone').classList.add('on')});
+document.addEventListener('dragleave',e=>{dragCounter--;if(dragCounter<=0){dragCounter=0;$('dropZone').classList.remove('on')}});
+document.addEventListener('drop',e=>{
+  e.preventDefault();dragCounter=0;$('dropZone').classList.remove('on');
   const f=e.dataTransfer.files[0];if(!f)return;
+  if(!e.target.closest('#pvArea'))return;
   const r=new FileReader();r.onload=()=>loadImg(r.result);r.readAsDataURL(f);
-};
+});
 
 // ═══════════ COMPARISON SLIDER ═══════════
 $('cmpBtn').onclick=()=>{
