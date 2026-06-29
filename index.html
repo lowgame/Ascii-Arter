@@ -344,29 +344,39 @@ $('randomBtn').onclick=()=>{
   const styleIds=STYLES.map(x=>x.id);
   s.style=styleIds[Math.floor(Math.random()*styleIds.length)];
   s.colorMode=COLOR_MODES[Math.floor(Math.random()*COLOR_MODES.length)];
-  s.brightness=+(Math.random()*2+0.3).toFixed(2);
-  s.contrast=+(Math.random()*3+0.5).toFixed(2);
-  s.saturation=+(Math.random()*2.5).toFixed(2);
-  s.invert=Math.random()<0.2;
-  s.resolution=Math.floor(Math.random()*250+50);
-  s.fontSize=Math.floor(Math.random()*12+5);
+  // Quality ranges: avoid extreme values that produce all-black or all-white
+  s.brightness=+(Math.random()*1.3+0.5).toFixed(2);   // 0.5 – 1.8
+  s.contrast=+(Math.random()*1.4+0.8).toFixed(2);      // 0.8 – 2.2
+  s.saturation=+(Math.random()*1.5+0.5).toFixed(2);    // 0.5 – 2.0
+  s.invert=Math.random()<0.1;                            // 10% chance
+  s.resolution=Math.floor(Math.random()*200+100);       // 100 – 300
+  s.fontSize=Math.floor(Math.random()*10+6);            // 6 – 16
   s.charRamp=RAMP_PRESETS[Math.floor(Math.random()*RAMP_PRESETS.length)];
-  s.edgeEnhance=+(Math.random()*1.2).toFixed(2);
-  s.bgMode=BG_MODES[Math.floor(Math.random()*BG_MODES.length)];
-  s.bgOpacity=Math.floor(Math.random()*70+30);
-  s.scanlines=Math.random()<0.3?+(Math.random()*0.5).toFixed(2):0;
-  s.noise=Math.random()<0.3?+(Math.random()*0.15).toFixed(2):0;
-  s.vignette=Math.random()<0.4?+(Math.random()*0.6).toFixed(2):0;
-  s.sharpen=Math.random()<0.3?+(Math.random()*1.5).toFixed(2):0;
-  s.threshold=Math.random()<0.2?+(Math.random()*0.6).toFixed(2):0;
-  s.bloom=Math.random()<0.4?+(Math.random()*0.5).toFixed(2):0;
-  s.chromaticAberration=Math.random()<0.4?+(Math.random()*4).toFixed(1):0;
-  s.letterbox=Math.random()<0.2?+(Math.random()*0.12).toFixed(2):0;
-  s.hueRotate=Math.random()<0.5?Math.floor(Math.random()*360):0;
+  s.edgeEnhance=+(Math.random()*0.7).toFixed(2);        // 0 – 0.7
+  // Never pick 'none' background (invisible)
+  const safeBGModes=BG_MODES.filter(m=>m!=='none');
+  s.bgMode=safeBGModes[Math.floor(Math.random()*safeBGModes.length)];
+  s.bgOpacity=Math.floor(Math.random()*60+40);          // 40 – 100
+  // Post effects with tasteful ranges
+  s.scanlines=Math.random()<0.2?+(Math.random()*0.3).toFixed(2):0;   // max 0.3
+  s.noise=Math.random()<0.15?+(Math.random()*0.06).toFixed(2):0;     // max 0.06
+  s.vignette=Math.random()<0.25?+(Math.random()*0.35).toFixed(2):0;  // max 0.35
+  s.sharpen=Math.random()<0.2?+(Math.random()*0.8).toFixed(2):0;     // max 0.8
+  // Threshold: low chance, low max — otherwise produces binary mess
+  s.threshold=Math.random()<0.1?+(Math.random()*0.3).toFixed(2):0;
+  s.bloom=Math.random()<0.25?+(Math.random()*0.35).toFixed(2):0;     // max 0.35
+  s.chromaticAberration=Math.random()<0.25?+(Math.random()*2.5).toFixed(1):0;
+  s.letterbox=Math.random()<0.1?+(Math.random()*0.05).toFixed(2):0;  // max 0.05
+  s.hueRotate=Math.random()<0.3?Math.floor(Math.random()*360):0;     // 30% chance
+  // Cross-parameter safety gates
+  if(s.threshold>0&&s.brightness<0.7)s.brightness=0.7;  // threshold needs some brightness
+  if(s.invert&&s.threshold>0)s.threshold=0;              // invert+threshold=unreadable
+  if(s.bloom>0.2&&s.brightness<0.6)s.brightness=0.6;    // bloom needs brightness
+  // Colors
   s.duoA='#'+Math.floor(Math.random()*16777215).toString(16).padStart(6,'0');
   s.duoB='#'+Math.floor(Math.random()*16777215).toString(16).padStart(6,'0');
   s.gradDir=['horizontal','vertical','diagonal','radial','diamond'][Math.floor(Math.random()*5)];
-  s.gradBlend=+(Math.random()).toFixed(2);
+  s.gradBlend=+(Math.random()*0.7+0.15).toFixed(2);     // 0.15 – 0.85
   s.gradA='#'+Math.floor(Math.random()*16777215).toString(16).padStart(6,'0');
   s.gradB='#'+Math.floor(Math.random()*16777215).toString(16).padStart(6,'0');
   syncDOM();
