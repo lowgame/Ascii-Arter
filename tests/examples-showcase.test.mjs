@@ -11,6 +11,124 @@ const rootDir = path.resolve(process.cwd());
 const here = path.dirname(fileURLToPath(import.meta.url));
 const require = createRequire(import.meta.url);
 
+const DEMOS = [
+  {
+    "slug": "pulseboard",
+    "name": "PulseBoard",
+    "title": "PulseBoard — Product signals without dashboard chaos",
+    "heroText": "See product signals before churn shows up."
+  },
+  {
+    "slug": "vaultflow",
+    "name": "Vaultflow",
+    "title": "Vaultflow — Treasury automation for lean finance teams",
+    "heroText": "Move cash with less dashboard debt."
+  },
+  {
+    "slug": "chromawave",
+    "name": "Chromawave",
+    "title": "Chromawave — Colorful wave launch page",
+    "heroText": "Let color do the first sell."
+  },
+  {
+    "slug": "orbitdeck",
+    "name": "OrbitDeck",
+    "title": "OrbitDeck — Floating product cards on ASCII ribbons",
+    "heroText": "Show the product before the dashboard cliché."
+  },
+  {
+    "slug": "midnightsilk",
+    "name": "MidnightSilk",
+    "title": "MidnightSilk — Cinematic full-background launch page",
+    "heroText": "Let the backdrop carry the tension."
+  },
+  {
+    "slug": "opalgrid",
+    "name": "OpalGrid",
+    "title": "OpalGrid — Soft white editorial grid with full-page motion",
+    "heroText": "Minimal copy. Full-frame atmosphere."
+  },
+  {
+    "slug": "auricnoir",
+    "name": "AuricNoir",
+    "title": "AuricNoir — Luxury black-and-gold full-background hero",
+    "heroText": "A quiet hero that still feels expensive."
+  },
+  {
+    "slug": "seaglass",
+    "name": "SeaGlass",
+    "title": "SeaGlass — Frosted ocean landing page with full-screen ASCII tide",
+    "heroText": "Keep the UI light and let the tide move."
+  },
+  {
+    "slug": "neonveil",
+    "name": "NeonVeil",
+    "title": "NeonVeil — Minimal poster-style glow background",
+    "heroText": "Glow in the background, not the buttons."
+  },
+  {
+    "slug": "papermoon",
+    "name": "PaperMoon",
+    "title": "PaperMoon — Airy editorial landing page on a living canvas",
+    "heroText": "The page stays clean while the field breathes."
+  },
+  {
+    "slug": "embermono",
+    "name": "EmberMono",
+    "title": "EmberMono — Warm monochrome launch page with ember drift",
+    "heroText": "Soft heat, almost no chrome."
+  },
+  {
+    "slug": "fjordmist",
+    "name": "FjordMist",
+    "title": "FjordMist — Nordic mist product page with full-bleed motion",
+    "heroText": "Cold, calm, and deliberately sparse."
+  },
+  {
+    "slug": "signalzero",
+    "name": "SignalZero",
+    "title": "SignalZero — Minimal monochrome system page with ambient scan",
+    "heroText": "Reduce the interface until only the signal remains."
+  },
+  {
+    "slug": "rosezenith",
+    "name": "RoseZenith",
+    "title": "RoseZenith — Pearl-pink halo page with floating notes",
+    "heroText": "A softer full-background look for beauty or fashion brands."
+  }
+];
+const GALLERY_ASSERTIONS = [
+  /RelayStack/i,
+  /PulseBoard/i,
+  /Vaultflow/i,
+  /Chromawave/i,
+  /OrbitDeck/i,
+  /MidnightSilk/i,
+  /OpalGrid/i,
+  /AuricNoir/i,
+  /SeaGlass/i,
+  /NeonVeil/i,
+  /PaperMoon/i,
+  /EmberMono/i,
+  /FjordMist/i,
+  /SignalZero/i,
+  /RoseZenith/i,
+  /Apple\-style\ ASCII\ wave\ hero/i,
+  /Your\ Company/i,
+  /colorful\ wave/i,
+  /floating\ product\ cards/i,
+  /cinematic\ full\-background\ launch\ page/i,
+  /soft\ white\ editorial\ grid/i,
+  /black\-and\-gold\ full\-background\ hero/i,
+  /full\-screen\ ASCII\ tide/i,
+  /poster\-style\ glow\ background/i,
+  /living\ canvas/i,
+  /ember\ drift/i,
+  /full\-bleed\ motion/i,
+  /ambient\ scan/i,
+  /floating\ notes/i,
+];
+
 function loadPlaywright() {
   const candidates = [
     'playwright',
@@ -92,15 +210,7 @@ async function withStaticServer(run) {
 
 test('examples gallery lists all showcase demos and screenshot assets exist', async () => {
   const galleryHtml = await readFile(path.join(rootDir, 'examples/index.html'), 'utf8');
-  assert.match(galleryHtml, /RelayStack/);
-  assert.match(galleryHtml, /PulseBoard/);
-  assert.match(galleryHtml, /Vaultflow/);
-  assert.match(galleryHtml, /Chromawave/);
-  assert.match(galleryHtml, /OrbitDeck/);
-  assert.match(galleryHtml, /Apple-style ASCII wave hero/i);
-  assert.match(galleryHtml, /Your Company/i);
-  assert.match(galleryHtml, /colorful wave/i);
-  assert.match(galleryHtml, /floating product cards/i);
+  for (const pattern of GALLERY_ASSERTIONS) assert.match(galleryHtml, pattern);
 
   for (const asset of [
     'assets/screenshots/relaystack-demo.png',
@@ -108,43 +218,50 @@ test('examples gallery lists all showcase demos and screenshot assets exist', as
     'assets/screenshots/vaultflow-demo.png',
     'assets/screenshots/chromawave-demo.png',
     'assets/screenshots/orbitdeck-demo.png',
+    'assets/screenshots/midnightsilk-demo.png',
+    'assets/screenshots/opalgrid-demo.png',
+    'assets/screenshots/auricnoir-demo.png',
+    'assets/screenshots/seaglass-demo.png',
+    'assets/screenshots/neonveil-demo.png',
+    'assets/screenshots/papermoon-demo.png',
+    'assets/screenshots/embermono-demo.png',
+    'assets/screenshots/fjordmist-demo.png',
+    'assets/screenshots/signalzero-demo.png',
+    'assets/screenshots/rosezenith-demo.png',
   ]) {
     assert.equal(existsSync(path.join(rootDir, asset)), true, `${asset} should exist`);
   }
 });
 
-test('repo and npm readmes highlight the artistic wave demo and Your Company starter copy', async () => {
+test('repo and npm readmes highlight the showcase range from artistic wave heroes to full-background studies', async () => {
   const repoReadme = await readFile(path.join(rootDir, 'README.md'), 'utf8');
   const packageReadme = await readFile(path.join(rootDir, 'lib/README.md'), 'utf8');
 
-  assert.match(repoReadme, /Apple-style ASCII wave hero/i);
-  assert.match(repoReadme, /Your Company/i);
-  assert.match(packageReadme, /Apple-style ASCII wave hero/i);
-  assert.match(packageReadme, /Your Company/i);
+  for (const pattern of [
+  /Apple\-style\ ASCII\ wave\ hero/i,
+  /Your\ Company/i,
+  /Chromawave/i,
+  /OrbitDeck/i,
+  /MidnightSilk/i,
+  /OpalGrid/i,
+  /AuricNoir/i,
+  /SeaGlass/i,
+  /NeonVeil/i,
+  /PaperMoon/i,
+  /EmberMono/i,
+  /FjordMist/i,
+  /SignalZero/i,
+  /RoseZenith/i,
+  /full\-background/i,
+  /full\-screen/i,
+  /full\-bleed/i,
+  ]) {
+    assert.match(repoReadme, pattern);
+    assert.match(packageReadme, pattern);
+  }
 });
 
-for (const demo of [
-  {
-    slug: 'pulseboard',
-    title: 'PulseBoard — Product signals without dashboard chaos',
-    heroText: 'See product signals before churn shows up.',
-  },
-  {
-    slug: 'vaultflow',
-    title: 'Vaultflow — Treasury automation for lean finance teams',
-    heroText: 'Move cash with less dashboard debt.',
-  },
-  {
-    slug: 'chromawave',
-    title: 'Chromawave — Colorful wave launch page',
-    heroText: 'Let color do the first sell.',
-  },
-  {
-    slug: 'orbitdeck',
-    title: 'OrbitDeck — Floating product cards on ASCII ribbons',
-    heroText: 'Show the product before the dashboard cliché.',
-  },
-]) {
+for (const demo of DEMOS) {
   test(`${demo.slug} demo mounts ascii-arter backgrounds without console errors`, async () => {
     let browser;
     try {
@@ -159,7 +276,7 @@ for (const demo of [
 
         await page.goto(`http://127.0.0.1:${port}/examples/${demo.slug}/`, { waitUntil: 'networkidle' });
         await page.waitForFunction(() => document.documentElement.dataset.demoReady === 'true');
-        await page.waitForTimeout(700);
+        await page.waitForTimeout(400);
 
         const info = await page.evaluate(() => ({
           title: document.title,

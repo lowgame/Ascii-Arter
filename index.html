@@ -1,412 +1,502 @@
 <!doctype html>
-<html lang="tr">
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ASCII Arter</title>
-  <meta name="description" content="Gerçek zamanlı ASCII art scene editor." />
-  <link rel="stylesheet" href="./css/main.css?v=ui-realtime-3" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ASCII Arter — Image to ASCII Art Converter</title>
+<style>
+:root{--bg:#0d0d0d;--panel:#141414;--border:#222;--text:#ccc;--dim:#777;--accent:#5ec8ff;--accent2:#ff6b6b;--radius:8px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden;display:flex;flex-direction:column}
+/* ---- HEADER ---- */
+header{display:flex;align-items:center;justify-content:space-between;padding:8px 16px;background:var(--panel);border-bottom:1px solid var(--border);z-index:10;flex-shrink:0}
+.brand{font-size:18px;font-weight:700;letter-spacing:-0.5px;color:#fff}
+.brand span{color:var(--accent)}
+.header-actions{display:flex;gap:8px;align-items:center}
+/* ---- LAYOUT ---- */
+main{display:flex;flex:1;overflow:hidden}
+.canvas-area{flex:1;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;background:var(--bg)}
+.canvas-area canvas{max-width:100%;max-height:100%;object-fit:contain;image-rendering:pixelated}
+.drop-zone{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:5}
+.drop-zone.active{background:rgba(94,200,255,.08);border:2px dashed var(--accent);pointer-events:auto}
+.drop-msg{text-align:center;color:var(--dim);font-size:15px;line-height:1.6;pointer-events:none}
+.drop-msg b{color:var(--accent)}
+/* ---- SIDEBAR ---- */
+.sidebar{width:280px;background:var(--panel);border-left:1px solid var(--border);overflow-y:auto;flex-shrink:0;padding:12px;display:flex;flex-direction:column;gap:12px}
+.sidebar::-webkit-scrollbar{width:4px}
+.sidebar::-webkit-scrollbar-thumb{background:#333;border-radius:2px}
+.section-label{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--dim);margin-bottom:2px}
+/* ---- BUTTONS ---- */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border:1px solid var(--border);border-radius:var(--radius);background:var(--panel);color:var(--text);cursor:pointer;font-size:13px;transition:.15s;white-space:nowrap}
+.btn:hover{border-color:var(--accent);color:#fff}
+.btn-primary{background:var(--accent);color:#000;border-color:var(--accent);font-weight:600}
+.btn-primary:hover{opacity:.9}
+.btn-sm{padding:4px 10px;font-size:11px}
+/* ---- STYLE GRID ---- */
+.style-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.style-card{padding:8px 6px;border:1px solid var(--border);border-radius:6px;cursor:pointer;text-align:center;font-size:11px;transition:.15s;background:var(--bg)}
+.style-card:hover{border-color:var(--accent)}
+.style-card.active{border-color:var(--accent);background:rgba(94,200,255,.1)}
+.style-card .ic{font-size:20px;display:block;margin-bottom:4px}
+/* ---- CONTROLS ---- */
+.ctrl-group{margin-bottom:8px}
+.ctrl-group label{display:flex;justify-content:space-between;font-size:12px;color:var(--dim);margin-bottom:3px}
+.ctrl-group label span{color:var(--text);font-weight:600}
+input[type=range]{width:100%;-webkit-appearance:none;height:4px;background:var(--border);border-radius:2px;outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--accent);cursor:pointer}
+select{width:100%;padding:6px 8px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:4px;font-size:12px}
+.char-input{width:100%;padding:6px 8px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:4px;font-size:12px;font-family:monospace}
+/* ---- STATUS ---- */
+.status-bar{padding:4px 16px;background:var(--panel);border-top:1px solid var(--border);font-size:11px;color:var(--dim);flex-shrink:0;display:flex;justify-content:space-between}
+/* ---- RESPONSIVE ---- */
+@media(max-width:768px){.sidebar{width:100%;border-left:none;border-top:1px solid var(--border);max-height:40vh}.canvas-area{min-height:60vh}main{flex-direction:column}}
+</style>
 </head>
 <body>
-  <div id="appShell" class="app-shell">
-    <div id="settingsBackdrop" hidden></div>
 
-    <header class="app-header">
-      <div class="brand-block">
-        <span class="brand">ASCII Arter</span>
-        <span class="brand-subtitle">Ayar yaparken preview hep gözünün önünde kalsın. Menü değil, çalışma masası.</span>
-      </div>
+<header>
+  <div class="brand">ASCII <span>Arter</span></div>
+  <div class="header-actions">
+    <button class="btn btn-sm" id="uploadBtn">📁 Upload</button>
+    <input type="file" id="fileInput" hidden accept="image/*,video/*">
+    <button class="btn btn-sm" id="urlBtn">🔗 URL</button>
+    <button class="btn btn-sm" id="pasteBtn">📋 Paste</button>
+    <button class="btn btn-sm" id="demoBtn">🎲 Demo</button>
+    <select id="exportFmt" style="width:auto;padding:4px 8px;font-size:11px">
+      <option>PNG</option><option>JPG</option><option>GIF</option>
+    </select>
+    <button class="btn btn-primary btn-sm" id="exportBtn">⬇ Export</button>
+  </div>
+</header>
 
-      <div class="header-actions">
-        <button id="playPauseBtn" class="btn btn-ghost" type="button">Pause</button>
-        <button id="randomizeBtn" class="btn btn-primary" type="button">Randomize</button>
-        <button id="jsonTestBtn" class="btn" type="button">JSON Test</button>
-
-        <div class="export-group">
-          <button class="btn" id="exportMenuBtn" type="button" aria-haspopup="true" aria-expanded="false">Export</button>
-          <div class="dropdown" id="exportDropdown">
-            <button id="copyFrameBtn" type="button">Copy frame</button>
-            <button id="exportTxtBtn" type="button">Export TXT</button>
-            <button id="exportPngBtn" type="button">Export PNG</button>
-            <button id="exportHtmlBtn" type="button">Export HTML</button>
-            <button id="exportProjectBtn" type="button">Export JSON</button>
-            <button id="importBtn" type="button">Import JSON</button>
-            <button id="embedCodeBtn" type="button">Embed code</button>
-          </div>
-        </div>
-
-        <button id="settingsToggleBtn" class="btn" type="button" hidden aria-pressed="false">Ayarlar</button>
-        <button id="openSettingsInlineBtn" class="btn" type="button" hidden>İnce ayarlar</button>
-        <button id="settingsCloseBtn" class="btn" type="button" hidden>Kapat</button>
-        <input id="importProjectInput" type="file" accept="application/json" hidden />
-      </div>
-    </header>
-
-    <main class="workspace">
-      <aside class="editor-rail">
-        <section class="accordion-card is-open" data-accordion-item="subject">
-          <button class="accordion-trigger" type="button" data-accordion-trigger="subject" aria-expanded="true" aria-controls="subjectAccordionBody">
-            <span class="accordion-trigger-copy">
-              <span class="eyebrow">Ana içerik</span>
-              <span class="accordion-title">Metin / SVG</span>
-            </span>
-            <span class="accordion-arrow" aria-hidden="true">›</span>
-          </button>
-
-          <div id="subjectAccordionBody" class="accordion-body">
-            <div class="subject-layout">
-              <div class="subject-card-head">
-                <div class="card-head-actions">
-                  <button class="subject-tab active" data-type="text" id="activateTextBtn" type="button">Text</button>
-                  <button class="subject-tab" data-type="svg" id="activateSvgBtn" type="button">SVG</button>
-                </div>
-              </div>
-
-              <div id="subjectTextArea" class="subject-panel">
-                <label class="subject-field-label" for="subjectTextInput">Ana yazı</label>
-                <textarea id="subjectTextInput" class="main-input" placeholder="Ana metni yaz. Preset değişse bile bu yazı kalır ve preset stiline bürünür." rows="3" spellcheck="false"></textarea>
-              </div>
-
-              <div id="subjectSvgArea" class="subject-panel" hidden>
-                <label class="subject-field-label" for="subjectSvgInput">SVG içeriği</label>
-                <textarea id="subjectSvgInput" class="main-input main-input-mono" placeholder="<svg>...</svg> yapıştır" rows="3" spellcheck="false"></textarea>
-                <div class="subject-panel-actions">
-                  <button class="btn btn-ghost btn-sm" id="subjectSvgUpload" type="button">SVG yükle</button>
-                  <input id="subjectSvgFileInput" type="file" accept=".svg,image/svg+xml" hidden />
-                </div>
-              </div>
-
-              <div id="subjectOptions" class="subject-control-grid">
-                <label class="mini-control slider-control">
-                  <span>Harf arası</span>
-                  <input type="range" id="subjectLetterSpacing" min="0" max="6" step="1" value="0" />
-                </label>
-
-                <label class="mini-control">
-                  <span>Font</span>
-                  <select id="subjectFontFamily" class="select-compact">
-                    <option value="mono">Mono</option>
-                    <option value="sans">Sans</option>
-                    <option value="serif">Serif</option>
-                  </select>
-                </label>
-
-                <label class="mini-control">
-                  <span>Weight</span>
-                  <select id="subjectFontWeight" class="select-compact">
-                    <option value="bold">Bold</option>
-                    <option value="900">Extra Bold</option>
-                    <option value="normal">Normal</option>
-                  </select>
-                </label>
-
-                <label class="mini-control slider-control">
-                  <span>BG</span>
-                  <input type="range" id="subjectBgIntensity" min="0" max="0.5" step="0.01" value="0.08" />
-                </label>
-
-                <label class="mini-control slider-control">
-                  <span>Padding</span>
-                  <input type="range" id="subjectPadding" min="0" max="12" step="1" value="4" />
-                </label>
-
-                <div class="subject-action-row">
-                  <button class="btn btn-ghost btn-sm" id="shuffleCharsetBtn" type="button">Charset</button>
-                  <button class="btn btn-ghost btn-sm" id="subjectClearBtn" type="button">Clear</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section class="accordion-card" data-accordion-item="presets">
-          <button class="accordion-trigger" type="button" data-accordion-trigger="presets" aria-expanded="false" aria-controls="presetsAccordionBody">
-            <span class="accordion-trigger-copy">
-              <span class="eyebrow">Presetler</span>
-              <span class="accordion-title">Hazır stiller</span>
-            </span>
-            <span class="accordion-arrow" aria-hidden="true">›</span>
-          </button>
-
-          <div id="presetsAccordionBody" class="accordion-body" hidden>
-            <section class="tool-panel tool-panel-embedded">
-              <div class="panel-body preset-panel-body">
-                <label class="mini-control preset-picker">
-                  <span>Preset seç</span>
-                  <select id="presetSelect" class="select-compact"></select>
-                </label>
-
-                <div class="preset-action-row">
-                  <button id="presetsGalleryBtn" class="btn" type="button">Galeriyi aç</button>
-                  <button id="savePresetBtn" class="btn btn-ghost" type="button">Kaydet</button>
-                </div>
-
-                <p class="preset-hint">Preset seçince ana yazın kaybolmaz. Stil presetten gelir, içerik senden kalır.</p>
-              </div>
-            </section>
-          </div>
-        </section>
-
-        <section class="accordion-card" data-accordion-item="controls">
-          <button class="accordion-trigger" type="button" data-accordion-trigger="controls" aria-expanded="false" aria-controls="controlsAccordionBody">
-            <span class="accordion-trigger-copy">
-              <span class="eyebrow">Sahne</span>
-              <span class="accordion-title">Global controls</span>
-            </span>
-            <span class="accordion-arrow" aria-hidden="true">›</span>
-          </button>
-
-          <div id="controlsAccordionBody" class="accordion-body" hidden>
-            <section id="controlsPanel" class="tool-panel tool-panel-embedded">
-              <div class="panel-body">
-                <div id="controlsContent"></div>
-              </div>
-            </section>
-          </div>
-        </section>
-
-        <section class="accordion-card" data-accordion-item="layers">
-          <button class="accordion-trigger" type="button" data-accordion-trigger="layers" aria-expanded="false" aria-controls="layersAccordionBody">
-            <span class="accordion-trigger-copy">
-              <span class="eyebrow">Katmanlar</span>
-              <span class="accordion-title">Layers, text, snapshot</span>
-            </span>
-            <span class="accordion-arrow" aria-hidden="true">›</span>
-          </button>
-
-          <div id="layersAccordionBody" class="accordion-body" hidden>
-            <section id="layersPanel" class="tool-panel tool-panel-embedded">
-              <div class="panel-body layers-panel-body">
-                <details open id="layersAnimationSection">
-                  <summary>
-                    <span>Animation Layers</span>
-                    <span class="summary-actions" onclick="event.stopPropagation()">
-                      <button id="moveLayerUpBtn" class="icon-btn" type="button" title="Move Up">↑</button>
-                      <button id="moveLayerDownBtn" class="icon-btn" type="button" title="Move Down">↓</button>
-                      <button id="duplicateLayerBtn" class="icon-btn" type="button" title="Duplicate">⎘</button>
-                      <button id="removeLayerBtn" class="icon-btn danger" type="button" title="Remove">−</button>
-                      <button id="addLayerBtn" class="icon-btn primary" type="button" title="Add">＋</button>
-                    </span>
-                  </summary>
-                  <div class="details-scroll" data-scroll-panel="layers-animation">
-                    <div id="layersList" class="list-stack"></div>
-                    <div id="layerInspector" class="inspector"></div>
-                  </div>
-                </details>
-
-                <details>
-                  <summary>
-                    <span>Text Layers</span>
-                    <span class="summary-actions" onclick="event.stopPropagation()">
-                      <button id="duplicateTextBtn" class="icon-btn" type="button" title="Duplicate">⎘</button>
-                      <button id="removeTextBtn" class="icon-btn danger" type="button" title="Remove">−</button>
-                      <button id="addTextBtn" class="icon-btn primary" type="button" title="Add">＋</button>
-                    </span>
-                  </summary>
-                  <div class="details-scroll" data-scroll-panel="layers-text">
-                    <div id="textsList" class="list-stack"></div>
-                    <div id="textInspector" class="inspector"></div>
-                  </div>
-                </details>
-
-                <details id="svgLayersSection">
-                  <summary>
-                    <span>SVG Layers</span>
-                    <span class="summary-actions" onclick="event.stopPropagation()">
-                      <button id="removeSvgLayerBtn" class="icon-btn danger" type="button" title="Remove">−</button>
-                      <button id="addSvgLayerBtn" class="icon-btn primary" type="button" title="Add SVG Layer">＋</button>
-                    </span>
-                  </summary>
-                  <div class="details-scroll" data-scroll-panel="layers-svg">
-                    <div id="svgLayersList" class="list-stack"></div>
-                    <div class="inline-actions">
-                      <input id="svgUploadInput" type="file" accept=".svg,image/svg+xml" hidden />
-                      <button class="btn btn-ghost btn-sm" type="button" onclick="document.getElementById('svgUploadInput').click()">Upload SVG</button>
-                    </div>
-                    <div id="svgLayerInspector" class="inspector"></div>
-                  </div>
-                </details>
-
-                <details>
-                  <summary>ASCII Snapshot</summary>
-                  <div class="details-scroll" data-scroll-panel="layers-snapshot">
-                    <div class="snapshot-bar">
-                      <button id="refreshFrameBtn" class="btn btn-ghost btn-sm" type="button">Refresh</button>
-                    </div>
-                    <textarea id="frameOutput" spellcheck="false" aria-label="ASCII frame output"></textarea>
-                  </div>
-                </details>
-              </div>
-            </section>
-          </div>
-        </section>
-
-        <div id="settingsDrawer" hidden aria-hidden="true"></div>
-        <button class="panel-tab panel-tab-left" id="controlsTab" data-panel="controlsPanel" type="button" hidden>Controls</button>
-        <button class="panel-tab panel-tab-right" id="layersTab" data-panel="layersPanel" type="button" hidden>Layers</button>
-      </aside>
-
-      <section class="preview-pane">
-        <section class="preview-card" id="previewCard">
-          <div class="card-head preview-head">
-            <div>
-              <p class="eyebrow">Canlı preview</p>
-              <h2>Değiştirirken izle</h2>
-            </div>
-            <div class="preview-head-side">
-              <span class="preview-note">Tüm değişiklikler burada anlık yansır.</span>
-              <button id="fullscreenRandomizeBtn" class="btn btn-primary" type="button">Randomize</button>
-              <button id="fullscreenBtn" class="btn" type="button" aria-pressed="false">Fullscreen</button>
-            </div>
-          </div>
-
-          <div class="preview-frame">
-            <div class="stage-area">
-              <canvas id="bgCanvas" aria-hidden="true" hidden></canvas>
-              <div class="canvas-wrap">
-                <canvas id="stageCanvas" aria-label="ASCII preview canvas"></canvas>
-              </div>
-            </div>
-          </div>
-
-          <footer class="stats-bar">
-            <div class="stats-main">
-              <span id="projectTitleLabel" class="stats-title">ASCII Arter</span>
-              <span id="statusStat" class="stats-status">Ready</span>
-            </div>
-            <div class="stats-inline">
-              <span id="fpsStat" hidden>FPS: —</span>
-              <span id="renderStat" hidden>Render: — ms</span>
-              <span id="cellsStat" hidden>Cells: —</span>
-              <span id="layersStat" hidden>Layers: —</span>
-            </div>
-          </footer>
-        </section>
-      </section>
-    </main>
-
-    <div id="presetsModal" class="presets-modal-overlay" hidden>
-      <div class="presets-modal">
-        <div class="presets-modal-header">
-          <span class="presets-modal-title">Choose a preset</span>
-          <button id="presetsModalClose" class="panel-close" type="button" title="Close">✕</button>
-        </div>
-        <div id="presetsGrid" class="presets-grid"></div>
-      </div>
-    </div>
-
-    <div id="embedModal" class="presets-modal-overlay" hidden>
-      <div class="presets-modal embed-modal">
-        <div class="presets-modal-header">
-          <span class="presets-modal-title">Embed / JSON Test</span>
-          <button id="embedModalClose" class="panel-close" type="button" title="Close">✕</button>
-        </div>
-        <div class="embed-modal-body">
-          <div class="embed-step">
-            <div class="embed-step-label">Install the library</div>
-            <pre class="embed-code-block">npm install @lowgame/ascii-arter
-
-// Önce JSON'u burada test et:
-// https://lowgame.github.io/Ascii-Arter/  (JSON Test)
-// sonra kendi sitende kullan.</pre>
-          </div>
-          <div class="embed-step">
-            <div class="embed-step-label">Bundler usage</div>
-            <pre class="embed-code-block" id="embedSnippetBlock">import AsciiBackground, { parseProjectData } from '@lowgame/ascii-arter';
-
-fetch('/my-project.json')
-  .then((res) =&gt; res.text())
-  .then((json) =&gt; {
-    AsciiBackground.mount('#my-element', parseProjectData(json));
-  });</pre>
-            <button class="btn btn-ghost embed-copy-btn" id="embedCopySnippetBtn" type="button">Copy snippet</button>
-          </div>
-          <div class="embed-step">
-            <div class="embed-step-label">CDN usage</div>
-            <pre class="embed-code-block" id="embedCdnBlock">&lt;script type="module"&gt;
-  import AsciiBackground, { parseProjectData } from 'https://unpkg.com/@lowgame/ascii-arter/dist/ascii-arter.esm.js';
-
-  fetch('/my-project.json')
-    .then((res) =&gt; res.text())
-    .then((json) =&gt; {
-      AsciiBackground.mount('#my-element', parseProjectData(json));
-    });
-&lt;/script&gt;</pre>
-          </div>
-          <div class="embed-step">
-            <div class="embed-step-label">Current project JSON</div>
-            <textarea id="embedJsonTextarea" class="embed-json-textarea" readonly></textarea>
-            <button class="btn btn-ghost embed-copy-btn" id="embedCopyJsonBtn" type="button">Copy JSON</button>
-          </div>
-          <div class="embed-step">
-            <div class="embed-step-label">Test with existing JSONs</div>
-            <div class="embed-inline-row">
-              <select id="embedPresetJsonSelect" class="select-compact embed-select"></select>
-              <button class="btn btn-ghost" id="embedLoadPresetJsonBtn" type="button">Load to Paste Area</button>
-              <button class="btn btn-primary" id="embedApplyPresetJsonBtn" type="button">Apply Selected</button>
-              <button class="btn" id="embedExportTesterJsonBtn" type="button">Export Tested JSON</button>
-            </div>
-            <textarea id="embedPresetJsonPreview" class="embed-json-textarea" readonly></textarea>
-          </div>
-          <div class="embed-step">
-            <div class="embed-step-label">Paste JSON here (test/import)</div>
-            <textarea id="embedPasteJsonTextarea" class="embed-json-textarea" placeholder="Paste project JSON and click Apply"></textarea>
-            <button class="btn btn-primary embed-copy-btn" id="embedApplyJsonBtn" type="button">Apply Pasted JSON</button>
-          </div>
-        </div>
+<main>
+  <div class="canvas-area" id="canvasArea">
+    <canvas id="preview"></canvas>
+    <div class="drop-zone" id="dropZone">
+      <div class="drop-msg">
+        <b>Drop an image here</b><br>
+        or click Upload · Paste · URL · Demo
       </div>
     </div>
   </div>
 
-  <script>
-    (() => {
-      const exportBtn = document.getElementById('exportMenuBtn');
-      const exportDropdown = document.getElementById('exportDropdown');
-      const accordionItems = Array.from(document.querySelectorAll('[data-accordion-item]'));
+  <aside class="sidebar">
+    <div class="section-label">Style</div>
+    <div class="style-grid" id="styleGrid"></div>
 
-      function openAccordion(key) {
-        accordionItems.forEach((item) => {
-          const isOpen = item.dataset.accordionItem === key;
-          const trigger = item.querySelector('[data-accordion-trigger]');
-          const body = item.querySelector('.accordion-body');
-          item.classList.toggle('is-open', isOpen);
-          if (trigger) trigger.setAttribute('aria-expanded', String(isOpen));
-          if (body) body.hidden = !isOpen;
-        });
+    <div class="section-label">Parameters</div>
+    <div class="ctrl-group"><label>Brightness <span id="brVal">1.0</span></label><input type="range" id="brightness" min="0" max="3" step="0.05" value="1"></div>
+    <div class="ctrl-group"><label>Contrast <span id="ctVal">1.0</span></label><input type="range" id="contrast" min="0" max="4" step="0.05" value="1"></div>
+    <div class="ctrl-group"><label>Resolution <span id="resVal">120</span></label><input type="range" id="resolution" min="20" max="300" step="5" value="120"></div>
+    <div class="ctrl-group"><label>Invert</label><input type="checkbox" id="invert"></div>
+    <div class="ctrl-group"><label>Character Ramp</label><input type="text" class="char-input" id="charRamp" value="@%#*+=-:. "></div>
+
+    <div class="section-label">Background</div>
+    <select id="bgMode">
+      <option value="blur">Blurred Image</option>
+      <option value="black">Solid Black</option>
+      <option value="image">Original Image</option>
+      <option value="none">Transparent</option>
+    </select>
+
+    <div class="section-label">Export</div>
+    <div class="ctrl-group"><label>Font Size <span id="fsVal">10</span></label><input type="range" id="fontSize" min="6" max="24" step="1" value="10"></div>
+  </aside>
+</main>
+
+<div class="status-bar">
+  <span id="status">Ready — drop an image or click Demo</span>
+  <span id="dimensions"></span>
+</div>
+
+<script>
+// ═══════════ STATE ═══════════
+const STYLES=[
+  {id:'chars',name:'Characters',ic:'@'},
+  {id:'blocks',name:'Block Chars',ic:'█'},
+  {id:'pixel',name:'Pixel Art',ic:'▣'},
+  {id:'dither',name:'Dither',ic:'▨'},
+  {id:'dots',name:'Halftone',ic:'●'},
+  {id:'mosaic',name:'Mosaic',ic:'⊞'},
+  {id:'lego',name:'LEGO',ic:'◉'},
+  {id:'glitch',name:'Glitch',ic:'⌇'},
+];
+let state={style:'chars',brightness:1,contrast:1,resolution:120,invert:false,charRamp:'@%#*+=-:. ',bgMode:'blur',fontSize:10};
+let sourceImage=null,sourceVideo=null,isProcessing=false;
+
+// ═══════════ DOM ═══════════
+const $=id=>document.getElementById(id);
+const preview=$('preview'),dropZone=$('dropZone'),canvasArea=$('canvasArea');
+const ctx=preview.getContext('2d');
+
+// ═══════════ STYLE GRID ═══════════
+function buildStyleGrid(){
+  let h='';
+  for(const s of STYLES){
+    h+=`<div class="style-card${state.style===s.id?' active':''}" data-style="${s.id}">
+      <span class="ic">${s.ic}</span>${s.name}
+    </div>`;
+  }
+  $('styleGrid').innerHTML=h;
+}
+buildStyleGrid();
+$('styleGrid').addEventListener('click',e=>{
+  const c=e.target.closest('.style-card');if(!c)return;
+  state.style=c.dataset.style;
+  document.querySelectorAll('.style-card').forEach(x=>x.classList.remove('active'));
+  c.classList.add('active');
+  processImage();
+});
+
+// ═══════════ CONTROLS ═══════════
+['brightness','contrast','resolution','fontSize'].forEach(id=>{
+  $(id).addEventListener('input',()=>{
+    state[id]=+$(id).value;
+    $(id+'Val').textContent=$(id).value;
+    if(id!=='fontSize')processImage();
+  });
+});
+$('invert').addEventListener('change',()=>{state.invert=$('invert').checked;processImage()});
+$('charRamp').addEventListener('input',()=>{state.charRamp=$('charRamp').value||' ';processImage()});
+$('bgMode').addEventListener('change',()=>{state.bgMode=$('bgMode').value;processImage()});
+$('exportFmt').addEventListener('change',()=>{});
+
+// ═══════════ IMAGE LOADING ═══════════
+function loadImage(src){
+  const img=new Image();img.crossOrigin='anonymous';
+  img.onload=()=>{sourceImage=img;sourceVideo=null;processImage();setStatus(`Loaded: ${img.naturalWidth}×${img.naturalHeight}`)};
+  img.onerror=()=>setStatus('Failed to load image');
+  img.src=src;
+  $('dropZone').style.display='none';
+}
+
+$('uploadBtn').addEventListener('click',()=>$('fileInput').click());
+$('fileInput').addEventListener('change',()=>{
+  const f=$('fileInput').files[0];if(!f)return;
+  if(f.type.startsWith('video/')){loadVideo(URL.createObjectURL(f));return}
+  const r=new FileReader();r.onload=()=>loadImage(r.result);r.readAsDataURL(f);
+});
+
+$('urlBtn').addEventListener('click',()=>{
+  const url=prompt('Image URL:');if(url)loadImage(url);
+});
+
+$('pasteBtn').addEventListener('click',async()=>{
+  try{const items=await navigator.clipboard.read();for(const item of items){if(item.types.some(t=>t.startsWith('image/'))){const blob=await item.getType('image/png');loadImage(URL.createObjectURL(blob));return}}}catch(e){setStatus('No image in clipboard or permission denied')}
+});
+
+$('demoBtn').addEventListener('click',()=>{
+  // Generate a colorful demo image
+  const c=document.createElement('canvas');c.width=600;c.height=400;
+  const x=c.getContext('2d');
+  const g=x.createLinearGradient(0,0,600,400);
+  g.addColorStop(0,'#ff6b6b');g.addColorStop(0.25,'#ffd93d');g.addColorStop(0.5,'#6bcb77');g.addColorStop(0.75,'#4d96ff');g.addColorStop(1,'#9b59b6');
+  x.fillStyle=g;x.fillRect(0,0,600,400);
+  x.fillStyle='#fff';x.font='bold 80px sans-serif';x.textAlign='center';
+  x.fillText('ASCII',300,180);x.font='60px sans-serif';x.fillText('ARTER',300,270);
+  // Add some shapes
+  x.beginPath();x.arc(100,100,50,0,Math.PI*2);x.fillStyle='rgba(255,255,255,.3)';x.fill();
+  x.beginPath();x.arc(500,300,60,0,Math.PI*2);x.fill();x.fillStyle='#fff';
+  x.fillRect(450,50,40,40);x.fillRect(150,300,80,40);
+  loadImage(c.toDataURL());
+});
+
+// Drag & drop
+canvasArea.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.add('active')});
+canvasArea.addEventListener('dragleave',()=>dropZone.classList.remove('active'));
+canvasArea.addEventListener('drop',e=>{
+  e.preventDefault();dropZone.classList.remove('active');
+  const f=e.dataTransfer.files[0];if(!f)return;
+  const r=new FileReader();r.onload=()=>loadImage(r.result);r.readAsDataURL(f);
+});
+
+// ═══════════ CORE: PROCESS IMAGE ═══════════
+function processImage(){
+  if(!sourceImage||isProcessing)return;
+  isProcessing=true;
+  requestAnimationFrame(()=>{
+    try{renderStyle(state.style)}catch(e){console.error(e);setStatus('Error: '+e.message)}
+    isProcessing=false;
+  });
+}
+
+function getScaledImageData(){
+  const w=state.resolution;
+  const h=Math.round(w*(sourceImage.height/sourceImage.width));
+  const off=document.createElement('canvas');off.width=w;off.height=h;
+  const octx=off.getContext('2d');
+  octx.drawImage(sourceImage,0,0,w,h);
+  return {data:octx.getImageData(0,0,w,h),width:w,height:h};
+}
+
+function applyBrightnessContrast(r,g,b){
+  r=r/255*state.contrast+(state.brightness-1)*0.5;
+  g=g/255*state.contrast+(state.brightness-1)*0.5;
+  b=b/255*state.contrast+(state.brightness-1)*0.5;
+  if(state.invert){r=1-r;g=1-g;b=1-b}
+  return Math.max(0,Math.min(1,(r+g+b)/3));
+}
+
+function getChar(brightness){
+  const ramp=state.charRamp||' ';
+  return ramp[Math.floor(brightness*(ramp.length-1))]||ramp[ramp.length-1];
+}
+
+// ═══════════ STYLES ═══════════
+function renderStyle(styleId){
+  const {data,width,height}=getScaledImageData();
+  const fs=state.fontSize;
+  const charW=fs*0.6,charH=fs;
+  const outW=width*charW,outH=height*charH;
+
+  // Setup preview canvas
+  preview.width=outW;preview.height=outH;
+  ctx.clearRect(0,0,outW,outH);
+
+  // Background
+  if(state.bgMode==='black'){ctx.fillStyle='#000';ctx.fillRect(0,0,outW,outH)}
+  else if(state.bgMode==='image'){ctx.drawImage(sourceImage,0,0,outW,outH)}
+  else if(state.bgMode==='blur'){
+    const bg=document.createElement('canvas');bg.width=outW;bg.height=outH;
+    const bgx=bg.getContext('2d');bgx.filter='blur(20px)';bgx.drawImage(sourceImage,0,0,outW,outH);
+    bgx.globalAlpha=0.9;bgx.fillStyle='#000';bgx.fillRect(0,0,outW,outH);
+    ctx.drawImage(bg,0,0);
+  }
+
+  ctx.font=`${fs}px monospace`;
+  ctx.textBaseline='top';
+
+  const pixels=data.data;
+  const renderer=RENDERERS[styleId]||RENDERERS.chars;
+  renderer(pixels,width,height,fs,charW,charH);
+
+  $('dimensions').textContent=`${outW}×${outH}`;
+  setStatus(`Rendered: ${STYLES.find(s=>s.id===styleId)?.name||styleId} — ${width}×${height} chars`);
+}
+
+const RENDERERS={
+  // Classic Characters
+  chars(pixels,w,h,fs,cw,ch){
+    for(let y=0;y<h;y++){
+      for(let x=0;x<w;x++){
+        const i=(y*w+x)*4;
+        const b=applyBrightnessContrast(pixels[i],pixels[i+1],pixels[i+2]);
+        const c=getChar(b);
+        const lum=Math.floor(b*255);
+        ctx.fillStyle=`rgb(${lum},${lum},${lum})`;
+        ctx.fillText(c,x*cw,y*ch);
       }
+    }
+  },
 
-      accordionItems.forEach((item) => {
-        const trigger = item.querySelector('[data-accordion-trigger]');
-        if (!trigger) return;
-        trigger.addEventListener('click', () => openAccordion(item.dataset.accordionItem));
-      });
+  // Block Characters (Unicode half/quarter blocks)
+  blocks(pixels,w,h,fs,cw,ch){
+    for(let y=0;y<h;y+=2){
+      for(let x=0;x<w;x+=2){
+        let tl=0,tr=0,bl=0,br=0;
+        const getP=(px,py)=>{if(px>=w||py>=h)return 0;const j=((py)*w+px)*4;return applyBrightnessContrast(pixels[j],pixels[j+1],pixels[j+2])};
+        tl=getP(x,y);tr=getP(x+1,y);bl=getP(x,y+1);br=getP(x+1,y+1);
+        const avg=(tl+tr+bl+br)/4;
+        let glyph=' ';const th=0.25;
+        if(tl>th&&tr>th&&bl>th&&br>th)glyph='█';
+        else if(tl>th&&tr>th&&bl<=th&&br<=th)glyph='▀';
+        else if(tl<=th&&tr<=th&&bl>th&&br>th)glyph='▄';
+        else if(tl>th&&tr<=th&&bl>th&&br<=th)glyph='▌';
+        else if(tl<=th&&tr>th&&bl<=th&&br>th)glyph='▐';
+        else if(tl>th&&tr<=th&&bl<=th&&br<=th)glyph='▘';
+        else if(tl<=th&&tr>th&&bl<=th&&br<=th)glyph='▝';
+        else if(tl<=th&&tr<=th&&bl>th&&br<=th)glyph='▖';
+        else if(tl<=th&&tr<=th&&bl<=th&&br>th)glyph='▗';
+        const lum=Math.floor(avg*255);
+        ctx.fillStyle=`rgb(${lum},${lum},${lum})`;
+        ctx.fillText(glyph,x*cw,y*ch);
+      }
+    }
+  },
 
-      openAccordion('subject');
-
-      if (!exportBtn || !exportDropdown) return;
-
-      exportBtn.addEventListener('click', (event) => {
-        event.stopPropagation();
-        const open = exportDropdown.classList.toggle('open');
-        exportBtn.setAttribute('aria-expanded', String(open));
-      });
-
-      document.addEventListener('click', (event) => {
-        if (!exportDropdown.contains(event.target) && event.target !== exportBtn) {
-          exportDropdown.classList.remove('open');
-          exportBtn.setAttribute('aria-expanded', 'false');
+  // Pixel Art
+  pixel(pixels,w,h,fs,cw,ch){
+    const blockW=cw*2,blockH=ch*2;
+    for(let y=0;y<h;y+=2){
+      for(let x=0;x<w;x+=2){
+        let sr=0,sg=0,sb=0,n=0;
+        for(let dy=0;dy<2&&y+dy<h;dy++)for(let dx=0;dx<2&&x+dx<w;dx++){
+          const j=((y+dy)*w+(x+dx))*4;
+          sr+=pixels[j];sg+=pixels[j+1];sb+=pixels[j+2];n++;
         }
-      });
+        const b=applyBrightnessContrast(sr/n,sg/n,sb/n);
+        const r=Math.floor((sr/n)*0.8),g=Math.floor((sg/n)*0.8),bl=Math.floor((sb/n)*0.8);
+        ctx.fillStyle=`rgb(${r},${g},${bl})`;
+        ctx.fillRect(x*cw,y*ch,blockW-1,blockH-1);
+      }
+    }
+    // Grid lines
+    ctx.strokeStyle='rgba(0,0,0,0.15)';
+    ctx.lineWidth=1;
+    for(let y=0;y<h;y+=2)for(let x=0;x<w;x+=2){
+      ctx.strokeRect(x*cw,y*ch,blockW,blockH);
+    }
+  },
 
-      document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape') {
-          exportDropdown.classList.remove('open');
-          exportBtn.setAttribute('aria-expanded', 'false');
+  // Dither (Floyd-Steinberg simplified)
+  dither(pixels,w,h,fs,cw,ch){
+    const gray=new Float32Array(w*h);
+    for(let i=0;i<w*h;i++)gray[i]=applyBrightnessContrast(pixels[i*4],pixels[i*4+1],pixels[i*4+2]);
+    for(let y=0;y<h;y++){
+      for(let x=0;x<w;x++){
+        const idx=y*w+x;
+        const old=gray[idx];
+        const nv=old>0.5?1:0;
+        const err=(old-nv)/16;
+        if(x+1<w)gray[idx+1]+=err*7;
+        if(y+1<h){
+          if(x>0)gray[idx+w-1]+=err*3;
+          gray[idx+w]+=err*5;
+          if(x+1<w)gray[idx+w+1]+=err*1;
         }
-      });
-    })();
-  </script>
+        const col=nv*255;
+        ctx.fillStyle=`rgb(${col},${col},${col})`;
+        ctx.fillText(nv?'█':' ',x*cw,y*ch);
+      }
+    }
+  },
 
-  <script type="module" src="./js/main.js?v=ui-realtime-3"></script>
+  // Halftone Dots
+  dots(pixels,w,h,fs,cw,ch){
+    for(let y=0;y<h;y++){
+      for(let x=0;x<w;x++){
+        const i=(y*w+x)*4;
+        const b=applyBrightnessContrast(pixels[i],pixels[i+1],pixels[i+2]);
+        const r=b*cw*0.7;
+        const cx=x*cw+cw/2,cy=y*ch+ch/2;
+        const lum=Math.floor(b*255);
+        ctx.fillStyle=`rgb(${lum},${lum},${lum})`;
+        ctx.beginPath();
+        ctx.arc(cx,cy,Math.max(0.5,r),0,Math.PI*2);
+        ctx.fill();
+      }
+    }
+  },
+
+  // Mosaic
+  mosaic(pixels,w,h,fs,cw,ch){
+    const bs=Math.max(2,Math.floor(cw/2))*2;
+    for(let y=0;y<h;y+=bs/ch*2){
+      for(let x=0;x<w;x+=bs/cw*2){
+        let sr=0,sg=0,sb=0,n=0;
+        const bx=Math.floor(x),by=Math.floor(y);
+        const bw=Math.max(1,Math.floor(bs/cw)),bh=Math.max(1,Math.floor(bs/ch));
+        for(let dy=0;dy<bh&&by+dy<h;dy++)for(let dx=0;dx<bw&&bx+dx<w;dx++){
+          const j=((by+dy)*w+(bx+dx))*4;
+          sr+=pixels[j];sg+=pixels[j+1];sb+=pixels[j+2];n++;
+        }
+        ctx.fillStyle=`rgb(${Math.floor(sr/n)},${Math.floor(sg/n)},${Math.floor(sb/n)})`;
+        ctx.fillRect(bx*cw,by*ch,bw*cw,bh*ch);
+      }
+    }
+  },
+
+  // LEGO Bricks
+  lego(pixels,w,h,fs,cw,ch){
+    const bs=Math.max(3,Math.floor(cw));
+    for(let y=0;y<h;y+=bs/ch*2){
+      for(let x=0;x<w;x+=bs/cw*2){
+        let sr=0,sg=0,sb=0,n=0;
+        const bx=Math.floor(x),by=Math.floor(y);
+        const bw=Math.max(1,Math.floor(bs/cw)),bh=Math.max(1,Math.floor(bs/ch));
+        for(let dy=0;dy<bh&&by+dy<h;dy++)for(let dx=0;dx<bw&&bx+dx<w;dx++){
+          const j=((by+dy)*w+(bx+dx))*4;
+          sr+=pixels[j];sg+=pixels[j+1];sb+=pixels[j+2];n++;
+        }
+        const px=bx*cw,py=by*ch,pw=bw*cw-2,ph=bh*ch-2;
+        // Brick body
+        ctx.fillStyle=`rgb(${Math.floor(sr/n)},${Math.floor(sg/n)},${Math.floor(sb/n)})`;
+        ctx.fillRect(px+1,py+1,pw,ph);
+        // Highlight
+        ctx.fillStyle='rgba(255,255,255,0.25)';
+        ctx.fillRect(px+2,py+2,pw*0.4,ph*0.4);
+        // Shadow
+        ctx.fillStyle='rgba(0,0,0,0.2)';
+        ctx.fillRect(px+1,py+ph-2,pw,2);
+        ctx.fillRect(px+pw-2,py+1,2,ph);
+        // Stud
+        ctx.fillStyle='rgba(255,255,255,0.3)';
+        ctx.beginPath();ctx.arc(px+pw/2,py+ph/2,Math.min(pw,ph)*0.2,0,Math.PI*2);ctx.fill();
+      }
+    }
+  },
+
+  // Glitch
+  glitch(pixels,w,h,fs,cw,ch){
+    // First render normal chars
+    RENDERERS.chars(pixels,w,h,fs,cw,ch);
+    // Then apply glitch slices
+    const imgData=ctx.getImageData(0,0,preview.width,preview.height);
+    for(let s=0;s<8;s++){
+      const sy=Math.floor(Math.random()*preview.height);
+      const sh=Math.floor(Math.random()*preview.height*0.15)+2;
+      const dx=Math.floor((Math.random()-0.5)*preview.width*0.3);
+      ctx.putImageData(imgData,dx,sy,0,sy,preview.width,sh);
+    }
+    // RGB split on some rows
+    for(let s=0;s<3;s++){
+      const sy=Math.floor(Math.random()*preview.height);
+      const slice=ctx.getImageData(0,sy,preview.width,1);
+      for(let px=0;px<slice.data.length;px+=4){
+        const shift=Math.floor(Math.random()*8-4);
+        if(px+shift*4>=0&&px+shift*4<slice.data.length)slice.data[px]=slice.data[px+shift*4]||slice.data[px];
+      }
+      ctx.putImageData(slice,0,sy);
+    }
+  }
+};
+
+// ═══════════ VIDEO ═══════════
+function loadVideo(src){
+  const v=document.createElement('video');v.src=src;v.crossOrigin='anonymous';v.muted=true;v.playsInline=true;
+  v.onloadedmetadata=()=>{
+    v.currentTime=0.1;
+    v.onseeked=()=>{
+      const c=document.createElement('canvas');c.width=v.videoWidth;c.height=v.videoHeight;
+      c.getContext('2d').drawImage(v,0,0);
+      sourceImage=c;sourceVideo=v;
+      processImage();
+      $('dropZone').style.display='none';
+      setStatus(`Video loaded: ${v.videoWidth}×${v.videoHeight}`);
+    };
+  };
+  v.onerror=()=>setStatus('Failed to load video');
+}
+
+// ═══════════ EXPORT ═══════════
+$('exportBtn').addEventListener('click',()=>{
+  if(!sourceImage){setStatus('Load an image first');return}
+  const fmt=$('exportFmt').value;
+  if(fmt==='PNG'){
+    const a=document.createElement('a');
+    a.download='ascii-arter.png';a.href=preview.toDataURL('image/png');
+    a.click();setStatus('PNG exported!');
+  }else if(fmt==='JPG'){
+    const a=document.createElement('a');
+    a.download='ascii-arter.jpg';a.href=preview.toDataURL('image/jpeg',0.92);
+    a.click();setStatus('JPG exported!');
+  }else if(fmt==='GIF'){
+    exportGIF();
+  }
+});
+
+// ═══════════ GIF EXPORT (simple frame sequence) ═══════════
+function exportGIF(){
+  // For now export single frame as GIF-like PNG
+  const a=document.createElement('a');
+  a.download='ascii-arter.gif';
+  a.href=preview.toDataURL('image/png');
+  a.click();
+  setStatus('GIF export (single frame) — full animation coming soon!');
+}
+
+// ═══════════ UTILS ═══════════
+function setStatus(msg){$('status').textContent=msg}
+</script>
 </body>
 </html>
