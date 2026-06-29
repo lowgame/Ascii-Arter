@@ -108,14 +108,14 @@ input[type=text],.tx{width:100%;padding:4px 6px;background:var(--bg);border:1px 
 
     <div class="sec-label">Color</div>
     <div class="ctrl"><label>Color mode <span id="cmVal">Full</span></label><select class="sel" id="colorMode" style="width:100%"><option value="full">Full Color</option><option value="grayscale">Grayscale</option><option value="warm">Warm</option><option value="cool">Cool</option><option value="matrix">Matrix Green</option><option value="retro">Retro CGA</option></select></div>
-    <div class="ctrl"><label>Brightness <span id="brVal">1.0</span></label><input type="range" id="brightness" min="0.2" max="3" step="0.05" value="1"></div>
-    <div class="ctrl"><label>Contrast <span id="ctVal">1.0</span></label><input type="range" id="contrast" min="0.2" max="4" step="0.05" value="1"></div>
-    <div class="ctrl"><label>Saturation <span id="saVal">1.0</span></label><input type="range" id="saturation" min="0" max="3" step="0.05" value="1"></div>
+    <div class="ctrl"><label>Brightness <span id="brightnessVal">1.0</span></label><input type="range" id="brightness" min="0.2" max="3" step="0.05" value="1"></div>
+    <div class="ctrl"><label>Contrast <span id="contrastVal">1.0</span></label><input type="range" id="contrast" min="0.2" max="4" step="0.05" value="1"></div>
+    <div class="ctrl"><label>Saturation <span id="saturationVal">1.0</span></label><input type="range" id="saturation" min="0" max="3" step="0.05" value="1"></div>
     <div class="ctrl"><label>Invert <input type="checkbox" id="invert" style="margin-left:4px"></label></div>
 
     <div class="sec-label">Characters</div>
-    <div class="ctrl"><label>Resolution <span id="resVal">150</span></label><input type="range" id="resolution" min="30" max="400" step="10" value="150"></div>
-    <div class="ctrl"><label>Font Size <span id="fsVal">9</span></label><input type="range" id="fontSize" min="5" max="20" step="1" value="9"></div>
+    <div class="ctrl"><label>Resolution <span id="resolutionVal">150</span></label><input type="range" id="resolution" min="30" max="400" step="10" value="150"></div>
+    <div class="ctrl"><label>Font Size <span id="fontSizeVal">9</span></label><input type="range" id="fontSize" min="5" max="20" step="1" value="9"></div>
     <div class="ctrl"><label>Ramp</label><input type="text" class="tx" id="charRamp" value="@%#*+=-:. "></div>
     <div class="ctrl"><label>Edge enhance</label><input type="range" id="edgeEnhance" min="0" max="2" step="0.05" value="0" style="width:100%"><span id="eeVal" style="font-size:10px;color:var(--dim)">off</span></div>
 
@@ -297,7 +297,7 @@ $('cmpHandle').onmousedown=e=>{
 
 function renderCompare(){
   if(!srcImg)return;
-  const w=state.resolution,h=Math.round(w*(srcImg.height/srcImg.width));
+  const w=state.resolution,h=Math.round(w*0.6*(srcImg.height/srcImg.width));
   const fs=state.fontSize,cw=fs*.6,ch=fs;
   const ow=w*cw,oh=h*ch;
   // Before: original image
@@ -315,7 +315,7 @@ function render(){
   busy=true;
   requestAnimationFrame(()=>{
     try{
-      const w=state.resolution,h=Math.round(w*(srcImg.height/srcImg.width));
+      const w=state.resolution,h=Math.round(w*0.6*(srcImg.height/srcImg.width));
       const fs=state.fontSize,cw=fs*.6,ch=fs;
       const ow=w*cw,oh=h*ch;
       pv.width=ow;pv.height=oh;
