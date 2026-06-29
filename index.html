@@ -13,11 +13,20 @@ body{font-family:var(--ff);background:var(--bg);color:var(--text);height:100vh;o
 .hdr .brand{font-size:16px;font-weight:700;color:#fff;letter-spacing:-.5px}
 .hdr .brand em{color:var(--accent);font-style:normal}
 .hdr-acts{display:flex;gap:4px;align-items:center;flex-wrap:wrap}
+.hdr-acts .sep{width:1px;height:18px;background:var(--border);margin:0 3px}
+/* preset row */
+.preset-row{display:flex;align-items:center;gap:4px;padding:4px 12px;background:#0d0d0d;border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap}
+.preset-row .plabel{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--dim);margin-right:4px}
+.preset-chip{padding:3px 10px;border:1px solid var(--border);border-radius:12px;cursor:pointer;font-size:10px;background:var(--panel);color:var(--text);transition:.15s;white-space:nowrap}
+.preset-chip:hover{border-color:var(--accent);color:#fff}
+.preset-chip .dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px;vertical-align:middle}
 /* buttons */
 .bt{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border:1px solid var(--border);border-radius:var(--r);background:var(--panel);color:var(--text);cursor:pointer;font-size:11px;transition:.15s;white-space:nowrap;font-family:var(--ff)}
 .bt:hover{border-color:var(--accent);color:#fff}
 .bt1{background:var(--accent);color:#000;border-color:var(--accent);font-weight:600}
 .bt1:hover{opacity:.9}
+.bt2{background:var(--accent2);color:#fff;border-color:var(--accent2);font-weight:600}
+.bt2:hover{opacity:.85}
 .sel{padding:5px 8px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:var(--r);font-size:11px;cursor:pointer;font-family:var(--ff)}
 /* main area */
 .main{display:flex;flex:1;overflow:hidden}
@@ -38,7 +47,7 @@ body{font-family:var(--ff);background:var(--bg);color:var(--text);height:100vh;o
 .cmp-handle{position:absolute;top:0;bottom:0;width:3px;background:#fff;left:50%;transform:translateX(-50%);cursor:ew-resize;z-index:2;box-shadow:0 0 6px rgba(0,0,0,.5)}
 .cmp-handle::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:32px;height:32px;border-radius:50%;background:#fff;border:2px solid #333}
 /* sidebar */
-.side{width:260px;background:var(--panel);border-left:1px solid var(--border);overflow-y:auto;flex-shrink:0;padding:10px;display:flex;flex-direction:column;gap:8px;font-size:11px}
+.side{width:270px;background:var(--panel);border-left:1px solid var(--border);overflow-y:auto;flex-shrink:0;padding:10px;display:flex;flex-direction:column;gap:8px;font-size:11px}
 .side::-webkit-scrollbar{width:4px}
 .side::-webkit-scrollbar-thumb{background:#333;border-radius:2px}
 .sec-label{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--dim);margin-top:2px}
@@ -48,9 +57,9 @@ body{font-family:var(--ff);background:var(--bg);color:var(--text);height:100vh;o
 .style-card:hover{border-color:var(--accent)}
 .style-card.active{border-color:var(--accent);background:rgba(110,200,255,.08)}
 .style-card .sc-ic{font-size:18px;display:block;margin-bottom:2px;line-height:1.2}
-.style-card .sc-preview{width:100%;height:28px;margin-top:3px;border-radius:3px;opacity:.6;image-rendering:pixelated;object-fit:cover}
+.style-card .sc-badge{position:absolute;top:2px;right:3px;font-size:7px;background:var(--accent);color:#000;padding:0px 3px;border-radius:3px;font-weight:700}
 /* controls */
-.ctrl{margin-bottom:4px}
+.ctrl{margin-bottom:3px}
 .ctrl label{display:flex;justify-content:space-between;font-size:10px;color:var(--dim);margin-bottom:2px}
 .ctrl label span{color:var(--text);font-weight:600}
 input[type=range]{width:100%;-webkit-appearance:none;height:3px;background:var(--border);border-radius:2px;outline:none;margin:2px 0}
@@ -60,6 +69,10 @@ input[type=text],.tx{width:100%;padding:4px 6px;background:var(--bg);border:1px 
 .color-dot{width:18px;height:18px;border-radius:3px;border:1px solid var(--border);cursor:pointer;flex-shrink:0}
 /* status */
 .stbar{padding:3px 12px;background:var(--panel);border-top:1px solid var(--border);font-size:10px;color:var(--dim);flex-shrink:0;display:flex;justify-content:space-between}
+/* loading spinner */
+.spinner-wrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:3;pointer-events:none}
+.spinner{width:30px;height:30px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 /* modals */
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:100}
 .modal.on{display:flex}
@@ -71,6 +84,8 @@ input[type=text],.tx{width:100%;padding:4px 6px;background:var(--bg);border:1px 
   .main{flex-direction:column}
   .side{width:100%;border-left:none;border-top:1px solid var(--border);max-height:35vh}
   .preview-area{min-height:50vh}
+  .hdr-acts{gap:2px}
+  .preset-row{gap:2px}
 }
 </style>
 </head>
@@ -85,12 +100,27 @@ input[type=text],.tx{width:100%;padding:4px 6px;background:var(--bg);border:1px 
     <button class="bt" id="pasteBtn">📋 Paste</button>
     <button class="bt" id="demoBtn">🎲 Demo</button>
     <button class="bt bt1" id="randomBtn" title="Randomize all settings!">🎰 Randomize</button>
+    <span class="sep"></span>
+    <select class="sel" id="expSize"><option value="1">1×</option><option value="2">2×</option><option value="3">3×</option><option value="4">4×</option></select>
     <select class="sel" id="expFmt"><option>PNG</option><option>JPG</option><option>WebP</option></select>
     <button class="bt bt1" id="expBtn">⬇ Export</button>
+    <button class="bt" id="copyBtn">📋 Copy</button>
     <button class="bt" id="cmpBtn" title="Before/After">⇆ Compare</button>
-    <button class="bt" id="recipeBtn">📋 Recipe</button>
+    <button class="bt" id="recipeBtn">🔗 Share</button>
   </div>
 </header>
+
+<div class="preset-row">
+  <span class="plabel">Quick Presets</span>
+  <span class="preset-chip" data-preset="cyberpunk"><span class="dot" style="background:#ff00ff"></span>Cyberpunk</span>
+  <span class="preset-chip" data-preset="matrix"><span class="dot" style="background:#00ff41"></span>Matrix</span>
+  <span class="preset-chip" data-preset="minimal"><span class="dot" style="background:#fff"></span>Minimal</span>
+  <span class="preset-chip" data-preset="vintage"><span class="dot" style="background:#c8a45c"></span>Vintage</span>
+  <span class="preset-chip" data-preset="ghibli"><span class="dot" style="background:#8ecae6"></span>Ghibli</span>
+  <span class="preset-chip" data-preset="hacker"><span class="dot" style="background:#0f0"></span>Hacker</span>
+  <span class="preset-chip" data-preset="synthwave"><span class="dot" style="background:#ff6b6b"></span>Synthwave</span>
+  <span class="preset-chip" data-preset="noir"><span class="dot" style="background:#888"></span>Noir</span>
+</div>
 
 <div class="main">
   <div class="preview-area" id="pvArea">
@@ -101,6 +131,7 @@ input[type=text],.tx{width:100%;padding:4px 6px;background:var(--bg);border:1px 
       <div class="cmp-handle" id="cmpHandle"></div>
     </div>
     <div class="drop-overlay" id="dropZone"><div class="drop-msg"><b>Drop image here</b><br>or Upload · Paste · URL · Demo</div></div>
+    <div class="spinner-wrap" id="spinner"><div class="spinner"></div></div>
   </div>
 
   <aside class="side">
@@ -108,17 +139,20 @@ input[type=text],.tx{width:100%;padding:4px 6px;background:var(--bg);border:1px 
     <div class="style-grid" id="styleGrid"></div>
 
     <div class="sec-label">Color</div>
-    <div class="ctrl"><label>Color mode <span id="cmVal">Full</span></label><select class="sel" id="colorMode" style="width:100%"><option value="full">Full Color</option><option value="grayscale">Grayscale</option><option value="warm">Warm</option><option value="cool">Cool</option><option value="matrix">Matrix Green</option><option value="retro">Retro CGA</option></select></div>
+    <div class="ctrl"><label>Color mode <span id="cmVal">Full</span></label><select class="sel" id="colorMode" style="width:100%"><option value="full">Full Color</option><option value="grayscale">Grayscale</option><option value="warm">Warm</option><option value="cool">Cool</option><option value="matrix">Matrix Green</option><option value="retro">Retro CGA</option><option value="duotone">Duotone</option><option value="vaporwave">Vaporwave</option><option value="pastel">Pastel</option></select></div>
+    <div class="ctrl"><label>🌈 Duotone A</label><input type="color" id="duoA" value="#ff6b6b" style="width:100%;height:22px;border:none;background:var(--bg);cursor:pointer" onchange="state.duoA=this.value;render()"></div>
+    <div class="ctrl"><label>🌈 Duotone B</label><input type="color" id="duoB" value="#4d96ff" style="width:100%;height:22px;border:none;background:var(--bg);cursor:pointer" onchange="state.duoB=this.value;render()"></div>
     <div class="ctrl"><label>Brightness <span id="brightnessVal">1.0</span></label><input type="range" id="brightness" min="0.2" max="3" step="0.05" value="1"></div>
     <div class="ctrl"><label>Contrast <span id="contrastVal">1.0</span></label><input type="range" id="contrast" min="0.2" max="4" step="0.05" value="1"></div>
     <div class="ctrl"><label>Saturation <span id="saturationVal">1.0</span></label><input type="range" id="saturation" min="0" max="3" step="0.05" value="1"></div>
+    <div class="ctrl"><label>Hue Rotate <span id="hueVal">0°</span></label><input type="range" id="hueRotate" min="0" max="360" step="5" value="0"></div>
     <div class="ctrl"><label>Invert <input type="checkbox" id="invert" style="margin-left:4px"></label></div>
 
     <div class="sec-label">Characters</div>
     <div class="ctrl"><label>Resolution <span id="resolutionVal">150</span></label><input type="range" id="resolution" min="30" max="400" step="10" value="150"></div>
     <div class="ctrl"><label>Font Size <span id="fontSizeVal">9</span></label><input type="range" id="fontSize" min="5" max="20" step="1" value="9"></div>
     <div class="ctrl"><label>Ramp</label><input type="text" class="tx" id="charRamp" value="@%#*+=-:. "></div>
-    <div class="ctrl"><label>Edge enhance</label><input type="range" id="edgeEnhance" min="0" max="2" step="0.05" value="0" style="width:100%"><span id="eeVal" style="font-size:10px;color:var(--dim)">off</span></div>
+    <div class="ctrl"><label>Edge enhance <span id="eeVal">off</span></label><input type="range" id="edgeEnhance" min="0" max="2" step="0.05" value="0"></div>
     <div class="ctrl"><label>Ramp presets</label><select class="sel" id="rampPreset" style="width:100%"><option value="">Custom</option><option value="@%#*+=-:. ">Standard 10</option><option value="█▓▒░ ">Blocks</option><option value="●○◐◑◒◓ ">Dots</option><option value="▇▆▅▄▃▂▁ ">Bars</option><option value="◆◇◈ ">Diamonds</option><option value="MWNHEXSR#+=-:. ">Extended 14</option><option value="╳╱╲ ">Lines</option></select></div>
 
     <div class="sec-label">Post Effects</div>
@@ -127,6 +161,9 @@ input[type=text],.tx{width:100%;padding:4px 6px;background:var(--bg);border:1px 
     <div class="ctrl"><label>Vignette <span id="vigVal">off</span></label><input type="range" id="vignette" min="0" max="1" step="0.05" value="0"></div>
     <div class="ctrl"><label>Sharpen <span id="sharpVal">off</span></label><input type="range" id="sharpen" min="0" max="2" step="0.05" value="0"></div>
     <div class="ctrl"><label>Threshold <span id="threshVal">off</span></label><input type="range" id="threshold" min="0" max="1" step="0.02" value="0"></div>
+    <div class="ctrl"><label>Bloom <span id="bloomVal">off</span></label><input type="range" id="bloom" min="0" max="1" step="0.05" value="0"></div>
+    <div class="ctrl"><label>Chromatic Ab. <span id="chromaVal">off</span></label><input type="range" id="chromaticAberration" min="0" max="8" step="0.5" value="0"></div>
+    <div class="ctrl"><label>Letterbox <span id="lbVal">off</span></label><input type="range" id="letterbox" min="0" max="0.2" step="0.01" value="0"></div>
 
     <div class="sec-label">Background</div>
     <select class="sel" id="bgMode" style="width:100%">
@@ -136,12 +173,12 @@ input[type=text],.tx{width:100%;padding:4px 6px;background:var(--bg);border:1px 
   </aside>
 </div>
 
-<div class="stbar"><span id="status">Ready — drop an image or click Demo</span><span id="dims"></span></div>
+<div class="stbar"><span id="status">Loading random image...</span><span id="dims"></span></div>
 
-<!-- Recipe modal -->
+<!-- Share modal -->
 <div class="modal" id="recipeModal"><div class="modal-inner">
-  <h3>Recipe — Share this look</h3>
-  <p style="font-size:10px;color:var(--dim);margin-bottom:6px">Copy this code. Anyone can paste it to recreate this exact style on their own image.</p>
+  <h3>Share — Copy this link</h3>
+  <p style="font-size:10px;color:var(--dim);margin-bottom:6px">Anyone can paste this link to recreate this exact style with their own image.</p>
   <textarea id="recipeText" readonly></textarea>
   <div style="display:flex;gap:6px;margin-top:8px;justify-content:flex-end">
     <button class="bt" id="recipeCopy">📋 Copy</button>
@@ -155,12 +192,16 @@ const $=id=>document.getElementById(id);
 const STYLES=[
   {id:'chars',name:'Characters',ic:'@',desc:'Classic ASCII with character ramp'},
   {id:'blocks',name:'Block Chars',ic:'█',desc:'Unicode half/quarter blocks'},
+  {id:'braille',name:'Braille',ic:'⣿',desc:'Ultra-detailed Braille dots',new:true},
   {id:'pixel',name:'Pixel Art',ic:'▣',desc:'Retro pixel blocks with grid'},
   {id:'dither',name:'Dither',ic:'▨',desc:'Floyd-Steinberg + ordered dither'},
   {id:'dots',name:'Halftone',ic:'●',desc:'Circles sized by brightness'},
   {id:'mosaic',name:'Mosaic',ic:'⊞',desc:'Color-sampled tile mosaic'},
   {id:'lego',name:'LEGO',ic:'◉',desc:'Studded brick rendering'},
   {id:'glitch',name:'Glitch',ic:'⌇',desc:'Scanlines + RGB split'},
+  {id:'neon',name:'Neon Glow',ic:'✨',desc:'Glowing text with blur',new:true},
+  {id:'heatmap',name:'Heatmap',ic:'🌡',desc:'Temperature color scale',new:true},
+  {id:'contour',name:'Contour',ic:'🗺',desc:'Brightness contour lines',new:true},
   {id:'edge',name:'Edge ASCII',ic:'◇',desc:'Sobel edges mapped to lines'},
   {id:'voxel',name:'Voxel',ic:'◆',desc:'Isometric cube shading'},
 ];
@@ -175,6 +216,8 @@ let state={
   colorMode:'full',resolution:150,fontSize:9,charRamp:'@%#*+=-:. ',
   bgMode:'blur',bgOpacity:90,edgeEnhance:0,
   scanlines:0,noise:0,vignette:0,sharpen:0,threshold:0,
+  bloom:0,chromaticAberration:0,letterbox:0,hueRotate:0,
+  duoA:'#ff6b6b',duoB:'#4d96ff',
 };
 let srcImg=null,srcVid=null,busy=false,compareMode=false;
 
@@ -189,6 +232,7 @@ function buildStyleGrid(){
   for(const s of STYLES){
     h+=`<div class="style-card${state.style===s.id?' active':''}" data-style="${s.id}">
       <span class="sc-ic">${s.ic}</span>${s.name}
+      ${s.new?'<span class="sc-badge">NEW</span>':''}
     </div>`;
   }
   $('styleGrid').innerHTML=h;
@@ -201,6 +245,29 @@ $('styleGrid').onclick=e=>{
   c.classList.add('active');
   render();
 };
+
+// ═══════════ PRESETS ═══════════
+const PRESETS={
+  cyberpunk:{style:'braille',colorMode:'duotone',duoA:'#ff00ff',duoB:'#00ffff',brightness:1.2,contrast:1.8,saturation:1.5,invert:false,resolution:200,charRamp:'⣿⣾⣽⣻⢟⠿⢟⠿⠿⠿⠿ ',bgMode:'black',bgOpacity:100,scanlines:0.15,noise:0.08,vignette:0.4,bloom:0.3,chromaticAberration:2,hueRotate:280,edgeEnhance:0,sharpen:0.4,threshold:0,fontSize:8},
+  matrix:{style:'chars',colorMode:'matrix',brightness:1.1,contrast:1.6,saturation:0,invert:false,resolution:200,charRamp:'ｦｱｳｴｵｶｼﾌﾎﾐﾒﾓﾔﾕﾖ ',bgMode:'black',bgOpacity:100,scanlines:0.5,noise:0.05,vignette:0.3,bloom:0.5,chromaticAberration:0,hueRotate:0,edgeEnhance:0.5,sharpen:0,threshold:0.15,fontSize:9},
+  minimal:{style:'dots',colorMode:'grayscale',brightness:1,contrast:1.3,saturation:0,invert:false,resolution:120,charRamp:' ',bgMode:'white',bgOpacity:100,scanlines:0,noise:0,vignette:0,bloom:0,chromaticAberration:0,hueRotate:0,edgeEnhance:0,sharpen:0,threshold:0,fontSize:12},
+  vintage:{style:'chars',colorMode:'retro',brightness:0.9,contrast:1.4,saturation:0.8,invert:false,resolution:180,charRamp:'@%#*+=-:. ',bgMode:'image',bgOpacity:60,scanlines:0.2,noise:0.08,vignette:0.5,bloom:0,chromaticAberration:1,letterbox:0.08,hueRotate:0,edgeEnhance:0,sharpen:0,threshold:0,fontSize:9},
+  ghibli:{style:'pixel',colorMode:'pastel',brightness:1.15,contrast:1.1,saturation:1.4,invert:false,resolution:160,charRamp:'█▓▒░ ',bgMode:'blur',bgOpacity:85,scanlines:0,noise:0.02,vignette:0.15,bloom:0.15,chromaticAberration:0,hueRotate:10,edgeEnhance:0,sharpen:0,threshold:0,fontSize:8},
+  hacker:{style:'chars',colorMode:'matrix',brightness:1,contrast:2.0,saturation:0,invert:true,resolution:250,charRamp:'01!@#$%^&*()',bgMode:'black',bgOpacity:100,scanlines:0.6,noise:0.1,vignette:0.5,bloom:0.7,chromaticAberration:3,hueRotate:0,edgeEnhance:0,sharpen:0,threshold:0.3,fontSize:7},
+  synthwave:{style:'neon',colorMode:'vaporwave',brightness:1.1,contrast:1.5,saturation:1.8,invert:false,resolution:170,charRamp:'█▓▒░ ',bgMode:'black',bgOpacity:100,scanlines:0.3,noise:0.04,vignette:0.35,bloom:0.5,chromaticAberration:4,hueRotate:290,edgeEnhance:0,sharpen:0,threshold:0,fontSize:7},
+  noir:{style:'contour',colorMode:'grayscale',brightness:0.8,contrast:2.0,saturation:0,invert:false,resolution:200,charRamp:'@%#*+=-:. ',bgMode:'black',bgOpacity:100,scanlines:0,noise:0.12,vignette:0.6,bloom:0,chromaticAberration:0,letterbox:0.1,hueRotate:0,edgeEnhance:0.8,sharpen:0,threshold:0,fontSize:9},
+};
+
+document.querySelectorAll('.preset-chip').forEach(chip=>{
+  chip.onclick=()=>{
+    const preset=PRESETS[chip.dataset.preset];
+    if(!preset)return;
+    Object.assign(state,{...preset});  // full override
+    syncDOM();
+    render();
+    setStatus(`Preset: ${chip.textContent.trim()}`);
+  };
+});
 
 // ═══════════ CONTROLS ═══════════
 ['brightness','contrast','saturation','resolution','fontSize'].forEach(id=>{
@@ -225,14 +292,14 @@ $('bgOpacity').oninput=()=>{$('bgOpVal').textContent=$('bgOpacity').value;state.
 $('rampPreset').onchange=()=>{const v=$('rampPreset').value;if(v){state.charRamp=v;$('charRamp').value=v;render()}};
 
 // Post effects handlers
-['scanlines','noise','vignette','sharpen','threshold'].forEach(id=>{
-  const labels={scanlines:'scanVal',noise:'noiseVal',vignette:'vigVal',sharpen:'sharpVal',threshold:'threshVal'};
-  $(id).oninput=()=>{state[id]=+$(id).value;const v=state[id];$(labels[id]).textContent=v>0?v.toFixed(2):'off';render()};
+['scanlines','noise','vignette','sharpen','threshold','bloom','chromaticAberration','letterbox','hueRotate'].forEach(id=>{
+  const labels={scanlines:'scanVal',noise:'noiseVal',vignette:'vigVal',sharpen:'sharpVal',threshold:'threshVal',bloom:'bloomVal',chromaticAberration:'chromaVal',letterbox:'lbVal',hueRotate:'hueVal'};
+  $(id).oninput=()=>{state[id]=+$(id).value;const v=state[id];const suffix=id==='hueRotate'?'°':id==='chromaticAberration'?'px':id==='letterbox'?'%':'';$(labels[id]).textContent=v>0?v.toFixed(2)+suffix:'off';render()};
 });
 
 // ═══════════ RANDOMIZE ═══════════
-const RAMP_PRESETS=['@%#*+=-:. ','█▓▒░ ','●○◐◑◒◓ ','▇▆▅▄▃▂▁ ','◆◇◈ ','MWNHEXSR#+=-:. ','╳╱╲ ','.:-+=*#%@'];
-const COLOR_MODES=['full','grayscale','warm','cool','matrix','retro'];
+const RAMP_PRESETS=['@%#*+=-:. ','█▓▒░ ','●○◐◑◒◓ ','▇▆▅▄▃▂▁ ','◆◇◈ ','MWNHEXSR#+=-:. ','╳╱╲ ','.:-+=*#%@','⣿⣾⣽⣻⢟⠿⠿⠿⠿ ','⠁⠂⠃⠄⠅⠆⠇⠈⠉⠊ '];
+const COLOR_MODES=['full','grayscale','warm','cool','matrix','retro','duotone','vaporwave','pastel'];
 const BG_MODES=['blur','black','white','image','none'];
 $('randomBtn').onclick=()=>{
   const s=state;
@@ -254,7 +321,12 @@ $('randomBtn').onclick=()=>{
   s.vignette=Math.random()<0.4?+(Math.random()*0.6).toFixed(2):0;
   s.sharpen=Math.random()<0.3?+(Math.random()*1.5).toFixed(2):0;
   s.threshold=Math.random()<0.2?+(Math.random()*0.6).toFixed(2):0;
-  // Update all DOM controls
+  s.bloom=Math.random()<0.4?+(Math.random()*0.5).toFixed(2):0;
+  s.chromaticAberration=Math.random()<0.4?+(Math.random()*4).toFixed(1):0;
+  s.letterbox=Math.random()<0.2?+(Math.random()*0.12).toFixed(2):0;
+  s.hueRotate=Math.random()<0.5?Math.floor(Math.random()*360):0;
+  s.duoA='#'+Math.floor(Math.random()*16777215).toString(16).padStart(6,'0');
+  s.duoB='#'+Math.floor(Math.random()*16777215).toString(16).padStart(6,'0');
   syncDOM();
   render();
 };
@@ -278,6 +350,11 @@ function syncDOM(){
   $('vignette').value=s.vignette;$('vigVal').textContent=s.vignette>0?s.vignette.toFixed(2):'off';
   $('sharpen').value=s.sharpen;$('sharpVal').textContent=s.sharpen>0?s.sharpen.toFixed(2):'off';
   $('threshold').value=s.threshold;$('threshVal').textContent=s.threshold>0?s.threshold.toFixed(2):'off';
+  $('bloom').value=s.bloom;$('bloomVal').textContent=s.bloom>0?s.bloom.toFixed(2):'off';
+  $('chromaticAberration').value=s.chromaticAberration;$('chromaVal').textContent=s.chromaticAberration>0?s.chromaticAberration.toFixed(1)+'px':'off';
+  $('letterbox').value=s.letterbox;$('lbVal').textContent=s.letterbox>0?(s.letterbox*100).toFixed(0)+'%':'off';
+  $('hueRotate').value=s.hueRotate;$('hueVal').textContent=s.hueRotate>0?s.hueRotate+'°':'0°';
+  $('duoA').value=s.duoA;$('duoB').value=s.duoB;
   $('rampPreset').value='';
 }
 
@@ -286,9 +363,10 @@ window.__state=state;window.__sync=syncDOM;window.__random=()=>$('randomBtn').on
 
 // ═══════════ IMAGE LOADING ═══════════
 function loadImg(src){
+  $('spinner').style.display='flex';
   const img=new Image();img.crossOrigin='anonymous';
-  img.onload=()=>{srcImg=img;srcVid=null;render();setStatus(`Loaded: ${img.naturalWidth}×${img.naturalHeight}`);$('dropZone').classList.remove('on');$('dropZone').style.display='none'};
-  img.onerror=()=>setStatus('Failed to load');
+  img.onload=()=>{srcImg=img;srcVid=null;render();setStatus(`Loaded: ${img.naturalWidth}×${img.naturalHeight}`);$('dropZone').style.display='none';$('spinner').style.display='none'};
+  img.onerror=()=>{setStatus('Failed to load');$('spinner').style.display='none'};
   img.src=src;
 }
 function loadVid(src){
@@ -316,23 +394,18 @@ $('pasteBtn').onclick=async()=>{
 $('demoBtn').onclick=()=>{
   const c=document.createElement('canvas');c.width=800;c.height=500;
   const x=c.getContext('2d');
-  // Vibrant gradient bg
   const g=x.createRadialGradient(400,200,50,400,300,500);
   g.addColorStop(0,'#ff6b6b');g.addColorStop(.3,'#ffd93d');g.addColorStop(.6,'#6bcb77');g.addColorStop(1,'#4d96ff');
   x.fillStyle=g;x.fillRect(0,0,800,500);
-  // Mountains
   x.fillStyle='rgba(20,20,40,.7)';x.beginPath();x.moveTo(0,500);x.lineTo(150,250);x.lineTo(300,400);x.lineTo(500,180);x.lineTo(650,350);x.lineTo(800,220);x.lineTo(800,500);x.fill();
-  // Sun
   x.fillStyle='rgba(255,255,255,.9)';x.beginPath();x.arc(200,120,60,0,Math.PI*2);x.fill();
-  // Text
   x.fillStyle='#fff';x.font='bold 90px system-ui';x.textAlign='center';
   x.fillText('ASCII',400,300);x.font='60px system-ui';x.fillText('ARTER',400,380);
-  // Smaller text
   x.font='20px system-ui';x.fillStyle='rgba(255,255,255,.6)';x.fillText('image → art',400,430);
   loadImg(c.toDataURL());
 };
 
-// Drag-drop — use document-level handlers to avoid child-element dragleave issues
+// Drag-drop
 let dragCounter=0;
 document.addEventListener('dragover',e=>{e.preventDefault()});
 document.addEventListener('dragenter',e=>{e.preventDefault();dragCounter++;if(e.target.closest('#pvArea'))$('dropZone').classList.add('on')});
@@ -348,12 +421,10 @@ document.addEventListener('drop',e=>{
 $('cmpBtn').onclick=()=>{
   if(!srcImg){setStatus('Load image first');return}
   compareMode=!compareMode;
-  $('cmpBtn').style.background=compareMode?'var(--accent)':'';
-  $('cmpBtn').style.color=compareMode?'#000':'';
+  $('cmpBtn').style.background=compareMode?'var(--accent)':'';$('cmpBtn').style.color=compareMode?'#000':'';
   $('cmpWrap').classList.toggle('on',compareMode);
   if(compareMode)renderCompare();
 };
-
 let cmpPos=0.5;
 $('cmpHandle').onmousedown=e=>{
   e.preventDefault();
@@ -368,19 +439,15 @@ $('cmpHandle').onmousedown=e=>{
   const onUp=()=>{document.removeEventListener('mousemove',onMove);document.removeEventListener('mouseup',onUp)};
   document.addEventListener('mousemove',onMove);document.addEventListener('mouseup',onUp);
 };
-
 function renderCompare(){
   if(!srcImg)return;
   const w=state.resolution,h=Math.round(w*0.6*(srcImg.height/srcImg.width));
   const fs=state.fontSize,cw=fs*.6,ch=fs;
   const ow=w*cw,oh=h*ch;
-  // Before: original image
   cmpBefore.width=ow;cmpBefore.height=oh;
   cbx.drawImage(srcImg,0,0,ow,oh);
-  // After: rendered
   cmpAfter.width=ow;cmpAfter.height=oh;
-  const renderCtx=cax;
-  doRender(renderCtx,ow,oh,w,h,fs,cw,ch);
+  doRender(cax,ow,oh,w,h,fs,cw,ch);
 }
 
 // ═══════════ CORE RENDER ═══════════
@@ -428,29 +495,29 @@ function doRender(ctx,ow,oh,w,h,fs,cw,ch){
 
   // Edge detection (Sobel)
   let edgeMap=null;
-  if(state.edgeEnhance>0){
+  if(state.edgeEnhance>0||state.style==='edge'||state.style==='contour'){
     edgeMap=new Float32Array(w*h);
     for(let y=1;y<h-1;y++)for(let x=1;x<w-1;x++){
       const i=(y*w+x)*4;const im1=(y*w+x-1)*4;const ip1=(y*w+x+1)*4;
       const ium1=((y-1)*w+x)*4;const iup1=((y+1)*w+x)*4;
       const gx=(pixels[ip1]-pixels[im1])*.5,gx2=(pixels[ip1+1]-pixels[im1+1])*.5,gx3=(pixels[ip1+2]-pixels[im1+2])*.5;
       const gy=(pixels[iup1]-pixels[ium1])*.5,gy2=(pixels[iup1+1]-pixels[ium1+1])*.5,gy3=(pixels[iup1+2]-pixels[ium1+2])*.5;
-      edgeMap[y*w+x]=Math.sqrt(gx*gx+gy*gy+gx2*gx2+gy2*gy2+gx3*gx3+gy3*gy3)/441; // max sqrt(3*255^2)
+      edgeMap[y*w+x]=Math.sqrt(gx*gx+gy*gy+gx2*gx2+gy2*gy2+gx3*gx3+gy3*gy3)/441;
     }
   }
 
   // Color mode function
+  function hexToRgb(h){return[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)]}
+  function lerp(a,b,t){return a+(b-a)*t}
+  function lerpColor(c1,c2,t){return[lerp(c1[0],c2[0],t),lerp(c1[1],c2[1],t),lerp(c1[2],c2[2],t)]}
+
   function applyColor(r,g,b){
     r/=255;g/=255;b/=255;
-    // Brightness/contrast
     r=r*state.contrast+(state.brightness-1)*.5;
     g=g*state.contrast+(state.brightness-1)*.5;
     b=b*state.contrast+(state.brightness-1)*.5;
-    // Saturation
     if(state.saturation!==1){const gray=(r+g+b)/3;r=gray+(r-gray)*state.saturation;g=gray+(g-gray)*state.saturation;b=gray+(b-gray)*state.saturation}
-    // Invert
     if(state.invert){r=1-r;g=1-g;b=1-b}
-    // Color mode
     switch(state.colorMode){
       case'grayscale':{const y=.299*r+.587*g+.114*b;return[y*255,y*255,y*255]}
       case'warm':{const y=.299*r+.587*g+.114*b;return[Math.min(255,y*300),Math.min(255,y*200),Math.min(255,y*100)]}
@@ -461,17 +528,64 @@ function doRender(ctx,ow,oh,w,h,fs,cw,ch){
         const pal=PALETTES.c64;const idx=Math.min(pal.length-1,Math.floor(y*pal.length));
         const hex=pal[idx];return[parseInt(hex.slice(1,3),16),parseInt(hex.slice(3,5),16),parseInt(hex.slice(5,7),16)];
       }
+      case'duotone':{
+        const y=.299*r+.587*g+.114*b;
+        const c1=hexToRgb(state.duoA),c2=hexToRgb(state.duoB);
+        return lerpColor(c1,c2,y);
+      }
+      case'vaporwave':{
+        const y=.299*r+.587*g+.114*b;
+        const v1=[255,100,180],v2=[80,200,255],v3=[180,80,255];
+        if(y<.33)return lerpColor(v1,v2,y/.33);
+        else return lerpColor(v2,v3,(y-.33)/.67);
+      }
+      case'pastel':{
+        const y=.299*r+.587*g+.114*b;
+        return[Math.min(255,160+y*95),Math.min(255,180+y*75),Math.min(255,200+y*55)];
+      }
       default:return[Math.max(0,Math.min(255,r*255)),Math.max(0,Math.min(255,g*255)),Math.max(0,Math.min(255,b*255))];
     }
   }
 
   function getBrightness(r,g,b){return Math.max(0,Math.min(1,(r/255+g/255+b/255)/3))}
-
   function getChar(b){
     if(b<0||b>1)return' ';
     const ramp=state.charRamp||' ';
     const idx=Math.floor(b*(ramp.length-1));
     return ramp[Math.max(0,Math.min(ramp.length-1,idx))];
+  }
+
+  // ═══ BRAILLE HELPER ═══
+  // Map 2x4 dot grid to Unicode braille (U+2800 to U+28FF)
+  function brailleChar(bits){
+    // bits: [0..7] where bit0=dot1, bit1=dot2, bit2=dot3, bit3=dot4, bit4=dot5, bit5=dot6, bit6=dot7, bit7=dot8
+    // Standard braille dot order: 1 4 / 2 5 / 3 6 / 7 8
+    // Unicode mapping: byte layout is bit0=dot1, bit1=dot2, bit2=dot3, bit3=dot7, bit4=dot4, bit5=dot5, bit6=dot6, bit7=dot8
+    // So we transpose: bits[0]→bit0, bits[1]→bit1, bits[2]→bit2, bits[4]→bit3, bits[5]→bit4, bits[6]→bit5, bits[3]→bit6, bits[7]→bit7
+    const unicode=(bits&0x07)|((bits>>1)&0x08)|((bits>>1)&0x10)|((bits<<3)&0x20)|((bits>>1)&0x40)|((bits>>1)&0x80)|((bits<<3)&0x100)|((bits<<3)&0x200);
+    // Simplified: just compute directly
+    let code=0x2800;
+    if(bits&1)code|=0x01;   // dot1
+    if(bits&2)code|=0x02;   // dot2
+    if(bits&4)code|=0x04;   // dot3
+    if(bits&8)code|=0x40;   // dot4
+    if(bits&16)code|=0x08;  // dot5
+    if(bits&32)code|=0x10;  // dot6
+    if(bits&64)code|=0x20;  // dot7
+    if(bits&128)code|=0x80; // dot8
+    return String.fromCodePoint(code);
+  }
+
+  // ═══ CONTOUR HELPER ═══
+  function isContourLine(gray,x,y,W,H){
+    // A pixel is a contour line if its brightness differs from neighbors beyond threshold
+    const b=gray[y*W+x];
+    const thresh=.08;
+    if(x>0&&Math.abs(gray[y*W+(x-1)]-b)>thresh)return true;
+    if(x<W-1&&Math.abs(gray[y*W+(x+1)]-b)>thresh)return true;
+    if(y>0&&Math.abs(gray[(y-1)*W+x]-b)>thresh)return true;
+    if(y<H-1&&Math.abs(gray[(y+1)*W+x]-b)>thresh)return true;
+    return false;
   }
 
   // ═══ RENDERERS ═══
@@ -492,7 +606,7 @@ function doRender(ctx,ow,oh,w,h,fs,cw,ch){
         const tl=getP(x,y),tr=getP(x+1,y),bl=getP(x,y+1),br=getP(x+1,y+1);
         const bt=(c)=>getBrightness(c[0],c[1],c[2])>.35;
         const btl=bt(tl),btr=bt(tr),bbl=bt(bl),bbr=bt(br);
-        let glyph=' ';const th=.35;
+        let glyph=' ';
         if(btl&&btr&&bbl&&bbr)glyph='█';
         else if(btl&&btr)glyph='▀';else if(bbl&&bbr)glyph='▄';
         else if(btl&&bbl)glyph='▌';else if(btr&&bbr)glyph='▐';
@@ -501,6 +615,42 @@ function doRender(ctx,ow,oh,w,h,fs,cw,ch){
         const avg=[Math.floor((tl[0]+tr[0]+bl[0]+br[0])/4),Math.floor((tl[1]+tr[1]+bl[1]+br[1])/4),Math.floor((tl[2]+tr[2]+bl[2]+br[2])/4)];
         ctx.fillStyle=`rgb(${avg[0]},${avg[1]},${avg[2]})`;
         ctx.fillText(glyph,x*cw,y*ch);
+      }
+    },
+    braille(){
+      // Process in 2x4 cell blocks for Braille dots
+      for(let cy=0;cy<h;cy+=4){
+        for(let cx=0;cx<w;cx+=2){
+          let bits=0;
+          for(let dy=0;dy<4;dy++){
+            for(let dx=0;dx<2;dx++){
+              const px=cx+dx,py=cy+dy;
+              if(px>=w||py>=h)continue;
+              const i=(py*w+px)*4;
+              const[r,g,b]=applyColor(pixels[i],pixels[i+1],pixels[i+2]);
+              const br=getBrightness(r,g,b);
+              if(br>.45){
+                // Braille dot numbering: left col top-to-bottom=1,2,3,7; right col top-to-bottom=4,5,6,8
+                const dotIdx=dx===0?[0,1,2,6][dy]:[3,4,5,7][dy];
+                bits|=(1<<dotIdx);
+              }
+            }
+          }
+          const ch=brailleChar(bits);
+          // Average color of the 2x4 cell
+          let sr=0,sg=0,sb=0,n=0;
+          for(let dy=0;dy<4;dy++)for(let dx=0;dx<2;dx++){
+            const px=cx+dx,py=cy+dy;
+            if(px>=w||py>=h)continue;
+            const i=(py*w+px)*4;
+            const[r,g,b]=applyColor(pixels[i],pixels[i+1],pixels[i+2]);
+            sr+=r;sg+=g;sb+=b;n++;
+          }
+          if(n>0){
+            ctx.fillStyle=`rgb(${Math.floor(sr/n)},${Math.floor(sg/n)},${Math.floor(sb/n)})`;
+            ctx.fillText(ch,cx*cw,cy*ch);
+          }
+        }
       }
     },
     pixel(){
@@ -577,22 +727,92 @@ function doRender(ctx,ow,oh,w,h,fs,cw,ch){
     },
     glitch(){
       R.chars.call(this);
-      const imgData=ctx.getImageData(0,0,pv.width,pv.height);
+      const imgData=ctx.getImageData(0,0,ctx.canvas.width,ctx.canvas.height);
       for(let s=0;s<6+Math.floor(state.edgeEnhance*4);s++){
-        const sy=Math.floor(Math.random()*pv.height);
-        const sh=Math.floor(Math.random()*pv.height*.12)+2;
-        const dx=Math.floor((Math.random()-.5)*pv.width*.25);
-        ctx.putImageData(imgData,dx,sy,0,sy,pv.width,sh);
+        const sy=Math.floor(Math.random()*ctx.canvas.height);
+        const sh=Math.floor(Math.random()*ctx.canvas.height*.12)+2;
+        const dx=Math.floor((Math.random()-.5)*ctx.canvas.width*.25);
+        ctx.putImageData(imgData,dx,sy,0,sy,ctx.canvas.width,sh);
       }
       for(let s=0;s<3;s++){
-        const sy=Math.floor(Math.random()*pv.height);
-        const sl=ctx.getImageData(0,sy,pv.width,1);
+        const sy=Math.floor(Math.random()*ctx.canvas.height);
+        const sl=ctx.getImageData(0,sy,ctx.canvas.width,1);
         for(let px=0;px<sl.data.length;px+=4){const shf=Math.floor(Math.random()*6-3);if(px+shf*4>=0&&px+shf*4<sl.data.length)sl.data[px]=sl.data[px+shf*4]||sl.data[px]}
         ctx.putImageData(sl,0,sy);
       }
     },
+    neon(){
+      // First render chars normally
+      for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+        const i=(y*w+x)*4;
+        const[r,g,b]=applyColor(pixels[i],pixels[i+1],pixels[i+2]);
+        let br=getBrightness(r,g,b);
+        if(edgeMap){br=Math.max(0,Math.min(1,br-edgeMap[y*w+x]*state.edgeEnhance))}
+        ctx.fillStyle=`rgb(${Math.floor(r)},${Math.floor(g)},${Math.floor(b)})`;
+        ctx.fillText(getChar(br),x*cw,y*ch);
+      }
+      // Apply glow: render to temp canvas, blur, composite back
+      const temp=document.createElement('canvas');temp.width=ctx.canvas.width;temp.height=ctx.canvas.height;
+      const tx=temp.getContext('2d');
+      tx.drawImage(ctx.canvas,0,0);
+      // Only glow bright areas
+      const glowCanvas=document.createElement('canvas');glowCanvas.width=ctx.canvas.width;glowCanvas.height=ctx.canvas.height;
+      const gx=glowCanvas.getContext('2d');
+      gx.filter='blur('+(fs*0.6)+'px)';gx.globalAlpha=0.5;
+      gx.drawImage(ctx.canvas,0,0);
+      gx.filter='none';gx.globalAlpha=1;
+      // Composite: original + glow
+      ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
+      ctx.drawImage(glowCanvas,0,0);
+      ctx.drawImage(temp,0,0);
+    },
+    heatmap(){
+      for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+        const i=(y*w+x)*4;
+        const br=getBrightness(pixels[i],pixels[i+1],pixels[i+2]);
+        // Temperature scale: black→blue→cyan→green→yellow→red→white
+        let r,g,b;
+        if(br<.16){r=0;g=0;b=Math.floor(br*4*255)}
+        else if(br<.33){const t=(br-.16)*6;r=0;g=Math.floor(t*255);b=255}
+        else if(br<.5){const t=(br-.33)*6;r=0;g=255;b=Math.floor((1-t)*255)}
+        else if(br<.66){const t=(br-.5)*6;r=Math.floor(t*255);g=255;b=0}
+        else if(br<.83){const t=(br-.66)*6;r=255;g=Math.floor((1-t)*255);b=0}
+        else{r=255;g=Math.floor((br-.83)*5*255);b=Math.floor((br-.83)*5*255)}
+        ctx.fillStyle=`rgb(${Math.floor(r)},${Math.floor(g)},${Math.floor(b)})`;
+        ctx.fillText(getChar(br),x*cw,y*ch);
+      }
+    },
+    contour(){
+      // Compute brightness map
+      const gray=new Float32Array(w*h);
+      for(let i=0;i<w*h;i++){
+        const[r,g,b]=applyColor(pixels[i*4],pixels[i*4+1],pixels[i*4+2]);
+        gray[i]=getBrightness(r,g,b);
+      }
+      // Band brightness into discrete levels
+      const levels=8;
+      for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+        const i=(y*w+x)*4;
+        let br=gray[y*w+x];
+        // Check if near a band boundary (contour line)
+        const band=Math.floor(br*levels)/levels;
+        const nextBand=Math.min(1,band+1/levels);
+        const nearBoundary=Math.abs(br-band)<.02||Math.abs(br-nextBand)<.02;
+        const isEdge=isContourLine(gray,x,y,w,h);
+        if(isEdge||nearBoundary){
+          ctx.fillStyle='rgba(255,255,255,0.9)';
+          const edgeChars='-/|\\\\_~·';
+          ctx.fillText(edgeChars[Math.floor(br*edgeChars.length)],x*cw,y*ch);
+        }else{
+          // Fill with band color
+          const[r,g,b]=applyColor(pixels[i],pixels[i+1],pixels[i+2]);
+          ctx.fillStyle=`rgba(${Math.floor(r*.3)},${Math.floor(g*.3)},${Math.floor(b*.3)},0.4)`;
+          ctx.fillText('·',x*cw,y*ch);
+        }
+      }
+    },
     edge(){
-      // Edge-only render: show edges as characters, fill area as transparent/dim
+      // Edge-only render
       const edgeData=new Float32Array(w*h);
       for(let y=1;y<h-1;y++)for(let x=1;x<w-1;x++){
         const i=(y*w+x)*4;
@@ -606,7 +826,7 @@ function doRender(ctx,ow,oh,w,h,fs,cw,ch){
         const br=getBrightness(r,g,b);
         const alpha=e>.08?1:.15;
         ctx.fillStyle=`rgba(${Math.floor(r)},${Math.floor(g)},${Math.floor(b)},${alpha})`;
-        const edgeChars='/#|\\-+*=@%';
+        const edgeChars='/#|\\\\-+*=@%';
         const ci=Math.floor(e*edgeChars.length);
         ctx.fillText(e>.08?edgeChars[Math.min(ci,edgeChars.length-1)]:getChar(br),x*cw,y*ch);
       }
@@ -623,13 +843,10 @@ function doRender(ctx,ow,oh,w,h,fs,cw,ch){
         }
         const R=Math.floor(sr/n),G=Math.floor(sg/n),B=Math.floor(sb/n);
         const px=bx*cw,py=by*ch,pw=bw*cw,ph=bh*ch;
-        // Top face (lighter)
         ctx.fillStyle=`rgb(${Math.min(255,R+40)},${Math.min(255,G+40)},${Math.min(255,B+40)})`;
         ctx.beginPath();ctx.moveTo(px,py+ph*.35);ctx.lineTo(px+pw*.35,py);ctx.lineTo(px+pw,py);ctx.lineTo(px+pw*.65,py+ph*.35);ctx.closePath();ctx.fill();
-        // Left face (darker)
         ctx.fillStyle=`rgb(${Math.max(0,R-30)},${Math.max(0,G-30)},${Math.max(0,B-30)})`;
         ctx.beginPath();ctx.moveTo(px,py+ph*.35);ctx.lineTo(px+pw*.65,py+ph*.35);ctx.lineTo(px+pw*.65,py+ph);ctx.lineTo(px,py+ph*.65);ctx.closePath();ctx.fill();
-        // Right face (base color)
         ctx.fillStyle=`rgb(${R},${G},${B})`;
         ctx.beginPath();ctx.moveTo(px+pw*.65,py+ph*.35);ctx.lineTo(px+pw,py);ctx.lineTo(px+pw,py+ph*.65);ctx.lineTo(px+pw*.65,py+ph);ctx.closePath();ctx.fill();
       }
@@ -640,7 +857,63 @@ function doRender(ctx,ow,oh,w,h,fs,cw,ch){
 
   // ═══ POST EFFECTS ═══
   const s=state;
-  // Sharpen — apply convolution to canvas
+
+  // Hue Rotate — use CSS filter on a temp canvas
+  if(s.hueRotate>0){
+    const temp=document.createElement('canvas');temp.width=ctx.canvas.width;temp.height=ctx.canvas.height;
+    const tx=temp.getContext('2d');tx.drawImage(ctx.canvas,0,0);
+    tx.filter=`hue-rotate(${s.hueRotate}deg)`;tx.drawImage(temp,0,0);
+    ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
+    ctx.drawImage(temp,0,0);
+  }
+
+  // Chromatic Aberration
+  if(s.chromaticAberration>0){
+    const cw=ctx.canvas.width,ch=ctx.canvas.height;
+    const original=ctx.getImageData(0,0,cw,ch);
+    const shifted=ctx.getImageData(0,0,cw,ch);
+    const od=original.data,sd=shifted.data;
+    // Shift red channel right, blue channel left
+    const shift=Math.floor(s.chromaticAberration);
+    for(let y=0;y<ch;y++)for(let x=0;x<cw;x++){
+      const i=(y*cw+x)*4;
+      // Red from shifted right
+      const rx=Math.min(cw-1,x+shift);
+      const ri=(y*cw+rx)*4;
+      sd[i]=od[ri];  // R from right
+      sd[i+1]=od[i+1];  // G stays
+      const bx=Math.max(0,x-shift);
+      const bi=(y*cw+bx)*4;
+      sd[i+2]=od[bi+2];  // B from left
+      sd[i+3]=255;
+    }
+    ctx.putImageData(shifted,0,0);
+  }
+
+  // Bloom — threshold-based glow
+  if(s.bloom>0){
+    const cw=ctx.canvas.width,ch=ctx.canvas.height;
+    // Extract bright areas
+    const bright=document.createElement('canvas');bright.width=cw;bright.height=ch;
+    const bx=bright.getContext('2d');
+    const imgData=ctx.getImageData(0,0,cw,ch);
+    const d=imgData.data;
+    const bd=bx.createImageData(cw,ch);
+    for(let i=0;i<d.length;i+=4){
+      const br=(d[i]+d[i+1]+d[i+2])/3;
+      if(br>128){
+        bd.data[i]=d[i];bd.data[i+1]=d[i+1];bd.data[i+2]=d[i+2];bd.data[i+3]=Math.min(255,(br-128)*2*s.bloom*2);
+      }else{bd.data[i]=0;bd.data[i+1]=0;bd.data[i+2]=0;bd.data[i+3]=0}
+    }
+    bx.putImageData(bd,0,0);
+    // Blur the bright areas
+    bx.filter=`blur(${Math.max(2,cw*.02)}px)`;bx.globalAlpha=s.bloom;
+    bx.drawImage(bright,0,0);
+    // Composite
+    ctx.drawImage(bright,0,0);
+  }
+
+  // Sharpen
   if(s.sharpen>0){
     const imgData=ctx.getImageData(0,0,ctx.canvas.width,ctx.canvas.height);
     const d=imgData.data,w=imgData.width,h=imgData.height;
@@ -656,11 +929,13 @@ function doRender(ctx,ow,oh,w,h,fs,cw,ch){
     }
     imgData.data.set(out);ctx.putImageData(imgData,0,0);
   }
+
   // Scanlines
   if(s.scanlines>0){
     ctx.fillStyle=`rgba(0,0,0,${s.scanlines})`;
     for(let y=0;y<ctx.canvas.height;y+=2)ctx.fillRect(0,y,ctx.canvas.width,1);
   }
+
   // Noise
   if(s.noise>0){
     const imgData=ctx.getImageData(0,0,ctx.canvas.width,ctx.canvas.height);
@@ -673,6 +948,7 @@ function doRender(ctx,ow,oh,w,h,fs,cw,ch){
     }
     ctx.putImageData(imgData,0,0);
   }
+
   // Vignette
   if(s.vignette>0){
     const cw=ctx.canvas.width,ch=ctx.canvas.height;
@@ -681,7 +957,8 @@ function doRender(ctx,ow,oh,w,h,fs,cw,ch){
     grad.addColorStop(0,'rgba(0,0,0,0)');grad.addColorStop(1,`rgba(0,0,0,${s.vignette*.8})`);
     ctx.fillStyle=grad;ctx.fillRect(0,0,cw,ch);
   }
-  // Threshold — posterize
+
+  // Threshold
   if(s.threshold>0){
     const imgData=ctx.getImageData(0,0,ctx.canvas.width,ctx.canvas.height);
     const d=imgData.data;
@@ -692,20 +969,54 @@ function doRender(ctx,ow,oh,w,h,fs,cw,ch){
     }
     ctx.putImageData(imgData,0,0);
   }
+
+  // Letterbox
+  if(s.letterbox>0){
+    const barH=Math.floor(ctx.canvas.height*s.letterbox);
+    ctx.fillStyle='#000';
+    ctx.fillRect(0,0,ctx.canvas.width,barH);
+    ctx.fillRect(0,ctx.canvas.height-barH,ctx.canvas.width,barH);
+  }
 }
 
 // ═══════════ EXPORT ═══════════
 $('expBtn').onclick=()=>{
   if(!srcImg){setStatus('Load image first');return}
   const fmt=$('expFmt').value;
+  const scale=+$('expSize').value;
   const mime=fmt==='JPG'?'image/jpeg':fmt==='WebP'?'image/webp':'image/png';
   const ext=fmt.toLowerCase();
-  const a=document.createElement('a');a.download=`ascii-arter.${ext}`;
-  a.href=pv.toDataURL(mime,fmt==='JPG'?.92:1);
-  a.click();setStatus(`Exported as ${fmt}!`);
+  if(scale===1){
+    const a=document.createElement('a');a.download=`ascii-arter.${ext}`;
+    a.href=pv.toDataURL(mime,fmt==='JPG'?.92:1);
+    a.click();setStatus(`Exported as ${fmt}!`);
+  }else{
+    // Scale up
+    const big=document.createElement('canvas');
+    big.width=pv.width*scale;big.height=pv.height*scale;
+    const bx=big.getContext('2d');
+    bx.imageSmoothingEnabled=false;
+    bx.drawImage(pv,0,0,big.width,big.height);
+    const a=document.createElement('a');a.download=`ascii-arter-${scale}x.${ext}`;
+    a.href=big.toDataURL(mime,fmt==='JPG'?.92:1);
+    a.click();setStatus(`Exported ${scale}× as ${fmt}!`);
+  }
 };
 
-// ═══════════ RECIPE ═══════════
+// ═══════════ COPY TO CLIPBOARD ═══════════
+$('copyBtn').onclick=async()=>{
+  if(!srcImg){setStatus('Load image first');return}
+  try{
+    const blob=await new Promise(r=>pv.toBlob(r,'image/png'));
+    await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
+    setStatus('Copied to clipboard! ✅');
+  }catch(e){
+    // Fallback: copy as text version
+    setStatus('Copy failed, use Export instead');
+  }
+};
+
+// ═══════════ SHARE LINK ═══════════
 $('recipeBtn').onclick=()=>{
   const recipe=btoa(JSON.stringify(state));
   const url=`${location.origin}${location.pathname}?r=${recipe}`;
@@ -715,14 +1026,24 @@ $('recipeBtn').onclick=()=>{
 $('recipeClose').onclick=()=>$('recipeModal').classList.remove('on');
 $('recipeCopy').onclick=()=>{
   navigator.clipboard.writeText($('recipeText').value);
-  setStatus('Recipe copied!');
+  setStatus('Link copied!');
 };
 
-// Load recipe from URL
+// ═══════════ URL RECIPE LOAD ═══════════
 const urlParams=new URLSearchParams(location.search);
 if(urlParams.has('r')){
   try{const loaded=JSON.parse(atob(urlParams.get('r')));Object.assign(state,loaded);syncDOM();setStatus('Recipe loaded!')}catch{}
 }
+
+// ═══════════ AUTO-LOAD RANDOM IMAGE ═══════════
+// Only load random image if no recipe was loaded (recipe loader handles its own image)
+if(!urlParams.has('r')){
+  // Pick a random images (mix of Picsum and Unsplash via picsum)
+  const randomSeed=Math.floor(Math.random()*1000);
+  $('spinner').style.display='flex';
+  loadImg(`https://picsum.photos/seed/${randomSeed}/800/500`);
+}
+// But if recipe loaded, don't override — user loads their own image
 
 // ═══════════ UTILS ═══════════
 function setStatus(m){$('status').textContent=m}
