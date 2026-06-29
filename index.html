@@ -142,6 +142,19 @@ input[type=text],.tx{width:100%;padding:4px 6px;background:var(--bg);border:1px 
     <div class="ctrl"><label>Color mode <span id="cmVal">Full</span></label><select class="sel" id="colorMode" style="width:100%"><option value="full">Full Color</option><option value="grayscale">Grayscale</option><option value="warm">Warm</option><option value="cool">Cool</option><option value="matrix">Matrix Green</option><option value="retro">Retro CGA</option><option value="duotone">Duotone</option><option value="vaporwave">Vaporwave</option><option value="pastel">Pastel</option></select></div>
     <div class="ctrl"><label>🌈 Duotone A</label><input type="color" id="duoA" value="#ff6b6b" style="width:100%;height:22px;border:none;background:var(--bg);cursor:pointer" onchange="state.duoA=this.value;render()"></div>
     <div class="ctrl"><label>🌈 Duotone B</label><input type="color" id="duoB" value="#4d96ff" style="width:100%;height:22px;border:none;background:var(--bg);cursor:pointer" onchange="state.duoB=this.value;render()"></div>
+    <div class="sec-label" style="margin-top:4px">Gradient</div>
+    <div class="ctrl"><label>Direction</label><select class="sel" id="gradDir" style="width:100%"><option value="horizontal">→ Horizontal</option><option value="vertical">↓ Vertical</option><option value="diagonal">↘ Diagonal</option><option value="radial">◎ Radial</option><option value="diamond">◇ Diamond</option></select></div>
+    <div class="ctrl"><label>Blend <span id="gradBlendVal">0.50</span></label><input type="range" id="gradBlend" min="0" max="1" step="0.05" value="0.5"></div>
+    <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:2px">
+      <span class="preset-chip" data-grad-preset="sunset" style="font-size:9px;padding:2px 6px"><span class="dot" style="background:#ff6b6b"></span>Sunset</span>
+      <span class="preset-chip" data-grad-preset="ocean" style="font-size:9px;padding:2px 6px"><span class="dot" style="background:#0077b6"></span>Ocean</span>
+      <span class="preset-chip" data-grad-preset="aurora" style="font-size:9px;padding:2px 6px"><span class="dot" style="background:#00f5d4"></span>Aurora</span>
+      <span class="preset-chip" data-grad-preset="neon" style="font-size:9px;padding:2px 6px"><span class="dot" style="background:#ff00ff"></span>Neon</span>
+      <span class="preset-chip" data-grad-preset="fire" style="font-size:9px;padding:2px 6px"><span class="dot" style="background:#ff9e00"></span>Fire</span>
+      <span class="preset-chip" data-grad-preset="cotton" style="font-size:9px;padding:2px 6px"><span class="dot" style="background:#ffc8dd"></span>Cotton</span>
+    </div>
+    <div class="ctrl"><label>🌊 Gradient A</label><input type="color" id="gradA" value="#ff6b6b" style="width:100%;height:22px;border:none;background:var(--bg);cursor:pointer" onchange="state.gradA=this.value;render()"></div>
+    <div class="ctrl"><label>🌊 Gradient B</label><input type="color" id="gradB" value="#4d96ff" style="width:100%;height:22px;border:none;background:var(--bg);cursor:pointer" onchange="state.gradB=this.value;render()"></div>
     <div class="ctrl"><label>Brightness <span id="brightnessVal">1.0</span></label><input type="range" id="brightness" min="0.2" max="3" step="0.05" value="1"></div>
     <div class="ctrl"><label>Contrast <span id="contrastVal">1.0</span></label><input type="range" id="contrast" min="0.2" max="4" step="0.05" value="1"></div>
     <div class="ctrl"><label>Saturation <span id="saturationVal">1.0</span></label><input type="range" id="saturation" min="0" max="3" step="0.05" value="1"></div>
@@ -167,7 +180,7 @@ input[type=text],.tx{width:100%;padding:4px 6px;background:var(--bg);border:1px 
 
     <div class="sec-label">Background</div>
     <select class="sel" id="bgMode" style="width:100%">
-      <option value="blur">Blurred Image</option><option value="black">Solid Black</option><option value="white">Solid White</option><option value="image">Original Image</option><option value="none">Transparent</option>
+      <option value="blur">Blurred Image</option><option value="black">Solid Black</option><option value="white">Solid White</option><option value="image">Original Image</option><option value="none">Transparent</option><option value="gradient">Gradient BG</option>
     </select>
     <div class="ctrl"><label>BG Opacity <span id="bgOpVal">90</span>%</label><input type="range" id="bgOpacity" min="0" max="100" value="90"></div>
   </aside>
@@ -204,6 +217,8 @@ const STYLES=[
   {id:'contour',name:'Contour',ic:'🗺',desc:'Brightness contour lines',new:true},
   {id:'edge',name:'Edge ASCII',ic:'◇',desc:'Sobel edges mapped to lines'},
   {id:'voxel',name:'Voxel',ic:'◆',desc:'Isometric cube shading'},
+  {id:'gradient',name:'Gradient',ic:'🌊',desc:'Gradient sweep across characters',new:true},
+  {id:'gradient2',name:'Gradient Blend',ic:'🎨',desc:'Image + gradient color blend',new:true},
 ];
 const C64=['#000','#fff','#880000','#aaffee','#cc44cc','#00cc55','#0000aa','#eeee77','#dd8855','#664400','#ff7777','#333','#777','#aaff66','#0088ff','#bbb'];
 const PALETTES={
@@ -218,6 +233,7 @@ let state={
   scanlines:0,noise:0,vignette:0,sharpen:0,threshold:0,
   bloom:0,chromaticAberration:0,letterbox:0,hueRotate:0,
   duoA:'#ff6b6b',duoB:'#4d96ff',
+  gradDir:'horizontal',gradBlend:0.5,gradA:'#ff6b6b',gradB:'#4d96ff',
 };
 let srcImg=null,srcVid=null,busy=false,compareMode=false;
 
@@ -290,17 +306,39 @@ $('colorMode').onchange=()=>{state.colorMode=$('colorMode').value;$('cmVal').tex
 $('bgMode').onchange=()=>{state.bgMode=$('bgMode').value;render()};
 $('bgOpacity').oninput=()=>{$('bgOpVal').textContent=$('bgOpacity').value;state.bgOpacity=+$('bgOpacity').value;render()};
 $('rampPreset').onchange=()=>{const v=$('rampPreset').value;if(v){state.charRamp=v;$('charRamp').value=v;render()}};
+$('gradDir').onchange=()=>{state.gradDir=$('gradDir').value;render()};
+$('gradBlend').oninput=()=>{state.gradBlend=+$('gradBlend').value;$('gradBlendVal').textContent=state.gradBlend.toFixed(2);render()};
+
+// Gradient preset chips
+const GRAD_PRESETS={
+  sunset:{gradA:'#ff6b6b',gradB:'#ffd93d'},
+  ocean:{gradA:'#0077b6',gradB:'#00b4d8'},
+  aurora:{gradA:'#00f5d4',gradB:'#7b2ff7'},
+  neon:{gradA:'#ff00ff',gradB:'#00ffff'},
+  fire:{gradA:'#ff9e00',gradB:'#ff0054'},
+  cotton:{gradA:'#ffc8dd',gradB:'#bde0fe'},
+};
+document.querySelectorAll('[data-grad-preset]').forEach(chip=>{
+  chip.onclick=()=>{
+    const p=GRAD_PRESETS[chip.dataset.gradPreset];
+    if(!p)return;
+    state.gradA=p.gradA;state.gradB=p.gradB;
+    $('gradA').value=p.gradA;$('gradB').value=p.gradB;
+    render();
+  };
+});
+
 
 // Post effects handlers
-['scanlines','noise','vignette','sharpen','threshold','bloom','chromaticAberration','letterbox','hueRotate'].forEach(id=>{
-  const labels={scanlines:'scanVal',noise:'noiseVal',vignette:'vigVal',sharpen:'sharpVal',threshold:'threshVal',bloom:'bloomVal',chromaticAberration:'chromaVal',letterbox:'lbVal',hueRotate:'hueVal'};
+['scanlines','noise','vignette','sharpen','threshold','bloom','chromaticAberration','letterbox','hueRotate','gradBlend'].forEach(id=>{
+  const labels={scanlines:'scanVal',noise:'noiseVal',vignette:'vigVal',sharpen:'sharpVal',threshold:'threshVal',bloom:'bloomVal',chromaticAberration:'chromaVal',letterbox:'lbVal',hueRotate:'hueVal',gradBlend:'gradBlendVal'};
   $(id).oninput=()=>{state[id]=+$(id).value;const v=state[id];const suffix=id==='hueRotate'?'°':id==='chromaticAberration'?'px':id==='letterbox'?'%':'';$(labels[id]).textContent=v>0?v.toFixed(2)+suffix:'off';render()};
 });
 
 // ═══════════ RANDOMIZE ═══════════
 const RAMP_PRESETS=['@%#*+=-:. ','█▓▒░ ','●○◐◑◒◓ ','▇▆▅▄▃▂▁ ','◆◇◈ ','MWNHEXSR#+=-:. ','╳╱╲ ','.:-+=*#%@','⣿⣾⣽⣻⢟⠿⠿⠿⠿ ','⠁⠂⠃⠄⠅⠆⠇⠈⠉⠊ '];
 const COLOR_MODES=['full','grayscale','warm','cool','matrix','retro','duotone','vaporwave','pastel'];
-const BG_MODES=['blur','black','white','image','none'];
+const BG_MODES=['blur','black','white','image','none','gradient'];
 $('randomBtn').onclick=()=>{
   const s=state;
   const styleIds=STYLES.map(x=>x.id);
@@ -327,6 +365,10 @@ $('randomBtn').onclick=()=>{
   s.hueRotate=Math.random()<0.5?Math.floor(Math.random()*360):0;
   s.duoA='#'+Math.floor(Math.random()*16777215).toString(16).padStart(6,'0');
   s.duoB='#'+Math.floor(Math.random()*16777215).toString(16).padStart(6,'0');
+  s.gradDir=['horizontal','vertical','diagonal','radial','diamond'][Math.floor(Math.random()*5)];
+  s.gradBlend=+(Math.random()).toFixed(2);
+  s.gradA='#'+Math.floor(Math.random()*16777215).toString(16).padStart(6,'0');
+  s.gradB='#'+Math.floor(Math.random()*16777215).toString(16).padStart(6,'0');
   syncDOM();
   render();
 };
@@ -355,6 +397,8 @@ function syncDOM(){
   $('letterbox').value=s.letterbox;$('lbVal').textContent=s.letterbox>0?(s.letterbox*100).toFixed(0)+'%':'off';
   $('hueRotate').value=s.hueRotate;$('hueVal').textContent=s.hueRotate>0?s.hueRotate+'°':'0°';
   $('duoA').value=s.duoA;$('duoB').value=s.duoB;
+  $('gradDir').value=s.gradDir;$('gradBlend').value=s.gradBlend;$('gradBlendVal').textContent=s.gradBlend.toFixed(2);
+  $('gradA').value=s.gradA;$('gradB').value=s.gradB;
   $('rampPreset').value='';
 }
 
@@ -481,6 +525,19 @@ function doRender(ctx,ow,oh,w,h,fs,cw,ch){
   // Background
   if(state.bgMode==='black'){ctx.fillStyle='#000';ctx.fillRect(0,0,ow,oh)}
   else if(state.bgMode==='white'){ctx.fillStyle='#fff';ctx.fillRect(0,0,ow,oh)}
+  else if(state.bgMode==='gradient'){
+    const ga=hexToRgb(state.gradA),gb=hexToRgb(state.gradB);
+    let grad;
+    switch(state.gradDir){
+      case'horizontal':grad=ctx.createLinearGradient(0,0,ow,0);break;
+      case'vertical':grad=ctx.createLinearGradient(0,0,0,oh);break;
+      case'diagonal':grad=ctx.createLinearGradient(0,0,ow,oh);break;
+      case'radial':grad=ctx.createRadialGradient(ow/2,oh/2,0,ow/2,oh/2,Math.max(ow,oh)*.7);break;
+      default:grad=ctx.createLinearGradient(0,0,ow,0);
+    }
+    grad.addColorStop(0,state.gradA);grad.addColorStop(1,state.gradB);
+    ctx.fillStyle=grad;ctx.fillRect(0,0,ow,oh);
+  }
   else if(state.bgMode==='image'){
     ctx.save();ctx.globalAlpha=state.bgOpacity/100;ctx.drawImage(srcImg,0,0,ow,oh);ctx.restore();
   }else if(state.bgMode==='blur'){
@@ -849,6 +906,62 @@ function doRender(ctx,ow,oh,w,h,fs,cw,ch){
         ctx.beginPath();ctx.moveTo(px,py+ph*.35);ctx.lineTo(px+pw*.65,py+ph*.35);ctx.lineTo(px+pw*.65,py+ph);ctx.lineTo(px,py+ph*.65);ctx.closePath();ctx.fill();
         ctx.fillStyle=`rgb(${R},${G},${B})`;
         ctx.beginPath();ctx.moveTo(px+pw*.65,py+ph*.35);ctx.lineTo(px+pw,py);ctx.lineTo(px+pw,py+ph*.65);ctx.lineTo(px+pw*.65,py+ph);ctx.closePath();ctx.fill();
+      }
+    },
+    gradient(){
+      // Get gradient colors
+      const ga=hexToRgb(state.gradA),gb=hexToRgb(state.gradB);
+      for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+        const i=(y*w+x)*4;
+        const br=getBrightness(pixels[i],pixels[i+1],pixels[i+2]);
+        // Compute gradient position t (0..1) based on direction
+        let t;
+        switch(state.gradDir){
+          case'horizontal':t=x/w;break;
+          case'vertical':t=y/h;break;
+          case'diagonal':t=(x/w+y/h)/2;break;
+          case'radial':{const dx=x/w-.5,dy=y/h*.6-.3;t=Math.sqrt(dx*dx+dy*dy)*1.5;break;}
+          case'diamond':{const dx2=Math.abs(x/w-.5),dy2=Math.abs(y/h-.5);t=dx2+dy2;break;}
+          default:t=x/w;
+        }
+        t=Math.max(0,Math.min(1,t));
+        // Lerp between gradient colors
+        const gr=Math.floor(ga[0]+(gb[0]-ga[0])*t);
+        const gg=Math.floor(ga[1]+(gb[1]-ga[1])*t);
+        const gb2=Math.floor(ga[2]+(gb[2]-ga[2])*t);
+        ctx.fillStyle=`rgb(${gr},${gg},${gb2})`;
+        const c=getChar(br);
+        if(c!==' ')ctx.fillText(c,x*cw,y*ch);
+      }
+    },
+    gradient2(){
+      // Blend image color with gradient
+      const ga=hexToRgb(state.gradA),gb=hexToRgb(state.gradB);
+      for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+        const i=(y*w+x)*4;
+        const[ir,ig,ib]=applyColor(pixels[i],pixels[i+1],pixels[i+2]);
+        const br=getBrightness(ir,ig,ib);
+        let t;
+        switch(state.gradDir){
+          case'horizontal':t=x/w;break;
+          case'vertical':t=y/h;break;
+          case'diagonal':t=(x/w+y/h)/2;break;
+          case'radial':{const dx=x/w-.5,dy=y/h*.6-.3;t=Math.sqrt(dx*dx+dy*dy)*1.5;break;}
+          case'diamond':{const dx2=Math.abs(x/w-.5),dy2=Math.abs(y/h-.5);t=dx2+dy2;break;}
+          default:t=x/w;
+        }
+        t=Math.max(0,Math.min(1,t));
+        const gr=Math.floor(ga[0]+(gb[0]-ga[0])*t);
+        const gg=Math.floor(ga[1]+(gb[1]-ga[1])*t);
+        const gb2=Math.floor(ga[2]+(gb[2]-ga[2])*t);
+        // Blend: gradBlend controls mix (0=pure gradient, 1=pure image)
+        const b=state.gradBlend;
+        const fr=Math.floor(gr*(1-b)+ir*b);
+        const fg=Math.floor(gg*(1-b)+ig*b);
+        const fb=Math.floor(gb2*(1-b)+ib*b);
+        ctx.fillStyle=`rgb(${fr},${fg},${fb})`;
+        const c=getChar(br);
+        if(c!==' ')ctx.fillText(c,x*cw,y*ch);
       }
     },
   };
