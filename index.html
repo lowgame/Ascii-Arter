@@ -51,6 +51,31 @@ body{font-family:var(--ff);background:var(--bg);color:var(--text);height:100vh;o
 .side::-webkit-scrollbar{width:4px}
 .side::-webkit-scrollbar-thumb{background:#333;border-radius:2px}
 .sec-label{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--dim);margin-top:2px}
+/* collapsible sections */
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;padding:4px 0;cursor:pointer;user-select:none;border-bottom:1px solid transparent;transition:.15s}
+.sec-hdr:hover{border-bottom-color:var(--border)}
+.sec-hdr .sec-arrow{font-size:8px;transition:.2s;color:var(--dim)}
+.sec-hdr.open .sec-arrow{transform:rotate(90deg)}
+.sec-body{overflow:hidden;transition:max-height .3s;max-height:0}
+.sec-body.open{max-height:600px}
+/* bg gallery */
+.bg-gallery{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;margin:4px 0}
+.bg-thumb{aspect-ratio:1.5;border-radius:3px;cursor:pointer;border:1px solid var(--border);overflow:hidden;transition:.15s;position:relative}
+.bg-thumb:hover{border-color:var(--accent)}
+.bg-thumb img{width:100%;height:100%;object-fit:cover}
+.bg-thumb.active{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.bg-thumb .bg-label{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.7);font-size:7px;padding:1px 3px;color:var(--dim)}
+/* cinematic chips */
+.cine-chips{display:flex;gap:3px;flex-wrap:wrap;margin:3px 0}
+.cine-chip{padding:2px 8px;border:1px solid var(--border);border-radius:10px;cursor:pointer;font-size:9px;background:var(--bg);color:var(--text);transition:.15s;white-space:nowrap}
+.cine-chip:hover{border-color:var(--accent);color:#fff}
+.cine-chip.active{background:var(--accent);color:#000;border-color:var(--accent)}
+/* looks gallery */
+.looks-gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;margin:4px 0}
+.look-card{border-radius:4px;cursor:pointer;border:1px solid var(--border);overflow:hidden;transition:.15s}
+.look-card:hover{border-color:var(--accent)}
+.look-card canvas{width:100%;aspect-ratio:1.5;display:block;image-rendering:pixelated;background:#111}
+.look-card .look-name{font-size:8px;text-align:center;padding:2px;color:var(--dim)}
 /* style grid */
 .style-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px}
 .style-card{padding:6px 4px;border:1px solid var(--border);border-radius:5px;cursor:pointer;text-align:center;font-size:10px;transition:.15s;background:var(--bg);position:relative;overflow:hidden}
@@ -99,7 +124,8 @@ input[type=text],.tx{width:100%;padding:4px 6px;background:var(--bg);border:1px 
     <button class="bt" id="urlBtn">🔗 URL</button>
     <button class="bt" id="pasteBtn">📋 Paste</button>
     <button class="bt" id="demoBtn">🎲 Demo</button>
-    <button class="bt bt1" id="randomBtn" title="Randomize all settings!">🎰 Randomize</button>
+    <button class="bt" id="shuffleBtn" title="Shuffle within current style">🔀 Shuffle</button>
+    <button class="bt bt1" id="remixBtn" title="Full remix — new style + settings">🎰 Remix</button>
     <span class="sep"></span>
     <select class="sel" id="expSize"><option value="1">1×</option><option value="2">2×</option><option value="3">3×</option><option value="4">4×</option></select>
     <select class="sel" id="expFmt"><option>PNG</option><option>JPG</option><option>WebP</option></select>
@@ -135,10 +161,35 @@ input[type=text],.tx{width:100%;padding:4px 6px;background:var(--bg);border:1px 
   </div>
 
   <aside class="side">
-    <div class="sec-label">Style</div>
-    <div class="style-grid" id="styleGrid"></div>
+    <!-- BACKGROUND GALLERY -->
+    <div class="sec-hdr open" data-section="bg"><span class="sec-label">🖼️ BACKGROUNDS</span><span class="sec-arrow">▶</span></div>
+    <div class="sec-body open" id="secBg">
+      <div class="bg-gallery" id="bgGallery"></div>
+    </div>
 
-    <div class="sec-label">Color</div>
+    <!-- STYLE -->
+    <div class="sec-hdr open" data-section="style"><span class="sec-label">🎨 STYLE</span><span class="sec-arrow">▶</span></div>
+    <div class="sec-body open" id="secStyle">
+    <div class="style-grid" id="styleGrid"></div>
+    </div>
+
+    <!-- CINEMATIC -->
+    <div class="sec-hdr open" data-section="cine"><span class="sec-label">🎬 CINEMATIC</span><span class="sec-arrow">▶</span></div>
+    <div class="sec-body open" id="secCine">
+      <div class="cine-chips" id="cineChips">
+        <span class="cine-chip" data-cine="">None</span>
+        <span class="cine-chip" data-cine="cinematic">Cinematic</span>
+        <span class="cine-chip" data-cine="golden">Golden Hour</span>
+        <span class="cine-chip" data-cine="noir">Noir</span>
+        <span class="cine-chip" data-cine="dreamy">Dreamy</span>
+        <span class="cine-chip" data-cine="neon">Neon</span>
+        <span class="cine-chip" data-cine="dusted">Dusted</span>
+      </div>
+    </div>
+
+    <!-- COLOR -->
+    <div class="sec-hdr open" data-section="color"><span class="sec-label">🌈 COLOR</span><span class="sec-arrow">▶</span></div>
+    <div class="sec-body open" id="secColor">
     <div class="ctrl"><label>Color mode <span id="cmVal">Full</span></label><select class="sel" id="colorMode" style="width:100%"><option value="full">Full Color</option><option value="grayscale">Grayscale</option><option value="warm">Warm</option><option value="cool">Cool</option><option value="matrix">Matrix Green</option><option value="retro">Retro CGA</option><option value="duotone">Duotone</option><option value="vaporwave">Vaporwave</option><option value="pastel">Pastel</option></select></div>
     <div class="ctrl"><label>🌈 Duotone A</label><input type="color" id="duoA" value="#ff6b6b" style="width:100%;height:22px;border:none;background:var(--bg);cursor:pointer" onchange="state.duoA=this.value;render()"></div>
     <div class="ctrl"><label>🌈 Duotone B</label><input type="color" id="duoB" value="#4d96ff" style="width:100%;height:22px;border:none;background:var(--bg);cursor:pointer" onchange="state.duoB=this.value;render()"></div>
@@ -161,14 +212,38 @@ input[type=text],.tx{width:100%;padding:4px 6px;background:var(--bg);border:1px 
     <div class="ctrl"><label>Hue Rotate <span id="hueVal">0°</span></label><input type="range" id="hueRotate" min="0" max="360" step="5" value="0"></div>
     <div class="ctrl"><label>Invert <input type="checkbox" id="invert" style="margin-left:4px"></label></div>
 
-    <div class="sec-label">Characters</div>
+    </div><!-- /secColor -->
+
+    <!-- TONE -->
+    <div class="sec-hdr" data-section="tone"><span class="sec-label">🎚️ TONE</span><span class="sec-arrow">▶</span></div>
+    <div class="sec-body" id="secTone">
+    <div class="ctrl"><label>Sepia <span id="sepiaVal">0%</span></label><input type="range" id="sepia" min="0" max="100" step="5" value="0"></div>
+    <div class="ctrl"><label>Blur <span id="blurVal">0px</span></label><input type="range" id="blur" min="0" max="20" step="0.5" value="0"></div>
+    <div class="ctrl"><label>Opacity <span id="opacityVal">100%</span></label><input type="range" id="opacity" min="10" max="100" step="5" value="100"></div>
+    </div>
+
+    <!-- DISTORT -->
+    <div class="sec-hdr" data-section="distort"><span class="sec-label">🌀 DISTORT</span><span class="sec-arrow">▶</span></div>
+    <div class="sec-body" id="secDistort">
+    <div class="ctrl"><label>Pixelate <span id="pixelateVal">off</span></label><input type="range" id="pixelate" min="0" max="30" step="1" value="0"></div>
+    <div class="ctrl"><label>Shift <span id="shiftVal">off</span></label><input type="range" id="shift" min="0" max="30" step="1" value="0"></div>
+    <div class="ctrl"><label>Grain <span id="grainVal">off</span></label><input type="range" id="grain" min="0" max="0.3" step="0.01" value="0"></div>
+    </div>
+
+    <!-- CHARACTERS -->
+    <div class="sec-hdr open" data-section="chars"><span class="sec-label">🔤 CHARACTERS</span><span class="sec-arrow">▶</span></div>
+    <div class="sec-body open" id="secChars">
     <div class="ctrl"><label>Resolution <span id="resolutionVal">150</span></label><input type="range" id="resolution" min="30" max="400" step="10" value="150"></div>
     <div class="ctrl"><label>Font Size <span id="fontSizeVal">9</span></label><input type="range" id="fontSize" min="5" max="20" step="1" value="9"></div>
     <div class="ctrl"><label>Ramp</label><input type="text" class="tx" id="charRamp" value="@%#*+=-:. "></div>
     <div class="ctrl"><label>Edge enhance <span id="eeVal">off</span></label><input type="range" id="edgeEnhance" min="0" max="2" step="0.05" value="0"></div>
     <div class="ctrl"><label>Ramp presets</label><select class="sel" id="rampPreset" style="width:100%"><option value="">Custom</option><option value="@%#*+=-:. ">Standard 10</option><option value="█▓▒░ ">Blocks</option><option value="●○◐◑◒◓ ">Dots</option><option value="▇▆▅▄▃▂▁ ">Bars</option><option value="◆◇◈ ">Diamonds</option><option value="MWNHEXSR#+=-:. ">Extended 14</option><option value="╳╱╲ ">Lines</option></select></div>
 
-    <div class="sec-label">Post Effects</div>
+    </div><!-- /secChars -->
+
+    <!-- POST EFFECTS -->
+    <div class="sec-hdr" data-section="fx"><span class="sec-label">✨ EFFECTS</span><span class="sec-arrow">▶</span></div>
+    <div class="sec-body" id="secFx">
     <div class="ctrl"><label>Scanlines <span id="scanVal">off</span></label><input type="range" id="scanlines" min="0" max="1" step="0.05" value="0"></div>
     <div class="ctrl"><label>Noise grain <span id="noiseVal">off</span></label><input type="range" id="noise" min="0" max="0.3" step="0.01" value="0"></div>
     <div class="ctrl"><label>Vignette <span id="vigVal">off</span></label><input type="range" id="vignette" min="0" max="1" step="0.05" value="0"></div>
@@ -178,11 +253,16 @@ input[type=text],.tx{width:100%;padding:4px 6px;background:var(--bg);border:1px 
     <div class="ctrl"><label>Chromatic Ab. <span id="chromaVal">off</span></label><input type="range" id="chromaticAberration" min="0" max="8" step="0.5" value="0"></div>
     <div class="ctrl"><label>Letterbox <span id="lbVal">off</span></label><input type="range" id="letterbox" min="0" max="0.2" step="0.01" value="0"></div>
 
-    <div class="sec-label">Background</div>
+    </div><!-- /secFx -->
+
+    <!-- BACKGROUND -->
+    <div class="sec-hdr open" data-section="bgsection"><span class="sec-label">🖼️ BACKGROUND</span><span class="sec-arrow">▶</span></div>
+    <div class="sec-body open" id="secBgSection">
     <select class="sel" id="bgMode" style="width:100%">
       <option value="blur">Blurred Image</option><option value="black">Solid Black</option><option value="white">Solid White</option><option value="image">Original Image</option><option value="none">Transparent</option><option value="gradient">Gradient BG</option>
     </select>
     <div class="ctrl"><label>BG Opacity <span id="bgOpVal">90</span>%</label><input type="range" id="bgOpacity" min="0" max="100" value="90"></div>
+    </div><!-- /secBgSection -->
   </aside>
 </div>
 
@@ -219,6 +299,10 @@ const STYLES=[
   {id:'voxel',name:'Voxel',ic:'◆',desc:'Isometric cube shading'},
   {id:'gradient',name:'Gradient',ic:'🌊',desc:'Gradient sweep across characters',new:true},
   {id:'gradient2',name:'Gradient Blend',ic:'🎨',desc:'Image + gradient color blend',new:true},
+  {id:'lattice',name:'Lattice',ic:'🔷',desc:'Geometric lattice pattern',new:true},
+  {id:'jp',name:'Japanese',ic:'あ',desc:'Japanese kana characters',new:true},
+  {id:'numeric',name:'Numeric',ic:'7',desc:'Numeric digit characters',new:true},
+  {id:'bayer',name:'Bayer Dither',ic:'⊞',desc:'Ordered Bayer matrix dither',new:true},
 ];
 const C64=['#000','#fff','#880000','#aaffee','#cc44cc','#00cc55','#0000aa','#eeee77','#dd8855','#664400','#ff7777','#333','#777','#aaff66','#0088ff','#bbb'];
 const PALETTES={
@@ -234,6 +318,7 @@ let state={
   bloom:0,chromaticAberration:0,letterbox:0,hueRotate:0,
   duoA:'#ff6b6b',duoB:'#4d96ff',
   gradDir:'horizontal',gradBlend:0.5,gradA:'#ff6b6b',gradB:'#4d96ff',
+  sepia:0,blur:0,opacity:100,pixelate:0,grain:0,shift:0,cinematic:'',
 };
 let srcImg=null,srcVid=null,busy=false,compareMode=false;
 
@@ -243,6 +328,78 @@ const cmpBefore=$('cmpBefore'),cmpAfter=$('cmpAfter');
 const cbx=cmpBefore.getContext('2d'),cax=cmpAfter.getContext('2d');
 
 // ═══════════ STYLE GRID ═══════════
+// Collapsible sections
+document.querySelectorAll('.sec-hdr').forEach(hdr=>{
+  hdr.onclick=()=>{
+    hdr.classList.toggle('open');
+    const body=document.getElementById('sec'+hdr.dataset.section.charAt(0).toUpperCase()+hdr.dataset.section.slice(1));
+    if(body)body.classList.toggle('open');
+    // Fix: map all section ids
+    const map={bg:'secBg',style:'secStyle',cine:'secCine',color:'secColor',tone:'secTone',distort:'secDistort',chars:'secChars',fx:'secFx',bgsection:'secBgSection'};
+    const target=document.getElementById(map[hdr.dataset.section]);
+    if(target)target.classList.toggle('open');
+  };
+});
+
+// Background image gallery
+const BG_IMAGES=[
+  {url:'https://picsum.photos/seed/mountain/300/200',label:'Mountain'},
+  {url:'https://picsum.photos/seed/ocean/300/200',label:'Ocean'},
+  {url:'https://picsum.photos/seed/city/300/200',label:'City'},
+  {url:'https://picsum.photos/seed/forest/300/200',label:'Forest'},
+  {url:'https://picsum.photos/seed/desert/300/200',label:'Desert'},
+  {url:'https://picsum.photos/seed/night/300/200',label:'Night'},
+  {url:'https://picsum.photos/seed/sunset2/300/200',label:'Sunset'},
+  {url:'https://picsum.photos/seed/space/300/200',label:'Space'},
+];
+function buildBgGallery(){
+  let h='';
+  BG_IMAGES.forEach((bg,i)=>{
+    h+=`<div class="bg-thumb" data-bg="${i}" title="${bg.label}"><img src="${bg.url}" loading="lazy"><span class="bg-label">${bg.label}</span></div>`;
+  });
+  $('bgGallery').innerHTML=h;
+}
+buildBgGallery();
+$('bgGallery').onclick=e=>{
+  const thumb=e.target.closest('.bg-thumb');if(!thumb)return;
+  const idx=+thumb.dataset.bg;
+  document.querySelectorAll('.bg-thumb').forEach(t=>t.classList.remove('active'));
+  thumb.classList.add('active');
+  loadImg(BG_IMAGES[idx].url.replace('300/200','800/500'));
+  setStatus(`Background: ${BG_IMAGES[idx].label}`);
+};
+
+// Cinematic presets
+const CINE_PRESETS={
+  cinematic:{brightness:1.1,contrast:1.4,saturation:1.2,sepia:15,vignette:0.25,grain:0.04,blur:0},
+  golden:{brightness:1.2,contrast:1.1,saturation:1.5,sepia:30,vignette:0.2,hueRotate:15,blur:0},
+  noir:{brightness:0.7,contrast:2.0,saturation:0,sepia:0,vignette:0.5,grain:0.1,blur:0},
+  dreamy:{brightness:1.2,contrast:0.8,saturation:0.9,blur:4,bloom:0.3,vignette:0.15,sepia:10},
+  neon:{brightness:1.1,contrast:1.6,saturation:2.0,hueRotate:280,bloom:0.4,blur:0},
+  dusted:{brightness:0.9,contrast:1.2,saturation:0.7,sepia:40,grain:0.08,vignette:0.3},
+};
+$('cineChips').onclick=e=>{
+  const chip=e.target.closest('.cine-chip');if(!chip)return;
+  document.querySelectorAll('.cine-chip').forEach(c=>c.classList.remove('active'));
+  chip.classList.add('active');
+  const preset=CINE_PRESETS[chip.dataset.cine];
+  if(preset){Object.assign(state,preset);state.cinematic=chip.dataset.cine}
+  else{state.cinematic='';state.sepia=0;state.blur=0;state.bloom=0;state.vignette=0;state.grain=0;state.hueRotate=0}
+  syncDOM();render();
+};
+
+// Shuffle — randomize within current style (keep style, randomize everything else)
+$('shuffleBtn').onclick=()=>{
+  const keepStyle=state.style;
+  $('remixBtn').onclick();  // full randomize
+  state.style=keepStyle;
+  document.querySelectorAll('.style-card').forEach(x=>x.classList.toggle('active',x.dataset.style===keepStyle));
+  render();
+};
+
+// Rename old randomBtn reference — now it's remixBtn
+// (the old $('randomBtn') reference will be handled by the new Remix button)
+
 function buildStyleGrid(){
   let h='';
   for(const s of STYLES){
@@ -329,6 +486,14 @@ document.querySelectorAll('[data-grad-preset]').forEach(chip=>{
 });
 
 
+// Tone & Distort handlers
+$('sepia').oninput=()=>{state.sepia=+$('sepia').value;$('sepiaVal').textContent=state.sepia+'%';render()};
+$('blur').oninput=()=>{state.blur=+$('blur').value;$('blurVal').textContent=state.blur>0?state.blur+'px':'0px';render()};
+$('opacity').oninput=()=>{state.opacity=+$('opacity').value;$('opacityVal').textContent=state.opacity+'%';render()};
+$('pixelate').oninput=()=>{state.pixelate=+$('pixelate').value;$('pixelateVal').textContent=state.pixelate>0?state.pixelate+'px':'off';render()};
+$('shift').oninput=()=>{state.shift=+$('shift').value;$('shiftVal').textContent=state.shift>0?state.shift+'px':'off';render()};
+$('grain').oninput=()=>{state.grain=+$('grain').value;$('grainVal').textContent=state.grain>0?state.grain.toFixed(2):'off';render()};
+
 // Post effects handlers
 ['scanlines','noise','vignette','sharpen','threshold','bloom','chromaticAberration','letterbox','hueRotate','gradBlend'].forEach(id=>{
   const labels={scanlines:'scanVal',noise:'noiseVal',vignette:'vigVal',sharpen:'sharpVal',threshold:'threshVal',bloom:'bloomVal',chromaticAberration:'chromaVal',letterbox:'lbVal',hueRotate:'hueVal',gradBlend:'gradBlendVal'};
@@ -339,7 +504,7 @@ document.querySelectorAll('[data-grad-preset]').forEach(chip=>{
 const RAMP_PRESETS=['@%#*+=-:. ','█▓▒░ ','●○◐◑◒◓ ','▇▆▅▄▃▂▁ ','◆◇◈ ','MWNHEXSR#+=-:. ','╳╱╲ ','.:-+=*#%@','⣿⣾⣽⣻⢟⠿⠿⠿⠿ ','⠁⠂⠃⠄⠅⠆⠇⠈⠉⠊ '];
 const COLOR_MODES=['full','grayscale','warm','cool','matrix','retro','duotone','vaporwave','pastel'];
 const BG_MODES=['blur','black','white','image','none','gradient'];
-$('randomBtn').onclick=()=>{
+$('remixBtn').onclick=()=>{
   const s=state;
   const styleIds=STYLES.map(x=>x.id);
   s.style=styleIds[Math.floor(Math.random()*styleIds.length)];
@@ -409,11 +574,18 @@ function syncDOM(){
   $('duoA').value=s.duoA;$('duoB').value=s.duoB;
   $('gradDir').value=s.gradDir;$('gradBlend').value=s.gradBlend;$('gradBlendVal').textContent=s.gradBlend.toFixed(2);
   $('gradA').value=s.gradA;$('gradB').value=s.gradB;
+  $('sepia').value=s.sepia;$('sepiaVal').textContent=s.sepia+'%';
+  $('blur').value=s.blur;$('blurVal').textContent=s.blur>0?s.blur+'px':'0px';
+  $('opacity').value=s.opacity;$('opacityVal').textContent=s.opacity+'%';
+  $('pixelate').value=s.pixelate;$('pixelateVal').textContent=s.pixelate>0?s.pixelate+'px':'off';
+  $('shift').value=s.shift;$('shiftVal').textContent=s.shift>0?s.shift+'px':'off';
+  $('grain').value=s.grain;$('grainVal').textContent=s.grain>0?s.grain.toFixed(2):'off';
+  document.querySelectorAll('.cine-chip').forEach(c=>c.classList.toggle('active',c.dataset.cine===s.cinematic));
   $('rampPreset').value='';
 }
 
 // Expose state for debugging
-window.__state=state;window.__sync=syncDOM;window.__random=()=>$('randomBtn').onclick();
+window.__state=state;window.__sync=syncDOM;window.__random=()=>$('remixBtn').onclick();
 
 // ═══════════ IMAGE LOADING ═══════════
 function loadImg(src){
@@ -918,6 +1090,78 @@ function doRender(ctx,ow,oh,w,h,fs,cw,ch){
         ctx.beginPath();ctx.moveTo(px+pw*.65,py+ph*.35);ctx.lineTo(px+pw,py);ctx.lineTo(px+pw,py+ph*.65);ctx.lineTo(px+pw*.65,py+ph);ctx.closePath();ctx.fill();
       }
     },
+    lattice(){
+      // Geometric lattice: draw connected dots/lines at grid intersections
+      const gap=Math.max(2,Math.floor(cw*.7));
+      const r=gap*.35;
+      for(let y=0;y<h;y+=Math.max(1,Math.floor(gap/ch*2))){
+        for(let x=0;x<w;x+=Math.max(1,Math.floor(gap/cw*2))){
+          const bx=Math.floor(x),by=Math.floor(y);
+          let sr=0,sg=0,sb=0,n=0;
+          const bw=Math.max(1,Math.floor(gap/cw)),bh=Math.max(1,Math.floor(gap/ch));
+          for(let dy=0;dy<bh&&by+dy<h;dy++)for(let dx=0;dx<bw&&bx+dx<w;dx++){
+            const j=((by+dy)*w+(bx+dx))*4;
+            const[r,g,b]=applyColor(pixels[j],pixels[j+1],pixels[j+2]);
+            sr+=r;sg+=g;sb+=b;n++;
+          }
+          if(n===0)continue;
+          const px=bx*cw,py=by*ch;
+          const R=Math.floor(sr/n),G=Math.floor(sg/n),B=Math.floor(sb/n);
+          // Draw node
+          ctx.fillStyle=`rgb(${R},${G},${B})`;ctx.beginPath();ctx.arc(px+bw*cw/2,py+bh*ch/2,r*1.5,0,Math.PI*2);ctx.fill();
+          // Draw connections to right and down neighbors
+          ctx.strokeStyle=`rgba(${R},${G},${B},.5)`;ctx.lineWidth=1;
+          if(x+Math.floor(gap/cw)<w){ctx.beginPath();ctx.moveTo(px+bw*cw/2,py+bh*ch/2);ctx.lineTo(px+bw*cw+gap,py+bh*ch/2);ctx.stroke()}
+          if(y+Math.floor(gap/ch)<h){ctx.beginPath();ctx.moveTo(px+bw*cw/2,py+bh*ch/2);ctx.lineTo(px+bw*cw/2,py+bh*ch+gap);ctx.stroke()}
+        }
+      }
+    },
+    jp(){
+      // Japanese kana characters mapped to brightness
+      const kana='あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをんアイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+      for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+        const i=(y*w+x)*4;
+        const[r,g,b]=applyColor(pixels[i],pixels[i+1],pixels[i+2]);
+        const br=getBrightness(r,g,b);
+        const idx=Math.floor(br*(kana.length-1));
+        ctx.fillStyle=`rgb(${Math.floor(r)},${Math.floor(g)},${Math.floor(b)})`;
+        ctx.fillText(kana[idx],x*cw,y*ch);
+      }
+    },
+    numeric(){
+      const digits='0123456789';
+      for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+        const i=(y*w+x)*4;
+        const[r,g,b]=applyColor(pixels[i],pixels[i+1],pixels[i+2]);
+        const br=getBrightness(r,g,b);
+        const idx=Math.floor(br*(digits.length-1));
+        ctx.fillStyle=`rgb(${Math.floor(r)},${Math.floor(g)},${Math.floor(b)})`;
+        ctx.fillText(digits[idx],x*cw,y*ch);
+      }
+    },
+    bayer(){
+      // Bayer 8x8 ordered dither matrix
+      const B8=[
+        0,32,8,40,2,34,10,42,
+        48,16,56,24,50,18,58,26,
+        12,44,4,36,14,46,6,38,
+        60,28,52,20,62,30,54,22,
+        3,35,11,43,1,33,9,41,
+        51,19,59,27,49,17,57,25,
+        15,47,7,39,13,45,5,37,
+        63,31,55,23,61,29,53,21
+      ];
+      for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+        const i=(y*w+x)*4;
+        const[r,g,b]=applyColor(pixels[i],pixels[i+1],pixels[i+2]);
+        const br=getBrightness(r,g,b);
+        const threshold=(B8[(y%8)*8+(x%8)]+1)/65;
+        if(br>threshold+state.threshold*.3){
+          ctx.fillStyle=`rgb(${Math.floor(r)},${Math.floor(g)},${Math.floor(b)})`;
+          ctx.fillText(state.charRamp[0]||'█',x*cw,y*ch);
+        }
+      }
+    },
     gradient(){
       // Get gradient colors
       const ga=hexToRgb(state.gradA),gb=hexToRgb(state.gradB);
@@ -1099,6 +1343,73 @@ function doRender(ctx,ow,oh,w,h,fs,cw,ch){
     ctx.fillStyle='#000';
     ctx.fillRect(0,0,ctx.canvas.width,barH);
     ctx.fillRect(0,ctx.canvas.height-barH,ctx.canvas.width,barH);
+  }
+  // Sepia
+  if(s.sepia>0){
+    const imgData=ctx.getImageData(0,0,ctx.canvas.width,ctx.canvas.height);
+    const d=imgData.data;
+    for(let i=0;i<d.length;i+=4){
+      const r=d[i],g=d[i+1],b=d[i+2];
+      d[i]=Math.min(255,r*.393+g*.769+b*.189+s.sepia*2.55);
+      d[i+1]=Math.min(255,r*.349+g*.686+b*.168+s.sepia*1.5);
+      d[i+2]=Math.min(255,r*.272+g*.534+b*.131);
+    }
+    ctx.putImageData(imgData,0,0);
+  }
+  // Pixelate
+  if(s.pixelate>0){
+    const cw=ctx.canvas.width,ch=ctx.canvas.height;
+    const ps=Math.max(2,s.pixelate);
+    const temp=document.createElement('canvas');temp.width=cw;temp.height=ch;
+    const tx=temp.getContext('2d');
+    tx.imageSmoothingEnabled=false;
+    tx.drawImage(ctx.canvas,0,0,cw/ps,ch/ps);
+    ctx.imageSmoothingEnabled=false;
+    ctx.clearRect(0,0,cw,ch);
+    ctx.drawImage(temp,0,0,cw,ch);
+  }
+  // Shift/glitch horizontal slices
+  if(s.shift>0){
+    const cw=ctx.canvas.width,ch=ctx.canvas.height;
+    const temp=document.createElement('canvas');temp.width=cw;temp.height=ch;
+    const tx=temp.getContext('2d');tx.drawImage(ctx.canvas,0,0);
+    for(let sy=0;sy<ch;sy+=Math.floor(ch/12)+1){
+      const amount=Math.floor((Math.random()-.5)*s.shift*2);
+      if(amount!==0){
+        ctx.drawImage(temp,amount,sy,cw,Math.floor(ch/12)+1,0,sy,cw,Math.floor(ch/12)+1);
+      }
+    }
+  }
+  // Grain (different from noise — more film-like, luminance only)
+  if(s.grain>0){
+    const imgData=ctx.getImageData(0,0,ctx.canvas.width,ctx.canvas.height);
+    const d=imgData.data;
+    for(let i=0;i<d.length;i+=4){
+      const n=(Math.random()-.5)*s.grain*255;
+      const lum=.299*d[i]+.587*d[i+1]+.114*d[i+2];
+      d[i]=Math.max(0,Math.min(255,lum+n));
+      d[i+1]=Math.max(0,Math.min(255,lum+n));
+      d[i+2]=Math.max(0,Math.min(255,lum+n));
+    }
+    ctx.putImageData(imgData,0,0);
+  }
+  // Blur (CSS filter on temp canvas)
+  if(s.blur>0){
+    const temp=document.createElement('canvas');temp.width=ctx.canvas.width;temp.height=ctx.canvas.height;
+    const tx=temp.getContext('2d');tx.drawImage(ctx.canvas,0,0);
+    tx.filter=`blur(${s.blur}px)`;tx.drawImage(temp,0,0);
+    ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
+    ctx.drawImage(temp,0,0);
+  }
+  // Opacity — blend with background
+  if(s.opacity<100){
+    const imgData=ctx.getImageData(0,0,ctx.canvas.width,ctx.canvas.height);
+    const d=imgData.data;
+    const alpha=s.opacity/100;
+    for(let i=0;i<d.length;i+=4){
+      d[i+3]=Math.floor(d[i+3]*alpha);
+    }
+    ctx.putImageData(imgData,0,0);
   }
 }
 
