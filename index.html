@@ -332,12 +332,9 @@ const cbx=cmpBefore.getContext('2d'),cax=cmpAfter.getContext('2d');
 document.querySelectorAll('.sec-hdr').forEach(hdr=>{
   hdr.onclick=()=>{
     hdr.classList.toggle('open');
-    const body=document.getElementById('sec'+hdr.dataset.section.charAt(0).toUpperCase()+hdr.dataset.section.slice(1));
-    if(body)body.classList.toggle('open');
-    // Fix: map all section ids
     const map={bg:'secBg',style:'secStyle',cine:'secCine',color:'secColor',tone:'secTone',distort:'secDistort',chars:'secChars',fx:'secFx',bgsection:'secBgSection'};
-    const target=document.getElementById(map[hdr.dataset.section]);
-    if(target)target.classList.toggle('open');
+    const id=map[hdr.dataset.section];
+    if(id){const body=document.getElementById(id);if(body)body.classList.toggle('open');}
   };
 });
 
